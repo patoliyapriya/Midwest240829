@@ -1,0 +1,33 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-19-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right slds-m-around_xx-small">
+        <c-group-header group-wrapper={groupDetails}
+                        quoteid={quoteid}
+                        onaccordion={handleAccordianChange}
+                        ongrouptoggle={handleGroupToggle}
+                        ongroupnamechange={handleGroupNameChange}
+                        is-marrs={isMarrs}>
+        </c-group-header>
+        <template for:each={groupDetails.subGroupDetails} for:item="subGroupItem" lwc:if={groupDetails.isOpen}>
+            <div key={subGroupItem.subGroupId}>
+                <c-quote-sub-group sub-group-wrapper={subGroupItem}
+                                quote-details={quoteDetails} 
+                                group-wrapper={groupDetails}
+                                onallsubgroupchecked={handelAllsubGroupChecked}
+                                onmarrssubgroup={handleMarrsSubGroup}
+                                onaccordion={handleSubGroupAccordion}
+                                is-marrs={isMarrs}>
+                </c-quote-sub-group>
+            </div>
+        </template>
+        <c-group-footer group-wrapper={groupDetails}
+                        is-marrs={isMarrs}>
+        </c-group-footer>
+    </div>
+</template>

@@ -1,0 +1,17 @@
+<template>
+    <template if:true={submittedExpenseApproval}>
+        <lightning-card title="Submitted Expense Approval">
+            <lightning-datatable 
+                        key-field="id" 
+                        columns={columns} 
+                        data={submittedExpenseApproval} 
+                        class="noRowHover"
+                        hide-checkbox-column>
+            </lightning-datatable>
+        </lightning-card>
+    </template>
+
+    <template if:false={submittedExpenseApproval}>
+        <lightning-card style="font-weight: bold ;"><div style="padding-left: 2%;">{errorMessage}</div></lightning-card>
+    </template>
+</template>

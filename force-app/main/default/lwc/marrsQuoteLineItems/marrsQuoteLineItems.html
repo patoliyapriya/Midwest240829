@@ -1,0 +1,93 @@
+<template>
+    <template if:true={lineItemDetails}>
+        <template if:true={showDeleteModal}>
+            <c-delete-modal record-id={rowId} is-from="Line Item" onhidedeletemodal={handleHideDeleteModal}>
+            </c-delete-modal>
+        </template>
+        <div>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered"
+            aria-labelledby="element-with-table-label other-element-with-table-label">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">Details</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">Product Name</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">Description</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">Price</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText"></div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={lineItemDetails} for:item="lineItem">
+                    <tr key={lineItem.lineItemId} data-tr={lineItem.lineItemId} draggable="true" data-id={lineItem.lineItemId} ondragstart={handleDragStart} ondragover={handleDragOver} ondrop={handleDrop}>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="text" 
+                                            variant="label-hidden"
+                                            class="tableWidth"
+                                            data-name="tag"
+                                            data-id={lineItem.lineItemId}
+                                            value={lineItem.tag}
+                                            onfocusout={handleChange}>
+                            </lightning-input>
+                        </td>
+                        <td data-label="Product" class="thWidth wrapText">
+                            {lineItem.productName}
+                        </td>
+
+                        <td class="slds-cell-edit slds-cell_action-mode wrapText thWidth" role="gridcell">
+                            <lightning-formatted-rich-text value={lineItem.description}
+                                                        class="decriptionRow" 
+                                                        data-id={lineItem.lineItemId} 
+                                                        ondblclick={showRichTextModal}>
+                            </lightning-formatted-rich-text>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="number"
+                                        step="any"
+                                        variant="label-hidden"
+                                        value={lineItem.salePrice}
+                                        data-id={lineItem.lineItemId}
+                                        data-name="salePrice"
+                                        onfocusout={handleChange}
+                                        onchange={handleInputChange}>
+                            </lightning-input>
+                        </td>
+                        <td role="gridcell">
+                            <lightning-button-menu alternative-text="Show menu"
+                                        variant="border-filled"  
+                                        menu-alignment="right" 
+                                        icon-name="utility:down" 
+                                        class="slds-m-right_xx-small slds-float_right">
+                                <lightning-menu-item label="Clone" 
+                                        data-id={lineItem.lineItemId}
+                                        data-subgroupid={lineItem.subGroupId}
+                                        onclick={handleCloneLineItem}>
+                                </lightning-menu-item>
+                                <lightning-menu-item label="Delete"
+                                        data-id={lineItem.lineItemId} 
+                                        onclick={handleShowDeleteModal}>
+                                </lightning-menu-item>
+                            </lightning-button-menu>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        </div>
+    </template>
+    <template if:true={editDescription}>
+        <c-rich-text-modal onhidedeletemodal={hideRichTextModal}
+                        value={description}
+                        onsavedescription={handleDescriptionChange}>
+        </c-rich-text-modal>
+    </template>
+</template>

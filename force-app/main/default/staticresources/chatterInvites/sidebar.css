@@ -1,0 +1,42 @@
+body { margin: 0; background-color: #CFEEF8; }
+		
+		.uInvite {
+			float: left;
+			width: 100%;
+			margin: 0 0 5px 0;
+			font-family: Arial, Helvetica;
+			font-size: 12px;
+		}
+		
+		.uPhoto {
+			float:left; 
+			width: 16px; 
+			display:inline; 
+			height:100%;
+		}
+		
+		.uInviteBody {
+			float: left; 
+			margin-left: 5px;
+			width: 140px; 
+			display:inline;
+		}
+		
+		.uInviteBody a.name, .uInviteBody a.record {
+			text-decoration: none;
+			color: #015BA7;
+		}
+		
+		.uInviteBody a.name {
+			font-weight: bold;
+		}
+		
+		.uInviteBody a.name:hover, .uInviteBody a.record:hover {
+			text-decoration: underline;
+		}
+		
+		.ui-icon {
+			float: left;
+			margin-right: 2px;
+			cursor: pointer;
+		}

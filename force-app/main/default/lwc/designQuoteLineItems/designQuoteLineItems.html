@@ -1,0 +1,166 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-26-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered"
+            aria-labelledby="element-with-table-label other-element-with-table-label">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col">
+                        <div class="slds-truncate">SALES TYPE</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">TAG</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">PRODUCT NAME</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">PRODUCT CODE</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">DESCRIPTION</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">QTY</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">SALE PRICE</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">C/R</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">QTY</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">PRODUCT CODE</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText" >AMOUNT</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">LINE</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">PAGE BREAK</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={lineItemDetails} for:item="lineItem">
+                    <tr key={lineItem.lineItemId} data-tr={lineItem.lineItemId}>
+                        
+                    <td data-label="saleType" class=" wrapText">
+                            {lineItem.saleType}
+                    </td>
+
+                    <td data-label="Tag" class=" wrapText">
+                    {lineItem.tag}
+                    </td>
+
+                    <td data-label="Product" class=" wrapText ">
+                        {lineItem.productName}
+                    </td>
+
+                    <td data-label="Code" class="  wrapText">
+                        {lineItem.code}
+                    </td>
+
+                    <td class="slds-cell-edit slds-cell_action-mode wrapText " role="gridcell">
+                        <lightning-formatted-rich-text value={lineItem.description}
+                                                    class="decriptionRow" 
+                                                    data-row-id={lineItem.lineItemId} 
+                                                    ondblclick={showRichTextModal}>
+                        </lightning-formatted-rich-text>
+                    </td>
+                    
+                    <td data-label="Qunatity" class="wrapText ">
+                        {lineItem.quantity}
+                    </td>
+
+                    <td data-label="salePrice" class="wrapText ">
+                        {lineItem.salePrice}
+                    </td>
+
+                    <td data-label="C/R" class="wrapText ">
+                        {lineItem.cr}
+                    </td>
+
+                    <td data-label="toggleQuantity">
+                        <label class="slds-checkbox_toggle slds-grid ">
+                            <lightning-input type="toggle" 
+                                            data-name="hideQuantity" 
+                                            message-toggle-inactive="" 
+                                            message-toggle-active="" 
+                                            data-id={lineItem.lineItemId}
+                                            checked = {lineItem.hideQuantity}  
+                                            onchange={handleToggleChange}>
+                            </lightning-input> 
+                        </label>
+                    </td>
+
+                    <td data-label="toggleProductcode">
+                        <label class="slds-checkbox_toggle slds-grid ">
+                            <lightning-input type="toggle" 
+                                            data-name="hideCode" 
+                                            message-toggle-inactive="" 
+                                            message-toggle-active="" 
+                                            data-id={lineItem.lineItemId}
+                                            checked = {lineItem.hideCode}  
+                                            onchange={handleToggleChange}>
+                            </lightning-input>
+                        </label>
+                    </td>
+                
+                    <td data-label="toggleAmount">
+                        <label class="slds-checkbox_toggle slds-grid ">
+                            <lightning-input type="toggle" 
+                                            data-name="hidePricing"  
+                                            message-toggle-inactive="" 
+                                            message-toggle-active="" 
+                                            data-id={lineItem.lineItemId}
+                                            checked = {lineItem.hidePricing}  
+                                            onchange={handleToggleChange}>
+                            </lightning-input>
+                        </label>
+                    </td>
+
+                    <td data-label="toggleLine">
+                        <label class="slds-checkbox_toggle slds-grid ">
+                            <lightning-input type="toggle" 
+                                            data-name="hideLine" 
+                                            message-toggle-inactive="" 
+                                            message-toggle-active="" 
+                                            data-id={lineItem.lineItemId}
+                                            checked = {lineItem.hideLine}  
+                                            onchange={handleToggleChange}>
+                            </lightning-input>
+                        </label>
+                    </td>
+
+                    <td data-label="togglePageBreak">
+                        <label class="slds-checkbox_toggle slds-grid ">
+                            <lightning-input type="toggle" 
+                                            data-name="pageBreak" 
+                                            message-toggle-inactive="" 
+                                            message-toggle-active="" 
+                                            data-id={lineItem.lineItemId}
+                                            checked = {lineItem.pageBreak}  
+                                            onchange={handleToggleChange}>
+                            </lightning-input>
+                        </label>
+                    </td>
+
+                </tr>
+                </template>
+            </tbody>
+
+        </table>
+</div>
+</template>

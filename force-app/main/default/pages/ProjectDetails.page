@@ -1,0 +1,1106 @@
+<apex:page standardController="Project__c" extensions="ProjectDetailsController" id="pageId" sidebar="false">
+    <style>
+        .parentDisable{
+            position:fixed;
+            top:0;
+            left:0;
+            background:#000;
+            opacity:0.5; 
+            height:100%;
+            width:100%; 
+            z-index:100;
+        }
+        
+        .parentDisableWaiting{
+            position:fixed;
+            top:0;
+            left:0;
+            background:#000;
+            opacity:0.5; 
+            height:100%;
+            width:100%; 
+            z-index:120;
+        }
+
+        .dateFormat {
+            padding: 0 2px;
+            display: none;
+        }
+        
+        .button { 
+            background: url('{!$Resource.LoadingButton}') no-repeat left top; 
+            width:335px; 
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 45%;
+            left: 45%;
+            z-index:130;
+        }
+        
+        .circle {
+            
+            width:22px;
+            height:22px;
+            float:left;
+            margin-bottom:18px;
+            margin-top:18px;
+            margin-left: 55px;
+            z-index:130;
+        }
+                
+        .txt {
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+            font-size:13px;
+            color:#000000;
+            line-height:20px;
+            margin-left:15px;
+            margin-bottom:18px;
+            margin-top:18px;
+            width: 200px;
+            font-weight: bold;
+            float: left;
+            z-index:130;
+        }   
+        
+        .error {
+          border:3px solid red;
+        }
+        
+        .emailPopup{
+            width:500px;
+            position:absolute;
+            border: 0px;
+            top: 25%;
+            left: 25%;
+            z-index:110;
+        }
+        
+        div.tooltip {
+            float: left;
+        }
+        div.tooltip:hover {
+            background: #ffffff;
+            text-decoration: none;
+        } /*BG color is a must for IE6*/
+        div.tooltip span {
+            display: none;
+            padding: 2px 3px;
+            margin-left: 8px;
+        }
+        div.tooltip:hover span {
+            display: inline;
+            position: absolute;
+            border: 1px solid #cccccc;
+            background: #FFC;;
+            color: #000000;
+        }
+
+    </style>
+    
+    <script>
+        function selectAll(isFrom, comp, eleId) {
+            console.log('---');
+            var tblStageStatusId = 'pageId:formId:pbMainDetail:pbsStageStatus:pbStageStatus:rptStageStatusGroup:';
+
+            for(var i=0, iLen=-1; i>iLen; i++) {
+                var txtProductGroupName = document.getElementById(tblStageStatusId + i + ':txtProductGroupName');
+                console.log('--txtProductGroupName--'+txtProductGroupName);
+                if(txtProductGroupName == null) {
+                    break;
+                }
+                for(var j=0, jLen=-1; j>jLen; j++) {
+                    var txtProductSubGroupName = document.getElementById(tblStageStatusId + i + ':rptStageStatusSubGroup:' + j + ':txtProductSubGroupName');
+                    console.log('--txtProductSubGroupName--'+txtProductSubGroupName);
+                    if(txtProductSubGroupName == null) {
+                        break;
+                    }
+                    for(var k=0, kLen=-1; k>kLen; k++) {
+                        
+                        var txtProductName = document.getElementById(tblStageStatusId + i + ':rptStageStatusSubGroup:' + j + ':rptStageStatusProduct:' + k + ':txtProductName');
+                        console.log('--txtProductName--'+txtProductName);
+                        if(txtProductName == null) {
+                            break;
+                        }
+                        if(isFrom == 'HideLineOnEmail' || isFrom == 'IOMCompleted') {
+                            var checkBox = document.getElementById(tblStageStatusId + i + ':rptStageStatusSubGroup:' + j + ':rptStageStatusProduct:' + k + ':' + eleId);
+                            if(comp.checked){
+                                checkBox.checked = true;
+                            }
+                            else{
+                                checkBox.checked = false;
+                            }
+                        } else {
+                            var tblField = document.getElementById(tblStageStatusId + i + ':rptStageStatusSubGroup:' + j + ':rptStageStatusProduct:' + k + ':' + eleId);
+                            tblField.value = comp.value;
+                        }
+                        
+                    }
+                }
+            }
+        }
+        function openEmailPopup(){
+            
+            var divEmail = document.getElementById('divEmail');
+            divEmail.style.display = 'block';
+            return false;
+            
+        }
+        
+        function closeEmailPopup(){
+            
+            var divEmail = document.getElementById('divEmail');
+            divEmail.style.display = 'none';
+            return false;
+            
+        }
+        
+        function startSplash() {                        
+            var divObj = document.getElementById('divLoading');            
+            divObj.style.display='block';                                                   
+        }
+          
+        function endSplash() {              
+            document.getElementById('divLoading').style.display='none';                      
+        }
+        
+        function validateScheduleEmail(){
+            var isValidate = false;
+            
+            var lstScheduleTo = '{!lstSCheduleTo}';
+            
+            var txtScheduleOn = document.getElementById('pageId:formId:pbScheduleEmail:pbsScheduleEmail:txtScheduleOn');
+            var txtScheduleEndDate = document.getElementById('pageId:formId:pbScheduleEmail:pbsScheduleEmail:txtScheduleEndDate');
+
+            for(var i=0; i<lstScheduleTo.length; i++) {
+                
+                var scheduleToTypeId = 'pageId:formId:pbScheduleEmail:pbsScheduleEmail:repeatScheduleTo:'+ i +':pbsEmailPopupId:selectScheduleType';
+                var scheduleToContactId = 'pageId:formId:pbScheduleEmail:pbsScheduleEmail:repeatScheduleTo:'+ i +':pbsEmailPopupId:txtScheduleToContact_lkid';
+                var scheduleToUserId = 'pageId:formId:pbScheduleEmail:pbsScheduleEmail:repeatScheduleTo:'+ i +':pbsEmailPopupId:txtScheduleToUser_lkid';
+                
+                var txtScheduleToType = document.getElementById(scheduleToTypeId);
+                var lookupElement = null;
+
+                if(txtScheduleToType != null) {
+                    break;
+                }
+
+                if(txtScheduleToType.value == 'User') {
+                    lookupElement = document.getElementById(scheduleToUserId);
+                } else {
+                    lookupElement = document.getElementById(scheduleToContactId);
+                }
+
+                if(lookupElement != null) { 
+                    if(lookupElement.value == '000000000000000') {
+                        isValidate = true;
+                        break;
+                    }
+                }
+
+            }
+            
+            if(txtScheduleOn.value == null || txtScheduleOn.value == ''){
+                isValidate = true;
+            }
+            else if(txtScheduleEndDate.value == null || txtScheduleEndDate.value == ''){
+                isValidate = true;
+            }
+            
+            if(isValidate == true){
+                alert('Please enter required fields to Schedule an Email.');
+                return false;
+            }
+            else{
+                scheduleEmailActionFunction();
+            }
+            
+            return true;
+        }
+        
+        function updateToolTip(txtNote) {
+            var txtNoteToolTipId = txtNote.id.replace('txtNote', 'txtTooltip');
+            var txtNoteToolTip = document.getElementById(txtNoteToolTipId);
+
+            txtNoteToolTip.innerText = txtNote.value;
+            //return false;
+        }
+
+    </script>
+    
+    <apex:form id="formId">
+        <apex:actionRegion >
+            <apex:outputPanel id="pnlErrorMessage">
+                <apex:pageMessages />
+            </apex:outputPanel>
+            <div id="divLoading" style="display:none;">
+                <div class="parentDisableWaiting"></div>
+                <div class="button" id="splashDiv">
+                    <div class="circle"><apex:image value="{!$Resource.LoadingImage}"></apex:image></div>
+                    <div class="txt">Please Wait. Loading...</div>
+                </div>
+            </div>  
+            <table width="100%">
+                <tr>
+                    <td align="center">
+                        <apex:commandButton value="Quick Save" action="{!quicksave}" reRender="pnlFullScreen,maindetail,pnlErrorMessage" status="splashStatus" oncomplete="saveQuoteLineItemsAndReleaseManagement();"/>
+                    </td>
+                </tr>
+            </table>
+            <apex:tabPanel switchType="client" selectedTab="name2" id="theTabPanel">
+                <apex:tab label="Project Details" name="ProjectDetails" id="tabProjectDetails">
+                    <apex:outputPanel id="pnlFullScreen">
+                        <apex:actionFunction name="saveQuoteLineItemsAndReleaseManagement" action="{!saveQuoteLineItemsAndReleaseManagement}" reRender="formId" status="splashStatus"/>
+                        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+                        <apex:pageBlock mode="maindetail" id="pbMainDetail">
+                            <apex:pageBlockSection title="Project Details" collapsible="false">
+                                <apex:outputField value="{!Project__c.Name}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Project Owner</apex:outputLabel>
+                                    <apex:inputField value="{!Project__c.OwnerId}" />
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Opportunity"/>
+                                    <apex:outputLink value="/{!oppDetails.Id}" >{!oppDetails.Name}</apex:outputLink>
+                                </apex:pageBlockSectionItem>
+                                
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Purchaser</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Account.Name}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!oppDetails.Opportunity_Number__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >End User</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.End_User_Contact_Name__r.Name}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:inputField value="{!Project__c.Pay_Cycle__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >End User Address</apex:outputLabel>
+                                    <apex:outputText value="{!endUserAddress}"/>
+                                </apex:pageBlockSectionItem>
+                                
+                                <apex:inputField value="{!Project__c.Project_Number__c}"/>
+                                <apex:inputField value="{!Project__c.Invoice_Date__c}"/>
+                                <apex:inputField value="{!Project__c.Project_Stage__c}"/>
+                                <apex:inputField value="{!Project__c.ProjectShipDate__c}"/>
+                                <apex:inputField value="{!Project__c.PO_Number__c}"/>
+                            </apex:pageBlockSection>
+                            
+                            <apex:pageBlockSection title="Important Project Notes" columns="1">
+                                <apex:pageblockSectionItem >
+                                    <apex:outputtext >Purchaser Credit Limit</apex:outputtext>
+                                    <apex:outputField value="{!oppDetails.Account.Credit_Limit__c} "/> 
+                                </apex:pageblockSectionItem>
+                                <apex:pageblockSectionItem >
+                                    <apex:outputtext >Purchaser Accouting Notes</apex:outputtext>
+                                    <apex:outputField value="{!oppDetails.Account.Payment_and_Accounting_Notes__c} "/>
+                                </apex:pageblockSectionItem>
+                                
+                                
+                                <apex:inputTextarea value="{!Project__c.Notes_Details__c}" rows="8" cols="150"/>
+                            </apex:pageBlockSection>
+                            
+                            <apex:pageBlockSection title="Closed Won Project Financials">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Sell Price</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Total_Base_Bid_Total__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Buy/Resell Margin %</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Total_Buy_Resell_Margin_Percentage__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Extended Cost</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Total_Extended_Cost__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Project Margin %</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Total_Project_Margin_Percentage__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Commisions and Rebates</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Commissions_and_Rebates__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Data From Quote"/>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__c}" />
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Buy/Resell Margin $</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Total_Buy_Resell_Margin__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Data From Quote Number"/>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.QuoteNumber}" />
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Project Margin $</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Sync_Quote__r.Total_Project_Margin__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            
+                            <apex:pageBlockSection title="Active Project Financials">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Sell Price</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Total_Base_Bid_Total__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Buy/Resell Margin %</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Total_Buy_Resell_Margin_Percentage__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Extended Cost</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Total_Extended_Cost__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Project Margin %</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Total_Project_Margin_Percentage__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Commisions and Rebates</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Commissions_and_Rebates__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Data From Quote"/>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__c}" />
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Buy/Resell Margin $</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Total_Buy_Resell_Margin__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Data From Quote Number"/>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.QuoteNumber}" />
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Total Project Margin $</apex:outputLabel>
+                                    <apex:outputField value="{!oppDetails.Active_Financial_Quote__r.Total_Project_Margin__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            
+                            <apex:pageBlockSection columns="1" id="pbsStageStatus">
+                                 <apex:pageBlock title="Stage Status" id="pbStageStatus">
+                                    <apex:pageBlockButtons location="top">
+                                        <apex:commandButton value="Email" onclick="window.open('{!emailURL}');return false;" />
+                                        <apex:commandButton value="Schedule Email" onclick="return openEmailPopup();"/>
+                                        <apex:outputPanel rendered="{!currentProject.Schedule_On__c != null}" style="color:red !important; font-weight:bold;">
+                                            <apex:outputText >Email is scheduled on every {!currentProject.Schedule_On__c} till</apex:outputText> &nbsp;
+                                            <apex:outputText value="{0,date,MM/dd/yy}">
+                                                <apex:param value="{!currentProject.Schedule_End_Date__c}"/>
+                                            </apex:outputText> 
+                                            <apex:outputText > to &nbsp;
+                                                
+                                            </apex:outputText>
+                                            <apex:repeat value="{!lstScheduleTo}" var="schTo">
+                                                <apex:outputField value="{!schTo.Contact__c}" rendered="{!schTo.Schedule_Type__c == 'Contact'}"/> &nbsp;
+                                                <apex:outputField value="{!schTo.User__c}" rendered="{!schTo.Schedule_Type__c == 'User'}"/>
+                                            </apex:repeat>
+                                            
+                                        </apex:outputPanel>
+                                    </apex:pageBlockButtons> 
+                                    
+                                    <apex:pageBlockSection columns="1">
+                                        <apex:outputPanel >
+                                            <table>
+                                                <tr>
+                                                    <td colspan="4">Hide Columns for an Email</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Tag__c}"/> 
+                                                        <apex:outputText value="Tag"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Release__c}"/>
+                                                        <apex:outputText value="Release #"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Released_to_Mfgr__c}"/>
+                                                        <apex:outputText value="Released to Mfgr"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Act_Ship__c}"/>
+                                                        <apex:outputText value="Act. Ship"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_IOM_Done__c}"/> 
+                                                        <apex:outputText value="IOM Done"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Billing_Status__c}"/> 
+                                                        <apex:outputText value="Billing Status"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Date_of_Billing__c}"/> 
+                                                        <apex:outputText value="Date of Billing"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Payment_Received__c}"/> 
+                                                        <apex:outputText value="Payment Received"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!Project__c.Hide_Note__c}"/> 
+                                                        <apex:outputText value="Note"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSection>
+                                    <br/>
+                                    <table width="100%" border="1" cellspacing="0" cellpadding="3">
+                                        <tr style="background-color:#0B7EC7;">
+                                            <td style="color:white;" width="15%"><b>Product Group Name</b></td>
+                                            <td style="color:white;" width="5%"><b>Tag</b></td>
+                                            <td style="color:white;" width="5%"><b>Hide Line On Email</b> <br/></td>
+                                            <td style="color:white;" width="10%"><b>Submittals</b></td>
+                                            <td style="color:white;" width="5%"><b>Release #</b></td>
+                                            <td style="color:white;" width="6%"><b>Released to mfgr</b></td>
+                                            <td style="color:white;" width="6%"><b>Est. Ship</b></td>
+                                            <td style="color:white;" width="6%"><b>Act. Ship</b></td>
+                                            <td style="color:white;" width="6%"><b>Tracking Number</b></td>
+                                            <td style="color:white;" width="5%"><b>IOM Done</b></td>
+                                            <td style="color:white;" width="6%"><b>Billing Status</b></td>
+                                            <td style="color:white;" width="6%"><b>Date of Billing</b></td>
+                                            <td style="color:white;" width="6%"><b>Payment Received</b></td>
+                                            <td style="color:white;" width="13%"><b>Note</b></td>
+                                        </tr>
+                                        <tr style="background-color:#0B7EC7;">
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <center><apex:inputField value="{!qliSelectAll.Hide_Line_On_Email__c}" onchange="return selectAll('HideLineOnEmail', this, 'checkHidLineOnEmail');"/></center>
+                                            </td>
+                                            <td>
+                                                <apex:inputField value="{!qliSelectAll.Submittals__c}" onchange="return selectAll('Submittal', this, 'txtSubmittal');"/>
+                                            </td>
+                                            <td></td>
+                                            <td>
+                                                <apex:inputField value="{!qliSelectAll.Release_Date__c}" onchange="return selectAll('ReleaseDate', this, 'txtReleaseDate');"/>
+                                            </td>
+                                            <td>
+                                                <apex:inputField value="{!qliSelectAll.Estimated_Ship_Date__c}" onchange="return selectAll('EstimatedShipDate', this, 'txtEstimatedShipDate');"/>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <center><apex:inputField value="{!qliSelectAll.IOM_Completed__c}" onchange="return selectAll('IOMCompleted', this, 'checkIOMCompleted');"/></center>
+                                            </td>
+                                            <td>
+                                                <apex:inputField value="{!qliSelectAll.Billing_Status__c}" onchange="return selectAll('BillingStatus', this, 'txtBillingStatus');"/>
+                                            </td>
+                                            <td>
+                                                <apex:inputField value="{!qliSelectAll.Date_of_Billing__c}" onchange="return selectAll('DateOfBilling', this, 'txtDateOfBilling');"/>
+                                            </td>
+                                            <td>
+                                                <apex:inputField value="{!qliSelectAll.Payment_Received__c}" onchange="return selectAll('PaymentReceived', this, 'txtPaymentReceived');"/>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <apex:repeat value="{!lstProductGroupWrapperClass}" var="pg" id="rptStageStatusGroup">
+                                            <tr>
+                                                <td colspan="14" style="font-size:14px;font-weight:bold;">
+                                                    <apex:outputText value="{!pg.productGroup.Name}" id="txtProductGroupName" />
+                                                </td>
+                                            </tr>
+                                            <apex:repeat value="{!pg.lstProductSubGroup}" var="psg" id="rptStageStatusSubGroup">
+                                                <tr>
+                                                    <td colspan="14" style="font-weight:bold;">
+                                                        <apex:outputText value="{!psg.productGroup.Name}" id="txtProductSubGroupName" />
+                                                    </td>
+                                                </tr>
+                                                <apex:repeat value="{!psg.lstProductSelected}" var="product" id="rptStageStatusProduct">
+                                                    <tr>
+                                                        <td>
+                                                            <apex:outputText value="{!product.productDetails.Product_Name__c}" id="txtProductName" />
+                                                        </td>
+                                                        <td>{!product.productDetails.Tag__c}</td>
+                                                        <td align="middle"><apex:inputCheckbox value="{!product.productDetails.Hide_Line_On_Email__c}" id="checkHidLineOnEmail"/></td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Submittals__c}" id="txtSubmittal"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputText value="{!product.productDetails.Release_pick__c}" id="txtReleasePick"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Release_Date__c}" id="txtReleaseDate"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Estimated_Ship_Date__c}" id="txtEstimatedShipDate"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Act_Ship__c}" id="txtActShip"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Tracking_Number__c}" id="txtSerialNumber" style="width:95%"/>
+                                                        </td>
+                                                        <td align="middle">
+                                                            <apex:inputField value="{!product.productDetails.IOM_Completed__c}" id="checkIOMCompleted"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Billing_Status__c}" id="txtBillingStatus"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Date_of_Billing__c}" id="txtDateOfBilling"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Payment_Received__c}" id="txtPaymentReceived"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Note__c}" id="txtNote" onkeyup="return updateToolTip(this);"/>
+                                                            <div class="tooltip" style="display:inline">
+                                                                <b style="font-size: 18px">...</b>
+                                                                <apex:outputText id="txtTooltip" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </apex:repeat>
+                                        </apex:repeat>
+                                    </table>
+                                    
+                                </apex:pageBlock>
+                                
+                                <apex:pageBlock title="Startup and Warranty" >
+                                    <table width="100%" border="1" cellspacing="0" cellpadding="3">
+                                        <tr style="background-color:#0B7EC7;">
+                                            <td style="color:white;" width="16%"><b>Product Group Name</b></td>
+                                            <td style="color:white;" width="5%"><b>Tag</b></td>
+                                            <td style="color:white;" width="5%"><b>Hide Line On Email</b></td>
+                                            <td style="color:white;" width="5%"><b>Product Code</b></td>
+                                            <td style="color:white;" width="5%"><b>Serial Number</b></td>
+                                            <td style="color:white;" width="9%"><b>Schedule Startup</b></td>
+                                            <td style="color:white;" width="9%"><b>Completed Startup</b></td>
+                                            <td style="color:white;" width="9%"><b>Warranty</b></td>
+                                            <td style="color:white;" width="9%"><b>Warranty Type</b></td>
+                                            <td style="color:white;" width="10%"><b>Parts Covered</b></td>
+                                            <td style="color:white;" width="9%"><b>Warranty Start</b></td>
+                                            <td style="color:white;" width="9%"><b>Warranty End</b></td>
+                                        </tr>
+                                        <apex:repeat value="{!lstProductGroupWrapperClass}" var="pg">
+                                            <tr>
+                                                <td colspan="12" style="font-weight:bold;font-size:14px;">{!pg.productGroup.Name}</td>
+                                            </tr>
+                                            <apex:repeat value="{!pg.lstProductSubGroup}" var="psg">
+                                                <tr>
+                                                    <td colspan="12" style="font-weight:bold;">{!psg.productGroup.Name} </td>
+                                                </tr>
+                                                <apex:repeat value="{!psg.lstProductSelected}" var="product">
+                                                    <tr>
+                                                        <td>{!product.productDetails.Product_Name__c}</td>
+                                                        <td>{!product.productDetails.Tag__c}</td>
+                                                        <td align="middle"><apex:inputCheckbox value="{!product.productDetails.Hide_Line_On_Email_Startup__c}" /></td>
+                                                        <td>{!product.productDetails.Product_Code__c}</td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Serial_Number__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Schedule_Startup_Date__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Completed_Startup_Date__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Warranty_Term__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Warranty_Type__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Warranty_Parts_Covered__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Warranty_Start_Date__c}" />
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!product.productDetails.Warranty_End_Date__c}" />
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </apex:repeat>
+                                        </apex:repeat>
+                                    </table>
+                                    
+                                </apex:pageBlock>
+                               
+                            </apex:pageBlockSection>
+                        </apex:pageBlock>
+                        
+                        <apex:variable value="{!0}" var="cntInr"/>
+                        <apex:variable value="" var="releaseNumber"/>
+                        <apex:repeat value="{!lstReleases}" var="release" id="rpt">
+                            <apex:variable value="{!0}" var="cnt"/>
+                            <apex:variable value="{!0}" var="grandMargin"/>
+                            <apex:variable value="{!0}" var="grandSalePrice"/>
+                            <apex:variable value="{!0}" var="grandCR"/>
+                            <apex:variable value="" var="headerName"/>
+                            <table width="100%" cellpadding="5" cellspacing="0" style="border:1px solid black;">
+                                <tr style="background-color:#0B7EC7;">
+                                    <td style="font-weight:bold;font-size:14px;color:white;">Release {!release.parentReleaseNumber}</td>
+                                </tr>
+                                <apex:repeat value="{!release.lstReleases}" var="rel" id="inrRpt">
+                                    <tr>
+                                        <td>
+                                            <apex:variable value="{!0}" var="quantityTotal"/>
+                                            <apex:variable value="{!0}" var="listPriceTotal"/>
+                                            <apex:variable value="{!0}" var="freightTotal"/>
+                                            <apex:variable value="{!0}" var="extendedCostTotal"/>
+                                            <apex:variable value="{!0}" var="salesPriceTotal"/>
+                                            <apex:variable value="{!0}" var="crTotal"/>
+                                            <apex:pageBlock id="pb">
+                                                <table width="100%" style="font-weight:bold;margin-bottom:5px;align:middle;">
+                                                    <tr>
+                                                        <td>
+                                                            Release {!rel.releaseNumber}
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputField value="{!rel.release.Release_Name__c}" />
+                                                            <apex:variable var="headerName" value="{!IF(headerName == '',IF(rel.release.Release_Name__c != '',rel.release.Release_Name__c, ''), IF(rel.release.Release_Name__c != '',headerName + ',' + rel.release.Release_Name__c, headerName))}"/>
+                                                        </td>
+                                                        <td>
+                                                            Sage: <apex:inputField value="{!rel.release.Sage__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            Customer PO: <apex:inputField value="{!rel.release.Customer_PO__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            MidwestMachinery PO: <apex:inputField value="{!rel.release.Midwest_Machinery_PO__c}"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="5">
+                                                            <apex:pageBlockTable value="{!rel.lstProductDetails}" var="ps" id="pbt">
+                                                                <apex:column headerValue="Manufacturer">
+                                                                    <apex:outputField value="{!ps.Manufacturer__c}"/>
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText value="Total:" />
+                                                                    </apex:facet>
+                                                                </apex:column>    
+                                                                <apex:column value="{!ps.Product_Name__c}"/>  
+                                                                <apex:column value="{!ps.Product_Code__c}"/>  
+                                                                <apex:column value="{!ps.Sale_Type__c}"/>  
+                                                                <apex:column headerValue="Quantity">
+                                                                    <apex:outputField value="{!ps.Quantity__c}" />
+                                                                    <apex:variable var="quantityTotal" value="{!ps.Quantity__c + quantityTotal}" />
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText id="txtQuantityTotal" />
+                                                                    </apex:facet>
+                                                                </apex:column>  
+                                                                <apex:column headerValue="List Price">
+                                                                    <apex:outputField value="{!ps.List_Price__c}"/>
+                                                                    <apex:variable var="listPriceTotal" value="{!ps.List_Price__c + listPriceTotal}" />
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText id="txtListPriceTotal"/>
+                                                                    </apex:facet>
+                                                                </apex:column>  
+                                                                <apex:column value="{!ps.Multiplier__c}"/>  
+                                                                <apex:column headerValue="Freight">
+                                                                    <apex:outputText value="$" rendered="{!ps.Freight__c != null}"/>
+                                                                    <apex:outputText value="{!ps.Freight__c}"/>
+                                                                    <apex:variable var="freightTotal" value="{!ps.Freight__c + freightTotal}" />
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText id="txtFreightTotal" />
+                                                                    </apex:facet>
+                                                                </apex:column>  
+                                                                <apex:column headerValue="Extended Cost">
+                                                                    <apex:outputField value="{!ps.Extended_Cost__c}"/>
+                                                                    <apex:variable var="extendedCostTotal" value="{!ps.Extended_Cost__c + extendedCostTotal}" />
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText id="txtExtendedCostTotal" />
+                                                                    </apex:facet>
+                                                                </apex:column>  
+                                                                <apex:column value="{!ps.Margin_Percentage__c}"/>  
+                                                                <apex:column headerValue="Sales Price">
+                                                                    <apex:outputField value="{!ps.Sales_Price__c}"/>
+                                                                    <apex:variable var="salesPriceTotal" value="{!ps.Sales_Price__c + salesPriceTotal}" />
+                                                                    <apex:variable var="grandSalePrice" value="{!ps.Sales_Price__c + grandSalePrice}" />
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText id="txtSalesPriceTotal" />
+                                                                    </apex:facet>
+                                                                </apex:column>  
+                                                                <apex:column HeaderValue="CR">
+                                                                    <apex:outputField value="{!ps.CR__c}"/>
+                                                                    <apex:variable var="crTotal" value="{!ps.CR__c + crTotal}" />
+                                                                    <apex:variable var="grandCR" value="{!ps.CR__c + grandCR}" />
+                                                                    <apex:facet name="footer">
+                                                                        <apex:outputText id="txtCRTotal" />
+                                                                    </apex:facet>
+                                                                </apex:column>  
+                                                            </apex:pageBlockTable>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                
+                                                    <script>
+                                                        var listPrice = '{!listPriceTotal}';
+                                                        var freight = '{!freightTotal}'
+                                                        var extendedCost = '{!extendedCostTotal}';
+                                                        var salesPrice = '{!salesPriceTotal}';
+                                                        var cr = '{!crTotal}';
+                                                        
+                                                        document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':inrRpt:' + {!cnt} + ':pb:pbt:txtQuantityTotal').innerHTML = {!quantityTotal};
+                                                        document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':inrRpt:' + {!cnt} + ':pb:pbt:txtListPriceTotal').innerHTML = '$' + listPrice.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                                                        document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':inrRpt:' + {!cnt} + ':pb:pbt:txtFreightTotal').innerHTML = '$' + freight.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                                                        document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':inrRpt:' + {!cnt} + ':pb:pbt:txtExtendedCostTotal').innerHTML = '$' + extendedCost.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                                                        document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':inrRpt:' + {!cnt} + ':pb:pbt:txtSalesPriceTotal').innerHTML = '$' + salesPrice.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                                                        document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':inrRpt:' + {!cnt} + ':pb:pbt:txtCRTotal').innerHTML = '$' + cr.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                                                        
+                                                    </script>
+                                                <apex:variable var="cnt" value="{!cnt + 1}" />
+                                            </apex:pageBlock>
+                                        </td>
+                                    </tr>
+                                </apex:repeat>
+                                
+                                <tr style="background-color:#ECECEC;">
+                                    <td>
+                                        <table width="100%" cellpadding="3" cellspacing="0" style="font-weight:bold;font-size:14px;">
+                                            <tr>
+                                                <td width="76%">
+                                                    <apex:outputText value="ArmStrong Pumps, ArmStrong Heat Exchanger | Relase 1 Total" id="txtTotalHeader"/>
+                                                </td>
+                                                <td width="10%" style="align:right;">Sale Price: <apex:outputText id="txtSalePriceTotal"/></td>
+                                                <td width="8%" style="align:right;">C/R: <apex:outputText id="txtCRTotal" /></td>
+                                            </tr>
+                                        </table>
+                                        <script>
+                                            //var margin = '{!grandMargin}';
+                                            var salesPrice = '{!grandSalePrice}';
+                                            var cr = '{!grandCR}';
+                                            var headerName = '{!headerName}';
+                                            
+                                            document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':txtSalePriceTotal').innerHTML = '$' + salesPrice.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');                       
+                                            document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':txtCRTotal').innerHTML = '$' + cr.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');                       
+                                            
+                                            document.getElementById('pageId:formId:rpt:' + {!cntInr} + ':txtTotalHeader').innerHTML = headerName + ' | Release ' + {!release.parentReleaseNumber} + ' Total';
+                                            
+                                        </script>
+                                    </td>
+                                </tr>
+                            </table>
+                            <apex:variable var="cntInr" value="{!cntInr + 1}" />
+                            <div style="margin:15px;"></div>
+                        </apex:repeat>
+                    </apex:outputPanel>
+                </apex:tab>
+                <apex:tab label="Turnover/Project Margin" name="TurnOverProjectMargin" id="tabTurnOverProjectMargin">
+                    <apex:pageBlock mode="maindetail">
+                        <apex:pageblockSection columns="2" title="Turnover Information">
+            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Existing Customer - has accounting review credit status?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Review_Credit_Status__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Existing_Customer_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >New Customer - has customer provide completed credit applications and resale certificate if applicable and return to accounting?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Return_to_Accounting__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.New_Customer_has_customer_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Customer PO In Hand?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Customer_PO_In_Hand__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Customer_PO_In_Hand_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Submittal Approval Received?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Submittal_Approval_Received__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Submittal_Approval_Received_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Special pricing approval documentation needed?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Special_pricing_approval_documentation_n__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Special_pricing_approval_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Special Shipping Requirements?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Special_Shipping_Requirements__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Special_Shipping_Requirements_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Special Warranty Requirements?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Special_Warranty_Requirements__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Special_Warranty_Requirements_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Special Drawing Requirements?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Special_Drawing_Requirements__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Special_Drawing_Requirements_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Special Submittal Requirements?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Special_Submittal_Requirements__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Special_Submittal_Requirements_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached Commission Worksheet?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_Commission_Worksheet__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_Commission_Worksheet_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached Final Scope Letter?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_Final_Scope_Letter__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_Final_Scope_Letter_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached All Backup Info for Special Req?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_All_Backup_Info_for_Special_Req__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_All_Backup_Info_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached All Design and Selection Docs?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_All_Design_and_Selection_Docs__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_All_Design_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached Pricing Approval Docs?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_Pricing_Approval_Docs__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_Pricing_Approval_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached Any Field Purchased Items/Quotes?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_Any_Field_Purchased_Items_Quote__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_Any_Field_Purchased_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Identified and Attached Service Items/Quotes?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Identified_and_Attached_Service_Items_Qu__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Identified_and_Attached_Service_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Margin Adjusted?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Margin_Adjusted__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Margin_Adjusted_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Is Electronic File Cleaned?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Is_Electronic_File_Cleaned__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Is_Electronic_File_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Attached all Email Correspondence?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Attached_all_Email_Correspondence__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Attached_all_Email_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Does Customer PO Reflect Negotiated Scope?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Does_Customer_PO_Reflect_Negotiated_Scop__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Does_Customer_PO_Reflect_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                        </apex:pageblockSection>
+                        
+                        <apex:pageblockSection columns="2" title="Project Margin Information">
+            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Final Review Before Release?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Final_Review_Before_Release__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Final_Review_Before_Release_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Has Project Info Sheet been Received?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Has_Project_Info_Sheet_been_Received__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Has_Project_Info_Sheet_been_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Tax status?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Tax_status__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Tax_status_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="O&M's Sent?"></apex:outputLabel>
+                                <apex:inputField value="{!Project__c.O_M_s_Sent__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.O_M_s_Sent_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Thank you Letter Sent to Customer?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Thank_you_Letter_Sent_to_Customer__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Thank_you_Letter_Sent_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Does Price Reflect Equipment Want Date?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Does_Price_Reflect_Equipement_Want_Date__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Does_Price_Reflect_Equipment_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Review Statement of Compliance from SE 2/Comments?</apex:outputLabel>
+                                <apex:inputField value="{!Project__c.Review_Statement_of_Compliance_from_SE_2__c}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel >Notes</apex:outputLabel>
+                                <apex:inputTextArea value="{!Project__c.Review_Statement_of_Compliance_Notes__c}" cols="60" rows="4"/>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageblockSection>
+                    </apex:pageBlock>
+                </apex:tab>
+            </apex:tabPanel>
+        </apex:actionRegion>
+        <apex:actionRegion >
+            <apex:outputPanel id="pnlScheduleEmail">
+                <div id="divEmail" style="display: none;">
+                    <div class="parentDisable"></div>
+                    <div class="emailPopup" style="width:700px">
+                        <table width="100%" cellpadding="0" cellspacing="0" >
+                            <tr style="background-color:#F2F2F2;height:25px;">
+                                <td style="font-weight:bold;" colspan="2">&nbsp;&nbsp; Schedule Email (9:00 AM)</td>
+                            </tr>
+                            <tr>
+                                <td align="middle" >
+                                    <apex:pageBlock id="pbScheduleEmail">
+                                        <apex:pageBlockButtons location="bottom">
+                                            <apex:commandButton value="Schedule" onclick="return validateScheduleEmail();"/>
+                                            <apex:commandButton value="Cancel" onclick="return closeEmailPopup();"/>
+                                        </apex:pageBlockButtons>
+                                        <apex:pageBlockSection columns="1" id="pbsScheduleEmail">
+                                                
+                                            <!--<apex:inputField value="{!currentProject.Schedule_To__c}" required="true" id="txtScheduleTo"/> -->
+                                            <apex:variable var="num" value="{!0}"/>
+                                            <apex:repeat value="{!lstScheduleTo}" var="schWrapper" id="repeatScheduleTo">
+                                                <apex:variable var="num" value="{!num + 1}"/>
+                                                <apex:pageBlockSectionItem id="pbsEmailPopupId">
+                                                    <apex:outputLabel value="Schedule To" style="font-weight:bold;"/>
+                                                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                                                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                                        <apex:actionRegion >
+                                                            <apex:selectList value="{!schWrapper.Schedule_Type__c}" multiselect="false" size="1" id="selectScheduleType">
+                                                                <apex:actionSupport reRender="pnlContactUser" event="onchange" status="splashStatus" action="{!changeContactUser}" />
+                                                                <apex:selectOption itemLabel="Contact" itemValue="Contact" />
+                                                                <apex:selectOption itemLabel="User" itemValue="User" />
+                                                            </apex:selectList> &nbsp;
+                                                            <apex:outputPanel id="pnlContactUser">
+                                                                <apex:inputField value="{!schWrapper.Contact__c}" id="txtScheduleToContact" rendered="{!schWrapper.Schedule_Type__c == 'Contact'}"/>
+                                                                <apex:inputField value="{!schWrapper.User__c}" id="txtScheduleToUser" rendered="{!schWrapper.Schedule_Type__c == 'User'}"/>&nbsp;&nbsp;&nbsp;
+                                                            </apex:outputPanel>
+                                                        </apex:actionRegion>
+                                                        <apex:image value="{!$Resource.Button_Plus}" width="18" height="18" style="cursor: pointer;" rendered="{!num == lstScheduleTo.size}">
+                                                            <apex:actionSupport action="{!doAddScheduleTo}" event="onclick" immediate="true" reRender="pbsScheduleEmail" status="splashStatus"/>
+                                                        </apex:image>&nbsp;
+                                                        <apex:image value="{!$Resource.Button_Minus}" width="18" height="18" style="cursor: pointer;" rendered="{!num != 1}">
+                                                            <apex:actionSupport action="{!doRemoveScheduleTo}" event="onclick" immediate="true" reRender="pbsScheduleEmail" status="splashStatus">
+                                                                <apex:param assignTo="{!removeIndex}" name="removeIndex" value="{!num}" />
+                                                            </apex:actionSupport>
+                                                        </apex:image>
+                                                    </apex:outputPanel>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:repeat>
+                                            <apex:inputField value="{!currentProject.Schedule_On__c}" required="true" id="txtScheduleOn" label="Send Every"/>
+                                            <apex:inputField value="{!currentProject.Schedule_End_Date__c}" required="true" id="txtScheduleEndDate"/>
+                                        </apex:pageBlockSection>
+                                    </apex:pageBlock>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <apex:actionFunction action="{!scheduleEmail}" name="scheduleEmailActionFunction" reRender="formId" status="splashStatus"/>
+            </apex:outputPanel>
+        </apex:actionRegion>
+    </apex:form>
+    <apex:relatedList list="AttachedContentDocuments" subject="{!$CurrentPage.parameters.id}" />
+    <apex:relatedList list="OpportunityContactRoles" subject="{!Project__c.Opportunity__c}"/>
+    <apex:relatedList list="OpenActivities" subject="{!$CurrentPage.parameters.id}"/>
+    <apex:relatedList list="CombinedAttachments" subject="{!$CurrentPage.parameters.id}"/>
+    <apex:relatedList list="ActivityHistories" subject="{!$CurrentPage.parameters.id}"/>
+</apex:page>

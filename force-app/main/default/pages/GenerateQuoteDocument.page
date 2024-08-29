@@ -1,0 +1,918 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 12-04-2023
+  @last modified by  : Nilesh Badrakiya
+-->
+<apex:page extensions="GenerateQuoteDocumentController" standardController="Quote" applyHtmlTag="false" showHeader="false"
+    applyBodyTag="false" renderAs="pdf">
+
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                margin-bottom: 2.5cm;
+
+                @bottom-center {
+                    content: element(footer);
+                }
+            }
+
+            div.footer {
+                display: block;
+                position: running(footer);
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+        </style>
+    </head>
+    <div class="footer">
+        <div style="font-family:Arial,sans-serif;font-size: 10px;text-align: justify;display:{!IF(isDenverUser, 'block', 'none')}">
+            Unless otherwise noted, this quotation is offered as follows: Shipments are F.O.B. point of manufacture with freight allowed to first destination. 
+            Payment terms are Net 30 Days. Sales and use taxes are not included. Quotation is subject to acceptance within 30 days. 
+            Prices quoted are firm provided release to ship is made within 30 days from date of order, not to exceed 60 days from the date of this quotation. 
+            Standard factory warranties will apply unless otherwise noted above.  Return charges may apply to any equipment that is returned.   
+            Start-Up is not included unless otherwise noted above.  Receiving, loading, hauling and installing of equipment is excluded.  
+            All quotations and sales are made in accordance with ENGINEERED PRODUCTS - STANDARD TERMS AND CONDITIONS OF SALE included on the last page of this quotation.
+        </div>
+        <div style="font-family:Arial,sans-serif;font-size:10px;text-align:right;">
+            <apex:outputText value="midwestmachinery.net" rendered="{! !isDenverUser}" />
+            <apex:outputText value="engineeredproducts.com" rendered="{!isDenverUser}" /> | Page
+            <span class="pagenumber" /> of
+            <span class="pagecount" />
+        </div>
+    </div>
+
+    <body style="font-family:Arial,sans-serif;">
+        <apex:form >
+            <apex:pageBlock >
+                <apex:pageBlockSection columns="1">
+                    <apex:outputPanel rendered="{!Quote.Include_Cover_Letter__c}">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td align="center" style="padding-top:25px;">
+                                    <apex:image value="{!$Resource.MidWest_Machinery_Logo}" rendered="{! !isDenverUser}" />
+                                    <apex:image value="{!$Resource.EPCoverLaterLogo}" width="350px;" rendered="{!isDenverUser}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:center;font-family:Arial,sans-serif;font-size:12px;padding-top:10px;">
+                                    {!$User.Street}, {!$User.City}, {!$User.State}, {!$User.PostalCode}, {!$User.Country}.
+                                    <br/>
+                                    <apex:outputText value="Phone: {!$User.Phone}" rendered="{!$User.Phone != ''}" />
+                                    <br/>
+                                    <apex:outputText value="Fax: {!$User.Fax}" rendered="{!$User.Fax != ''}" />
+                                    <br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:25px;font-family:Arial,sans-serif;">
+                                    <apex:outputText value="{0,date,E MMM d, yyyy}">
+                                        <apex:param value="{!TODAY()}" />
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:25px;font-family:Arial,sans-serif;">
+                                    <apex:outputText value="{!Quote.Scope_of_Work__c}" escape="false" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:25px;font-family:Arial,sans-serif;">
+                                    Regards,
+                                    <br/> {!$User.FirstName} {!$User.LastName}
+                                    <br/> {!$User.Title}
+                                    <br/> {!$User.CompanyName}
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="page-break-after:always;padding-top:25px;"></div>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!isDenverUser}">
+                        <table width="100%">
+                            <tr>
+                                <td style="vertical-align:top;width:50%;">
+                                    <apex:image value="{!$Resource.EPQuoteHeader}" width="100%" height="100%" />
+                                </td>
+                                <td style="vertical-align:top;width:50%;">
+                                    <table style="border-bottom:4px solid black; font-family:arial,sans-serif;" width="100%">
+                                        <tr>
+                                            <td style="font-size:28px;font-family:arial,sans-serif;">
+                                                <b>QUOTATION</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:18px;font-family:arial,sans-serif;">{!Quote.Name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>OPP # / QUOTE #:</b>
+                                                {!Quote.Opportunity.Opportunity_Number__c} / {!Quote.QuoteNumber}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>QUOTE DATE: </b>
+                                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                                    <apex:param value="{!Today()}" />
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>PLAN DATE: </b>
+                                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                                    <apex:param value="{!Quote.Plan_Date__c}" />
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Attention_to_Account__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>ATTN TO COMPANY: </b>{!Quote.Attention_to_Account__r.Name}
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Bidding_To__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>ATTN TO PERSON: </b>{!Quote.Bidding_To__r.Name}
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Opportunity.Consulting_Engineer_Contact_Person__r.AccountId == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>CONSULTING ENGINEER: </b>
+                                                <apex:outputText value="{!Quote.Opportunity.Consulting_Engineer_Contact_Person__r.Account.Name}" />
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Submitted_By__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>SUBMITTED BY: </b>{!Quote.Submitted_By__r.Name}
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Scope_Revision_Number__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>QUOTE REV: </b>{!Quote.Scope_Revision_Number__c}
+                                            </td>
+                                        </tr>
+                                       
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{! !isDenverUser}">
+                        <table width="100%">
+                            <tr>
+                                <td colspan="2" style="vertical-align:top;">
+                                    <apex:image value="{!$Resource.Submittal_Header}" width="705px" height="80px" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align:top;width:300px;">
+                                    <apex:image value="{!$Resource.Submittal_Header1}" width="300px" height="150px" />
+                                </td>
+                                <td style="padding-left:10px;vertical-align:top;">
+                                    <table style="border-bottom:4px solid black; font-family:arial,sans-serif;" width="100%">
+                                        <tr>
+                                            <td style="font-size:28px;font-family:arial,sans-serif;">
+                                                <b>QUOTATION</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:18px;font-family:arial,sans-serif;">{!Quote.Name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>OPP # / QUOTE #:</b>
+                                                {!Quote.Opportunity.Opportunity_Number__c} / {!Quote.QuoteNumber}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>QUOTE DATE: </b>
+                                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                                    <apex:param value="{!Today()}" />
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>PLAN DATE: </b>
+                                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                                    <apex:param value="{!Quote.Plan_Date__c}" />
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Attention_to_Account__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>ATTN TO COMPANY: </b>{!Quote.Attention_to_Account__r.Name}
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Bidding_To__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>ATTN TO PERSON: </b>{!Quote.Bidding_To__r.Name}
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Opportunity.Consulting_Engineer_Contact_Person__r.AccountId == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>CONSULTING ENGINEER: </b>
+                                                <apex:outputText value="{!Quote.Opportunity.Consulting_Engineer_Contact_Person__r.Account.Name}" />
+                                            </td>
+                                        </tr>
+                                        <tr style="display: {!IF(Quote.Submitted_By__c == null, 'none', 'table-row')};">
+                                            <td style="font-size:12px;font-family:arial,sans-serif;">
+                                                <b>SUBMITTED BY: </b>{!Quote.Submitted_By__r.Name}
+                                            </td>
+                                        </tr>
+                                       
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!Quote.Top_Exception_Notes__c != ''}">
+                        <div style="margin-top:15px"></div>
+                        <div style="font-family:Arial,sans-serif;font-size: 11px;border: 1px solid #D9D9D9;background-color:#F2F2F2;padding:8px;">
+                            <apex:outputText value="{!Quote.Top_Exception_Notes__c}" escape="false" />
+                        </div>
+                    </apex:outputPanel>
+
+                    <apex:outputText >
+                        <div style="margin-top:15px"></div>
+                        <apex:variable value="{!0}" var="cnt" />
+                        <apex:repeat value="{!lstProductGroupWrapperClass}" var="grp">
+                            <apex:variable value="{!cnt+1}" var="cnt" />
+                            <apex:outputPanel rendered="{!AND(grp.productGroup.Alternate__c == false)}">
+                                
+                                <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid black;{!IF(grp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                    <tr style="background-color:black;">
+                                        <td style="color: white;font-family:Arial,sans-serif;font-size: 16px;font-weight:bold;" colspan="2">{!grp.productGroup.Name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                                <apex:outputPanel rendered="{!AND(subGrp.productGroup.Alternate__c == false)}">
+                                                    
+                                                    <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8;{!IF(subGrp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                                        <tr style="background-color:#F2F2F2;">
+                                                            <td colspan="7">{!subGrp.productGroup.Name}</td>
+                                                        </tr>
+                                                        <tr style="background-color:#767171;">
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">QTY</td>
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">TAG</td>
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Product_Code__c == true || subGrp.productGroup.Hide_Code__c, 'none', 'table-cell')}">PRODUCT CODE</td>
+                                                            <td colspan="{!subGrp.colspan}" style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">DESCRIPTION</td>
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(quote.Hide_Price_Per__c == true, 'table-cell', 'none')}">PRICE PER</td>
+                                                            <td style="border-left: 1px solid #9e9b9b;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">PRICE</td>
+                                                        </tr>
+                                                        <apex:variable var="color" value="#F2F2F2" />
+                                                        <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                                            <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                                            <apex:outputText rendered="{!AND(prod.productDetails.Alternate__c == false)}">
+                                                                
+                                                                <tr style="background-color: {!color};{!IF(prod.productDetails.Page_Break__c,'page-break-after: always;','')}">
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{!prod.productDetails.Quantity__c}" rendered="{! !prod.productDetails.Hide_Quantity__c}" />
+                                                                    </td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">{!prod.productDetails.Tag__c}</td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Product_Code__c == true || subGrp.productGroup.Hide_Code__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{!prod.productDetails.Product_Code__c}" rendered="{! !prod.productDetails.Hide_Code__c}" />
+                                                                    </td>
+                                                                    <td colspan="{!subGrp.colspan}" style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                                        <apex:outputText value="{!prod.productDetails.Descriptions__c}" escape="false" />
+                                                                    </td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(quote.Hide_Price_Per__c == true, 'table-cell', 'none')}">
+                                                                        <apex:outputField value="{!prod.productDetails.Price_Per__c}" />
+                                                                    </td>
+                                                                    <td style="border-left: 1px solid #9e9b9b;font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">
+                                                                        
+                                                                        <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                                            <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                                        </apex:outputText>
+                                                                    </td>
+                                                                </tr>
+                                                            </apex:outputText>
+                                                        </apex:repeat>
+                                                        
+                                                        <tr style="display : {!IF(subGrp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')};">
+                                                            <td colspan="7" style="border-top: 1px solid #9e9b9b;">
+                                                                <table width="100%" cellpadding="2" cellspacing="0">
+                                                                    <tr>
+                                                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!subGrp.productGroup.Name} Total</td>
+                                                                        <td style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;width:10%;">
+                                                                            
+                                                                            <apex:outputText value="{0, Number,currency}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}">
+                                                                                <apex:param value="{!subGrp.productGroup.Total_Line_Items__c}" />
+                                                                            </apex:outputText>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <div style="margin-top:3px;"></div>
+                                                </apex:outputPanel>
+                                            </apex:repeat>
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: #A8D08D;display : {!IF(grp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')}">
+                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!grp.productGroup.Name} &nbsp;Total</td>
+                                        <td width="15%" style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;">
+                                            
+                                            <apex:outputText value="{0, Number,currency}" rendered="{! !grp.productGroup.Hide_Pricing__c}">
+                                                <apex:param value="{!grp.productGroup.Total_Sub_Groups__c}" />
+                                            </apex:outputText>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!IF( AND(cnt != lstProductGroupWrapperClass.size,grp.productGroup.Alternate__c == false), TRUE, FALSE )}">
+                                <div style="page-break-after: always;"> </div>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </apex:outputText>
+
+                    <apex:outputPanel id="pnlSummary" rendered="{!Quote.Hide_Total_Base_Bid_Total__c == false}">
+                        <table align="right" cellpadding="5" cellspacing="0" width="60%" style="margin-top:15px;border: 1px solid #c8c8c8;">
+                            <tr style="background-color:#767171;">
+                                <td style="font-family:Arial,sans-serif;font-size:14px;color:white;font-weight:bold;text-align:right;">TOTAL AMOUNT</td>
+                                <td style="font-family:Arial,sans-serif;font-size:14px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">
+                                    <center></center>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:Arial,sans-serif;font-size: 14px;text-align:right;">Grand Total</td>
+                                <td style="font-family:Arial,sans-serif;font-size: 14px;text-align:right;border-left: 1px solid #9e9b9b;">
+                                    <apex:outputText value="{0, Number,currency}">
+                                        <apex:param value="{!quote.Total_Base_Bid_Total__c}" />
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!hasAlternates}">
+                        <div style="background-color:#F2F2F2;border: solid 1px;margin-top: 2%;">
+                            <center>
+                                <div style="color: Black;font-family:Arial,sans-serif;font-size: 25px;font-weight:bold;margin-top: 0.5%;">Alternates</div>
+                                <div style="color: Black;font-family:Arial,sans-serif;font-size: 13px;/* border: solid; */margin-bottom: 0.5%;">All products below are alternate options and NOT included in the base bid.</div>
+                            </center>
+                        </div>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!hasIndividualAlternates}">
+                        <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8; margin-top:20px;">
+
+                            <tr style="background-color:#767171;">
+                                <td style="width:90%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b">DESCRIPTION</td>
+                                <td style="width:10%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b">PRICE</td>
+                            </tr>
+                            <apex:variable var="alternateColor" value="#F2F2F2" />
+                            <apex:repeat value="{!lstProductGroupWrapperClass}" var="grp">
+                                <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                    <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                        <apex:outputText rendered="{!IF( AND(prod.productDetails.Alternate__c == true,grp.productGroup.Alternate__c == false,subGrp.productGroup.Alternate__c==false,prod.productDetails.Hide_Line__c == false), TRUE, FALSE )}">
+
+                                            <apex:variable var="alternateColor" value="{!IF(alternateColor == '#F2F2F2', '', '#F2F2F2')}" />
+
+                                            <tr style="background-color:{!alternateColor};">
+
+                                                <td style="font-family:Arial,sans-serif;font-size: 10px;">
+                                                    <apex:outputText value="{!grp.productGroup.Name} Group. {!prod.productDetails.Descriptions__c}" escape="false" style="font-family:Arial,sans-serif;font-size: 10px;">
+                                                    </apex:outputText>
+                                                </td>
+                                                <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                   
+                                                    <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                        <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                    </apex:outputText>
+                                                </td>
+
+
+                                            </tr>
+                                        </apex:outputText>
+
+                                    </apex:repeat>
+                                </apex:repeat>
+                            </apex:repeat>
+                           
+                        </table>
+                    </apex:outputPanel>
+
+
+                    <apex:outputPanel rendered="{!hasAlternates}">
+                        <div style="margin-top:15px"></div>
+
+                        <apex:repeat value="{!lstProductGroupWrapperClassForAlternate}" var="grp">
+                            <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                <apex:variable value="{!0}" var="subtotal" />
+                                <apex:outputPanel rendered="{!If(AND(subGrp.productGroup.Alternate__c == true,grp.productGroup.Alternate__c == FALSE,subGrp.productGroup.Hide_Line__c == false),TRUE,False)}">
+
+
+                                    <table width="100%" cellpadding="5" cellspacing="0" style="{!IF(grp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                        <tr>
+                                            <td colspan="2">
+
+                                                <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8;{!IF(subGrp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                                    <tr style="background-color:#F2F2F2;">
+                                                        <td colspan="7">{!subGrp.productGroup.Name}</td>
+                                                    </tr>
+                                                    <tr style="background-color:#767171;">
+                                                        <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">QTY</td>
+                                                        <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">TAG</td>
+                                                        <td colspan="{!subGrp.colspan}" style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">DESCRIPTION</td>
+                                                        <td style="width:10%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">PRICE</td>
+                                                    </tr>
+                                                    <apex:variable var="color" value="#F2F2F2" />
+                                                    <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                                        <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                                        <apex:outputText rendered="{!prod.productDetails.Hide_Line__c == false}">
+                                                            <tr style="background-color: {!color};{!IF(prod.productDetails.Page_Break__c,'page-break-after: always;','')}">
+
+                                                                <td style="font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">
+                                                                    <apex:outputText value="{!prod.productDetails.Quantity__c}" rendered="{! !prod.productDetails.Hide_Quantity__c}" />
+                                                                </td>
+                                                                <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">{!prod.productDetails.Tag__c}</td>
+
+                                                                <td colspan="{!subGrp.colspan}" style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                                    <apex:outputText value="{!prod.productDetails.Descriptions__c}" escape="false" />
+                                                                </td>
+                                                                <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">
+                                                                   
+                                                                    <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                                        <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                                    </apex:outputText>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        </apex:outputText>
+                                                        <apex:variable value="{!subtotal+prod.productDetails.Sales_Price__c}" var="subtotal" />
+                                                    </apex:repeat>
+
+                                                    <tr style="display : {!IF(subGrp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')};">
+                                                        <td colspan="7" style="border-top: 1px solid #9e9b9b;">
+                                                            <table width="100%" cellpadding="2" cellspacing="0">
+                                                                <tr>
+                                                                    <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!subGrp.productGroup.Name} Total</td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;width:10%;">
+                                                                        
+                                                                        <apex:outputText value="{0, Number,currency}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}">
+                                                                            <apex:param value="{!subtotal}" />
+                                                                        </apex:outputText>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </apex:outputPanel>
+                            </apex:repeat>
+                        </apex:repeat>
+                    </apex:outputPanel>
+
+
+                    <apex:outputPanel rendered="{!hasAlternates}">
+                        <div style="margin-top:15px"></div>
+
+                        <apex:repeat value="{!lstProductGroupWrapperClassForAlternate}" var="grp">
+                            <apex:variable value="{!0}" var="grptotal" />
+                            <apex:outputPanel rendered="{!grp.productGroup.Alternate__c == true}">
+                                <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid black;{!IF(grp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                    <tr style="background-color:black;">
+                                        <td style="color: white;font-family:Arial,sans-serif;font-size: 16px;font-weight:bold;" colspan="2">{!grp.productGroup.Name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                                <apex:variable value="{!0}" var="subtotal" />
+                                                <apex:outputPanel rendered="{!subGrp.productGroup.Hide_Line__c == false}">
+                                                    <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8;{!IF(subGrp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                                        <tr style="background-color:#F2F2F2;">
+                                                            <td colspan="7">{!subGrp.productGroup.Name}</td>
+                                                        </tr>
+                                                        <tr style="background-color:#767171;">
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">QTY</td>
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">TAG</td>
+                                                            <td colspan="{!subGrp.colspan}" style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">DESCRIPTION</td>
+                                                            <td style="width:10%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">PRICE</td>
+                                                        </tr>
+                                                        <apex:variable var="color" value="#F2F2F2" />
+                                                        <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                                            <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                                            <apex:outputText rendered="{!prod.productDetails.Hide_Line__c == false}">
+                                                                <tr style="background-color: {!color};{!IF(prod.productDetails.Page_Break__c,'page-break-after: always;','')}">
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{!prod.productDetails.Quantity__c}" rendered="{! !prod.productDetails.Hide_Quantity__c}" />
+                                                                    </td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">{!prod.productDetails.Tag__c}</td>
+
+                                                                    <td colspan="{!subGrp.colspan}" style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                                        <apex:outputText value="{!prod.productDetails.Descriptions__c}" escape="false" />
+                                                                    </td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">
+                                                                        
+                                                                        <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                                            <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                                        </apex:outputText>
+                                                                    </td>
+                                                                    
+                                                                </tr>
+                                                            </apex:outputText>
+                                                            <apex:variable value="{!subtotal+prod.productDetails.Sales_Price__c}" var="subtotal" />
+                                                        </apex:repeat>
+
+                                                        <tr style="display : {!IF(subGrp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')};">
+                                                            <td colspan="7" style="border-top: 1px solid #9e9b9b;">
+                                                                <table width="100%" cellpadding="2" cellspacing="0">
+                                                                    <tr>
+                                                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!subGrp.productGroup.Name} Total</td>
+                                                                        <td style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;width:10%;">
+                                                                           
+                                                                            <apex:outputText value="{0, Number,currency}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}">
+                                                                                <apex:param value="{!subtotal}" />
+                                                                                <apex:variable value="{!grptotal+subtotal}" var="grptotal" />
+                                                                            </apex:outputText>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <div style="margin-top:3px;"></div>
+                                                </apex:outputPanel>
+                                                <apex:variable value="{!grptotal+subtotal}" var="grptotal" />
+                                            </apex:repeat>
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: #A8D08D;display : {!IF(grp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')}">
+                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!grp.productGroup.Name} &nbsp;Total</td>
+                                        <td width="15%" style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;">
+                                           
+                                            <apex:outputText value="{0, Number,currency}" rendered="{! !grp.productGroup.Hide_Pricing__c}">
+                                                <apex:param value="{!grptotal}" />
+                                            </apex:outputText>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </apex:outputPanel>
+
+
+                    <apex:outputPanel rendered="{!lstAdditionDuduction.size > 0}">
+                        <table width="100%" cellpadding="5" cellspacing="0" style="margin-top:25px;border: 1px solid #c8c8c8;">
+                            <tr style="background-color:#F2F2F2;">
+                                <td colspan="4" style="font-family:Arial,sans-serif;font-size: 14px;font-weight:bold;vertical-align:middle;">Adds/Deducts/Alternates</td>
+                            </tr>
+                            <tr style="background-color:#767171;">
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:3%;align:middle;">#</td>
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:15%;border-left: 1px solid #9e9b9b;">TYPE</td>
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:67%;border-left: 1px solid #9e9b9b;">DETAILS</td>
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:15%;border-left: 1px solid #9e9b9b;">AMOUNT</td>
+                            </tr>
+                            <apex:variable value="{!0}" var="addDedCount" />
+                            <apex:variable var="color" value="#F2F2F2" />
+                            <apex:repeat value="{!lstAdditionDuduction}" var="ad">
+                                <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                <tr style="background-color: {!color};">
+                                    <td align="middle" style="font-family:Arial,sans-serif;font-size: 10px;">
+                                        <apex:variable value="{!addDedCount + 1}" var="addDedCount" /> {!addDedCount}.
+                                    </td>
+                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                        <apex:outputText value="{!ad.Type__c}" style="width:95%;" />
+                                    </td>
+                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                        <apex:outputText value="{!ad.Details__c}" style="width:95%;" />
+                                    </td>
+                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                        
+                                        <apex:outputText value="{0, Number,currency}" style="width:90%;">
+                                            <apex:param value="{!ad.Amount__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!Quote.Bottom_Exception_Notes__c != ''}">
+                        <div style="margin-top:15px;"></div>
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="font-family:Arial,sans-serif;font-size: 11px;border: 1px solid #D9D9D9;background-color:#F2F2F2;padding:8px;margin-top:25px;">
+                                    <apex:outputText value="{!Quote.Bottom_Exception_Notes__c}" escape="false" />
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="margin-top:15px;"></div>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{! !isDenverUser}">
+                        <table width="100%" style="margin-top:10px;">
+                            <tr>
+                                <td width="15%" style="font-family:Arial,sans-serif;font-size:9px;color:#C45911;font-weight:bold;vertical-align:top;">PAYMENT TERMS</td>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;" width="85%">
+                                    <apex:outputText value="{!$Label.Quote_Payment_Terms}" escape="false" /></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;color:#C45911;font-weight:bold;vertical-align:top;">FREIGHT TERMS</td>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;">
+                                    <apex:outputField value="{!Quote.Shipping_Charges__c}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;color:#C45911;font-weight:bold;vertical-align:top;">LEAD TIME</td>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;">{!Quote.Current_Lead_Time__c} (after purchaser’s release) Stock items are subject to prior
+                                    sales.</td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;color:#C45911;font-weight:bold;vertical-align:top;">MATERIAL SURCHARGE</td>
+                                <td style="font-family:Arial,sans-serif;font-size:9px;">
+                                    Due to current material base price and surcharge volatility, the material price included in our proposal is contingent upon
+                                    domestic mill pricing, surcharge, and availability. Seller reserves the right to increase
+                                    pricing due to escalation of material cost. Material pricing is separate from and not
+                                    subject to the quote validity period. Additional details can be provided at your request.
+                                </td>
+                            </tr>
+                        </table>
+                        <hr/>
+                        <b>Notes</b>
+                        <br/>
+                        <div style="font-family:Arial,sans-serif; font-size: 9px;">
+                            <ol>
+                                <li>This quote does not provide for any Motor Starters, Disconnects, Flexible Couplings, Vibration
+                                    Isolators or Inertia Bases unless otherwise noted.</li>
+                                <li>All sales, use or excise taxes payable by the &nbsp;
+                                    <apex:outputText value="Midwest Machinery"
+                                        rendered="{! !isDenverUser}" />
+                                    <apex:outputText value="Engineered Products" rendered="{!isDenverUser}" /> Company, or to be collected by the &nbsp;
+                                    <apex:outputText value="Midwest Machinery"
+                                        rendered="{! !isDenverUser}" />
+                                    <apex:outputText value="Engineered Products" rendered="{!isDenverUser}" /> Company from Purchaser, in connection with the sale, installation, or use of the proposed
+                                    equipment shall be added to the prices quoted</li>
+                                <li>Unless otherwise stated above, freight is not included.</li>
+                                <li>
+                                    <apex:outputText value="Midwest Machinery" rendered="{! !isDenverUser}" />
+                                    <apex:outputText value="Engineered Products" rendered="{!isDenverUser}" /> Company’s responsibility for delivery is limited to date of shipment. Carrier can be
+                                    requested to give a maximum of 24 hours notice of delivery. Shipments involving more
+                                    than one truck arrive at a job site at different times.</li>
+                                <li>Purchaser to receive, unload, haul, hoist and set equipment in place. (Unless otherwise indicated
+                                    above)</li>
+                                <li>Quantities listed are not guaranteed and must be verified by purchaser.</li>
+                                <li>This quotation is subject to change without notice and is void after 30 days unless otherwise
+                                    noted.</li>
+                                <li>All contracts are subject to acceptance by the Company and are contingent upon credit approval.</li>
+                                <li>Startups and field visits are at additional costs unless otherwise noted.</li>
+                                <li>
+                                    <apex:outputText value="Midwest Machinery" rendered="{! !isDenverUser}" />
+                                    <apex:outputText value="Engineered Products" rendered="{!isDenverUser}" /> Company does not offer any warranty beyond that of the manufacturer and assumes no liability
+                                    for warranty labor, incidental losses or damages.</li>
+                                <li>Return charges are 25% of selling price for stock materials and 25%-100% of selling price
+                                    for non-stock material depending on the manufacturers return charges. Written authorization
+                                    from&nbsp;
+                                    <apex:outputText value="Midwest Machinery" rendered="{! !isDenverUser}" />
+                                    <apex:outputText value="Engineered Products" rendered="{!isDenverUser}" /> must be obtained prior to returning any matter</li>
+                                <li>The terms and conditions are attached.</li>
+                            </ol>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection rendered="{! !isDenverUser}">
+                    <apex:outputPanel >
+                        <div style="page-break-after: always;"> </div>
+                        <div style="font-family:Arial,sans-serif; font-size: 9px;">
+                            <p style="font-weight:bold; font-size: 12px;font-family:Arial,sans-serif;">Conditions of Sale</p>
+
+                            <p style="font-family:Arial,sans-serif;">These, as well as any other conditions or provisions attached, are to be considered a part of
+                                this contract:</p>
+
+                            <p style="font-family:Arial,sans-serif;">The title and right of possession to the equipment or material we furnish remains in us until
+                                full purchase price (including any modification or extension of payments, whether evidenced
+                                by notes or otherwise) shall have been fully paid in cash: and purchaser will do all acts
+                                necessary to perfect and maintain such retention of title in us.</p>
+
+                            <p style="font-family:Arial,sans-serif;">No part of the equipment furnished under this proposal shall be considered a fixture or incorporated
+                                into the realty by reason of its being attached to real estate, and any part may be separated
+                                from such real estate for purpose of repossession by us or our agents, without liability
+                                for such removal on our part, if purchaser has defaulted in payment of the purchase money.</p>
+
+                            <p style="font-family:Arial,sans-serif;">Time assigned for shipment is to commence from receipt of all approved data and is subject to
+                                fires, strikes, accidents or other delays unavoidable or beyond our reasonable control. We
+                                assume no liability for damages due to delays or in erection. The receipt of the equipment
+                                by purchaser shall constitute its acceptance of delivery, and waiver of any and all claims
+                                for loss or damage due to delay. We will not make allowance for repairs or alterations unless
+                                made with our written consent or approval. If shipment or erection of the equipment or any
+                                part thereof, shall, when ready, be delayed on your account, it is understood that payments
+                                shall be due as though shipment had been made or erection completed. In case of such delay
+                                in shipment, it is also agreed that charge will be made for storage and/or any other expenses
+                                incurred by us.</p>
+
+                            <p style="font-family:Arial,sans-serif;">Workmen's compensation, public liability and property damage insurance are provided for all labor
+                                and superintendence furnished by us under this contract. No other form of insurance will
+                                be provided unless herein specified or unless cost of premium is paid by the purchaser. Fire
+                                insurance in an amount sufficient to protect our interests in the material or equipment sold
+                                is to be taken out and maintained by purchaser and the policies of insurance are to be made
+                                payable to us as our interests may appear at the time of loss. Purchaser will assume all
+                                loss in the event of not having affected such insurance.</p>
+
+                            <p style="font-family:Arial,sans-serif;">It is expressly agreed that there are no promises, agreements or understandings outside of this
+                                contract: That no agent or salesman has any authority to obligate this company by any terms,
+                                stipulations or conditions not herein expressed: and that no modification of this contract
+                                shall be binding on us unless the same is in writing and approved by an executive officer.</p>
+
+                            <p style="font-family:Arial,sans-serif;">Unless specifically stated, this quotation does not comply with any local ordinance or regulation.</p>
+
+                            <p style="font-family:Arial,sans-serif;">The working days and hours of the superintendent and of such labor as we may supply on this contract
+                                will be on a standard work week of 40 hours, on an 8 hour day Monday through Friday. If overtime
+                                is necessary or requested, cost shall be absorbed by the purchaser at regular overtime rate
+                                for the class of work required.</p>
+
+                            <p style="font-family:Arial,sans-serif;">Where state laws or municipal ordinances require permits to install equipment covered by this
+                                proposal, the purchaser assumes the responsibility for securing the approval of said plans
+                                and specifications from the proper state or municipal authorities and for payment of any
+                                required fees. If any changes are required in the equipment covered by this proposal to meet
+                                the approval of said authorities, the purchaser shall inform us of such changes and shall
+                                reimburse us for changes actually made to comply with the requirements of said authorities.</p>
+
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection rendered="{!isDenverUser}">
+                    <apex:outputPanel >
+                        <div style="page-break-after: always;"> </div>
+                        <div style="font-family:Arial,sans-serif; font-size: 10px;text-align: justify;">
+
+                            <table cellpadding="3" cellspacing="2">
+                                <tr>
+                                    <td colspan="2" style="font-size:11px;">
+                                        <center>
+                                            <b>ENGINEERED PRODUCTS - STANDARD TERMS AND CONDITIONS OF SALE</b>
+                                        </center>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%" style="vertical-align:top;">
+                                        <p>
+                                            <b>TAXES</b> - All Federal, State and Local taxes, use, or similar taxes will be
+                                            for buyer’s account.
+                                        </p>
+                                        <p>
+                                            <b>PAYMENT TERMS</b> - The net amount of invoices shall be due and payable in cash
+                                            30 days after the invoice date. The material is subject to shipment in whole
+                                            or in part at the option of the seller and each shipment is subject to immediate
+                                            invoicing. If at any time, seller deems buyer’s credit unsatisfactory, seller
+                                            reserves the right to require payment in advance, or other security or guarantee
+                                            that invoices will be paid promptly when due. If buyer fails to comply with the
+                                            terms of payment or with any other of these terms and conditions, seller shall
+                                            have the right to withhold further deliveries or to cancel the unfilled portion
+                                            of any order and all unpaid accounts shall thereupon become due and payable without
+                                            prejudice to any claims for damages to which seller may be entitled. A service
+                                            charge of 1 1/2% per month (18% per annum, but not more than the lawful interest
+                                            rate maximum) will be added on any past due accounts, and if the account is not
+                                            paid when due, buyer agrees to pay all reasonable costs of collection including
+                                            a reasonable sum for attorney’s fees.
+                                        </p>
+                                        <p>
+                                            <b>SHIPMENT</b> - SHIPMENTS ARE F.O.B. POINT OF MANUFACTURE WITH FREIGHT ALLOWED.
+                                            All risk of loss, damage and other incidence of title and ownership shall pass
+                                            to buyer upon delivery to carrier at seller’s shipping point and such delivery
+                                            shall constitute delivery to buyer. Shipping dates or time of arrival of shipment
+                                            at destination will not be guaranteed by seller. Seller shall not be liable for
+                                            any delays or defaults in making shipment where occasioned by any cause of any
+                                            kind or extent beyond its control, or the control of its suppliers, manufacturers
+                                            or contractors, which prevent or interfere with seller making shipments on an
+                                            estimated date. In the event of shipping delay, if buyer and seller do not mutually
+                                            agree to cancel the order for the item involved, the shipping date shall be automatically
+                                            extended to the manufacturer’s current estimate.
+                                        </p>
+                                        <p>
+                                            <b>WARRANTY</b> - Any warranties expressed or implied are limited to those provided
+                                            by the manufacturer to buyer. Seller expressly warrants title. EXCEPT FOR SUCH
+                                            EXPRESS WARRANTY, SELLER MAKES NO WARRANTY OF ANY KIND WHATSOEVER, EXPRESS OR
+                                            IMPLIED, AND ALL WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+                                            AND OTHER WARRANTIES OF WHATEVER KIND, ARE HEREBY DISCLAIMED BY SELLER AND EXCLUDED.
+                                            Seller assumes no liability for any failure of buyer’s specifications to meet
+                                            buyer’s requirements, nor does seller guarantee that materials furnished meet
+                                            or conform to any specifications except as specifically noted in writing by seller.
+                                        </p>
+                                        <p>
+                                            <b>CLAIMS</b> - Any claims or exceptions by buyer for defective material must be
+                                            made in writing within 30 days after buyer’s receipt of materials, and buyer
+                                            shall give seller an opportunity to investigate. SELLER IS FURNISHING BASIC MATERIALS
+                                            AND PRODUCTS OF VARIOUS MANUFACTURERS AT STANDARD PRICES AND IS NOT INSURING
+                                            BUYER AGAINST POSSIBLE CONSEQUENCES OF ERROR, OMISSIONS OR NEGLECT IN MANUFACTURE,
+                                            PRODUCTION OR DELIVERY. EXCEPT FOR BREACH OF THE EXPRESS WARRANTY SPECIFIED ABOVE,
+                                            SELLER SHALL NOT, UNDER ANY CIRCUMSTANCES BE LIABLE ON ACCOUNT OF ANY IMPERFECTION,
+                                            DEVIATION FROM SPECIFICATIONS OR OTHER DEFECT IMPAIRING THE QUALITY, VALUE OR
+                                            SUITABILITY FOR ANY PURPOSE, OF ANY PRODUCT OR MATERIAL SOLD HEREUNDER, WHETHER
+                                            CAUSED BY SELLER’S NEGLIGENCE OR OTHERWISE. IN NO EVENT SHALL SELLER BE LIABLE
+                                            FOR CONSEQUENTIAL, PUNITIVE, SPECIAL OR CONTINGENT DAMAGES, OR ANY OTHER CLAIM
+                                            OR DEMAND WHATSOEVER, EXCEPT TO THE EXTENT OF THE PURCHASE PRICE OF THE PRODUCT,
+                                            THE REFUND OF WHICH SHALL BE BUYER’S SOLE AND EXCLUSIVE REMEDY HEREUNDER. BUYER
+                                            ASSUMES ALL RISK OF LOSS, DAMAGE, OR DELAY INCIDENT TO THE FURNISHING OF ANY
+                                            PRODUCT BY SELLER HEREUNDER, OR THE UTILIZATION THEREOF, EXCEPT TO THE EXTENT
+                                            EXPRESSLY ABOVE PROVIDED. Seller shall have no responsibility to make any claim
+                                            for loss, damage or injury to shipments caused by a carrier or others, after
+                                            delivery to carrier at seller’s shipping point. Any claim by buyer against seller
+                                            for shortage or damage occurring prior to delivery to carrier must be made within
+                                            5 days after receipt of materials and accompanied by the original transportation
+                                            bill signed by carrier noting that carrier received material from shipper in
+                                            the condition claimed.
+                                        </p>
+                                    </td>
+                                    <td style="vertical-align:top;">
+                                        <p>
+                                            <b>GENERAL</b> - All prices on seller’s quotations are for acceptance within 30
+                                            days unless otherwise stated in writing. Neither seller’s quotation prices, nor
+                                            invoice charges for materials, include any field or service work or operator
+                                            training unless so stated in writing. The right to correct typographical errors
+                                            is hereby reserved.
+                                        </p>
+                                        <p>
+                                            When seller’s quotation prices or invoice charges for materials include standard shipping charges, it is understood that
+                                            the method of shipment will be at the seller’s option, and buyer is responsible
+                                            for furnishing labor and equipment for unloading within the time limit allowed
+                                            by the carrier. Seller’s quotations do not guarantee to include all materials
+                                            required for a specific project, nor that the material quantities, sizes or specifications
+                                            noted are correct. Buyer assumes all liability for type and quantity of materials
+                                            ordered. Orders are not subject to cancellation, return or back charge, or change
+                                            in specifications, shipping schedules or other conditions without the seller’s
+                                            written consent. When orders have been filled as specified, no items may be returned,
+                                            nor will any credit be allowed, unless the consent of seller has first been secured,
+                                            and only standard stock items returned will, if accepted, be credited less the
+                                            cost of handling and the freight costs involved. Materials not normally stocked
+                                            by seller may not be returned for credit.
+                                        </p>
+                                        <p>
+                                            Except as otherwise provided, all quotations and sales shall be subject to these terms and conditions and buyer is conclusively
+                                            presumed to have accepted these terms and conditions unless otherwise agreed
+                                            in writing. Orders designated to be invoiced directly by the manufacturer are
+                                            subject to acceptance by such manufacturer and to such manufacturer’s terms and
+                                            conditions, and to these terms and conditions. In the event of inconsistency
+                                            or conflict between the terms and conditions of the manufacturer and seller,
+                                            the manufacturer’s terms and conditions that are involved in such inconsistency
+                                            or conflict shall have priority.
+                                        </p>
+                                        <p>
+                                            Until all amounts owed by buyer to seller pursuant to these terms and conditions and any other contract between seller and
+                                            buyer are collected and paid in full, seller retains a security interest in the
+                                            goods supplied and buyer grants to seller a purchase money security interest
+                                            under the Uniform Commercial Code in and lien upon such goods, as well as all
+                                            attachments, additions and accessions thereto, all as security for the payment
+                                            of all such amounts and the performance by buyer of all its obligations to seller.
+                                            Buyer acknowledges that this security interest continues in all proceeds of such
+                                            goods, attachments, additions and accessions, including cash, checks, notes,
+                                            accounts receivable, proceeds of the unearned premiums on property insurance
+                                            and other collections received by buyer. Buyer further acknowledges that seller’s
+                                            purchase money security interest continues notwithstanding any attachment or
+                                            affixing of the goods, attachments, additions or accessions to real estate.
+                                        </p>
+                                        <p>
+                                            In the event buyer’s purchase order states terms additional to, or different from, these terms and conditions, then seller’s
+                                            acknowledgment in accordance with these terms and conditions shall be deemed
+                                            a notification of objection to such additional or different terms, or in the
+                                            event such purchase order expressly limits acceptance to its terms, the seller’s
+                                            acknowledgment shall constitute an offer to sell that may be accepted only in
+                                            accordance with these terms and conditions, without modification, addition or
+                                            alteration. Under those circumstances the failure of buyer to deliver notification
+                                            of objection to these terms and conditions within a reasonable time shall be
+                                            deemed an acceptance hereof and a contract shall be formed only upon these terms
+                                            and conditions.
+                                        </p>
+                                        <p>
+                                            This agreement constitutes the sole and entire agreement between buyer and seller and none of the terms and conditions contained
+                                            herein may be added to, deleted, modified or altered except by written instrument
+                                            signed by seller. There are no oral understandings, representations or agreements
+                                            relative to this agreement, which are not fully expressed herein. The laws of
+                                            the State of Colorado shall govern the validity, interpretation and enforcement
+                                            hereof. All orders are received subject to approval and acceptance by an officer
+                                            of seller and seller reserves the right to reject any orders as well as the right
+                                            to select its own customers.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:form>
+    </body>
+</apex:page>

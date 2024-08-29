@@ -1,0 +1,694 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 12-01-2023
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <table>
+        <tr>
+            <td class="tableAlign">
+                <!-- Sales  -->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 98%;" cellspacing=9px>
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <td style="width: 50%; font-weight: bold; ">Sales</td>
+                            <td colspan=2 class="centerHeading">AS SOLD</td>
+                            <td colspan=2 class="centerHeading">ACTIVE FINANCIALS</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DIRECT </td>
+                            <td colspan="2">
+                                <!-- ${asSoldQuote.salesDirect} -->
+                                <lightning-formatted-number value={asSoldQuote.salesDirect} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                            <td colspan="2">
+                                <!-- ${activeFinancialQuote.salesDirect} -->
+                                <lightning-formatted-number value={activeFinancialQuote.salesDirect}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BUY/RESELL</td>
+                            <td colspan="2">
+                                <lightning-formatted-number value={asSoldQuote.salesBuyReSell} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                            <td colspan="2">
+                                <lightning-formatted-number value={activeFinancialQuote.salesBuyReSell}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL PROJECT SALES</td>
+                            <td colspan="2"><lightning-formatted-number value={asSoldQuote.totalProjectSales}
+                                    format-style="currency" currency-code="USD"></lightning-formatted-number></td>
+                            <td colspan="2"><lightning-formatted-number value={activeFinancialQuote.totalProjectSales}
+                                    format-style="currency" currency-code="USD"></lightning-formatted-number></td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th colspan="5">COST</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DIRECT</td>
+                            <td colspan="2">N/A</td>
+                            <td colspan="2">N/A</td>
+                        </tr>
+                        <tr>
+                            <td>BUY/RESELL</td>
+                            <td colspan="2">
+                                <lightning-formatted-number value={asSoldQuote.costBuyResell} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                            <td colspan="2">
+                                <lightning-formatted-number value={activeFinancialQuote.costBuyResell}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL PROJECT COST</td>
+                            <td colspan="2"><lightning-formatted-number value={asSoldQuote.costBuyResell}
+                                    format-style="currency" currency-code="USD"></lightning-formatted-number></td>
+                            <td colspan="2"><lightning-formatted-number value={activeFinancialQuote.costBuyResell}
+                                    format-style="currency" currency-code="USD"></lightning-formatted-number></td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <td>MARGIN</td>
+                            <td><b>$</b></td>
+                            <td><b>%</b></td>
+                            <td><b>$</b></td>
+                            <td><b>%</b></td>
+                        </tr>
+                    </thead>
+                    <template if:true={asSoldQuote}>
+                        <tbody>
+                            <tr>
+                                <td>COMISSION/REBATE</td>
+                                <td>
+                                    <lightning-formatted-number value={asSoldQuote.marginCommissionRebate}
+                                        format-style="currency" currency-code="USD"> </lightning-formatted-number>
+                                </td>
+                                <td>
+                                    {asSoldQuote.marginCommissionRebatePercentage}%
+                                </td>
+                                <td>
+                                    <lightning-formatted-number value={activeFinancialQuote.marginCommissionRebate}
+                                        format-style="currency" currency-code="USD"> </lightning-formatted-number>
+                                </td>
+                                <td>
+                                    <template if:true={activeFinancialQuote.marginCommissionRebatePercentage}>
+                                        {activeFinancialQuote.marginCommissionRebatePercentage}%
+                                    </template>
+                                    <template if:false={activeFinancialQuote.marginCommissionRebatePercentage}>
+                                        N/A
+                                    </template>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BUY/RESELL</td>
+                                <td>
+                                    <lightning-formatted-number value={asSoldQuote.marginBuyResell}
+                                        format-style="currency" currency-code="USD"> </lightning-formatted-number>
+                                </td>
+                                <td>
+                                    {asSoldQuote.marginBuyResellPercentage}%
+                                </td>
+                                <td>
+                                    <lightning-formatted-number value={activeFinancialQuote.marginBuyResell}
+                                        format-style="currency" currency-code="USD"> </lightning-formatted-number>
+                                </td>
+                                <td>{activeFinancialQuote.marginBuyResellPercentage}%</td>
+                            </tr>
+                            <tr class="bgcolorOfTotal">
+                                <td>TOTAL PROJECT MARGIN</td>
+                                <td>
+                                    <lightning-formatted-number value={asSoldQuote.totalProjectMargin}
+                                        format-style="currency" currency-code="USD"> </lightning-formatted-number>
+                                </td>
+                                <td>
+                                    {asSoldQuote.totalProjectMarginPercentage}%
+                                </td>
+                                <td>
+                                    <lightning-formatted-number value={activeFinancialQuote.totalProjectMargin}
+                                        format-style="currency" currency-code="USD"> </lightning-formatted-number>
+                                </td>
+                                <td>{activeFinancialQuote.totalProjectMarginPercentage}%</td>
+                            </tr>
+                        </tbody>
+                    </template>
+
+                </table>
+                <br>
+                <br>
+                <!--Sales AFQ Table -->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 70%;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th colspan=2 style="width: 50%;">SALES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DIRECT</td>
+                            <td>
+                                <!-- ${activeFinancialQuote.salesDirect} -->
+                                <lightning-formatted-number value={activeFinancialQuote.salesDirect}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BUY/RESELL</td>
+                            <td>
+                                <!-- ${activeFinancialQuote.salesBuyReSell} -->
+                                <lightning-formatted-number value={activeFinancialQuote.salesBuyReSell}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL BOOKINGS</td>
+                            <td>
+                                <!-- ${activeFinancialQuote.totalProjectSales} -->
+                                <lightning-formatted-number value={activeFinancialQuote.totalProjectSales}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Margin Table-->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 70%;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th colspan=2 style="width: 50%;">MARGIN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>COMMISSION/REBATE</td>
+                            <td>
+                                <lightning-formatted-number value={activeFinancialQuote.marginCommissionRebate}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BUY/RESELL</td>
+                            <td>
+                                <lightning-formatted-number value={activeFinancialQuote.marginBuyResell}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL </td>
+                            <td>
+                                <lightning-formatted-number value={activeFinancialQuote.totalProjectMargin}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Invoiced Table-->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 70%;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th colspan=2 style="width: 50%;">INVOICED</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>COMMISSION/REBATE</td>
+                            <td>
+                                <lightning-formatted-number value={total.totalInvoicedCR} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BUY/RESELL</td>
+                            <td>
+                                <lightning-formatted-number value={total.totalInvoicedBR} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL </td>
+                            <td>
+                                <lightning-formatted-number value={total.totalInvoiced} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Backlog(Revenue)-->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 70%;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th colspan=2 style="width: 50%;">BACKLOG(BOOKED NOT INVOICED)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>REVENUE-COMMISSION/REBATE</td>
+                            <td>
+                                <lightning-formatted-number value={total.revenueCommisionAndRebate}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>REVENUE-BUY/RESELL</td>
+                            <td>
+                                <lightning-formatted-number value={total.revenueBuyResell} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL BACKLOG-SALES</td>
+                            <td>
+                                <lightning-formatted-number value={total.totalRevenue} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Backlog(Margin)-->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 70%;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th colspan=2 style="width: 50%;">BACKLOG(BOOKED NOT INVOICED)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MARGIN-COMMISSION/REBATE</td>
+                            <td>
+                                <lightning-formatted-number value={total.marginCommisionAndRebate}
+                                    format-style="currency" currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MARGIN-BUY/RESELL</td>
+                            <td>
+                                <lightning-formatted-number value={total.marginBuyResell} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="bgcolorOfTotal">
+                            <td>TOTAL BACKLOG-MARGIN</td>
+                            <td>
+                                <lightning-formatted-number value={total.totalMargin} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <!-- SO/PO table-->
+            <td class="tableAlign">
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 100%;" id="tblSO">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th style="width: 20%;">SO/PO</th>
+                            <th style="width: 20%;">Revenue</th>
+                            <th style="width: 20%;">Cost</th>
+                            <th style="width: 20%;">Margin $</th>
+                            <th style="width: 20%;">Margin %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={lstSalesAndPurchaseOrders} for:item="so">
+                            <tr key={so.id}>
+                                <td>
+                                    <lightning-formatted-url value={so.soUrl} label={so.Name} target="_blank">
+                                    </lightning-formatted-url>
+                                </td>
+                                <td>
+                                    <!-- ${so.AcctSeedERP__Total__c} -->
+                                    <lightning-formatted-number value={so.AcctSeedERP__Total__c} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <template for:each={so.Purchase_Orders__r} for:item="po">
+                                <tr key={po.id}>
+                                    <td style="padding-left: 30px;">
+                                        <lightning-formatted-url value={po.poUrl} label={po.Name} target="_blank">
+                                        </lightning-formatted-url>
+                                    </td>
+                                    <td></td>
+                                    <td style="color: red;">
+                                        <!-- (${po.AcctSeedERP__Total__c}) -->
+                                        (<lightning-formatted-number value={po.AcctSeedERP__Total__c}
+                                            format-style="currency" currency-code="USD">
+                                        </lightning-formatted-number>)
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </template>
+                            <!-- Inventory Cost from product  -->
+                            <template for:each={so.invCost} for:item="ic">
+                                <tr key={ic.id}>
+                                    <td style="padding-left: 30px;">
+                                        <lightning-formatted-url value={ic.icUrl} label={ic.Name}
+                                            target="_blank"></lightning-formatted-url>
+                                    </td>
+                                    <td></td>
+                                    <td style="color: red;">
+                                        (<lightning-formatted-number value={ic.AcctSeed__Unit_Cost__c}
+                                            format-style="currency" currency-code="USD">
+                                        </lightning-formatted-number>)
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </template>
+                            <tr key={so.id} style="background-color: #EBEBEB; font-weight: bold;">
+                                <td style="font-weight: bold;">Totals</td>
+                                <td>
+                                    <!-- ${so.AcctSeedERP__Total__c} -->
+                                    <lightning-formatted-number value={so.AcctSeedERP__Total__c} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>
+                                </td>
+                                <td style="color: red; font-weight: bold;">
+                                    <!-- (${so.poTotal}) -->
+                                    (<lightning-formatted-number value={so.poAndICTotal} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>)
+
+                                </td>
+                                <td>
+                                    <!-- ${so.margin} -->
+                                    <lightning-formatted-number value={so.margin} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>
+                                </td>
+                                <td>{so.marginPercentage}%</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+                <!-- lABOR POSTING WITH JOURNAL ENTRY -->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 100%; margin-top: 20px;" id="tblJournalEntry">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th style="width: 25%;">LABOR POSTINGS</th>
+                            <th style="width: 25%;">HOURS</th>
+                            <th style="width: 25%;">DEBITS/CREDITS</th>
+                            <th style="width: 25%;">REFERENCE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={journalEntryList} for:item="journalEnt">
+                            <tr key={journalEnt.ID}>
+                                <td></td>
+                                <td>{journalEnt.hourQuantity}</td>
+                                <!-- need if its debit then red else credit then green -->
+                                <td style="color: red; font-weight: bold;" if:true={journalEnt.debit}>
+                                    (<lightning-formatted-number value={journalEnt.debit} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>)
+                                </td>
+
+                                <td style="color: green; font-weight: bold;" if:false={journalEnt.debit}>
+                                    (<lightning-formatted-number value={journalEnt.credit} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>)
+                                </td>
+                                <td class="slds-form-element slds-size--1-of-12 td-fixed-width">
+                                    <div class="slds-cell-wrap">{journalEnt.reference}</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                    <tr style="background-color: #EBEBEB; font-weight: bold;">
+                        <td style="font-weight: bold;">TOTAL LABOR</td>
+                        <td></td>
+                        <td style="color: red; font-weight: bold;">
+                            (<lightning-formatted-number value={totalLabourJE} format-style="currency"
+                                currency-code="USD">
+                            </lightning-formatted-number>)
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+                <!-- OTHER POSTING WITH JOURNAL ENTRY -->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 100%; margin-top: 20px;" id="OtherJournalEntry">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th style="width: 25%;">OTHER POSTINGS</th>
+                            <th style="width: 25%;">HOURS</th>
+                            <th style="width: 25%;">DEBITS/CREDITS</th>
+                            <th style="width: 25%;">REFERENCE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={journalEntryOtherList} for:item="journalEntOther">
+                            <tr key={journalEntOther.ID}>
+                                <td></td>
+                                <td>{journalEntOther.hourQuantity}</td>
+                                <!-- need if its debit then red else credit then green -->
+                                <td style="color: red; font-weight: bold;" if:true={journalEntOther.debit}>
+                                    (<lightning-formatted-number value={journalEntOther.debit} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>)
+                                </td>
+
+                                <td style="color: green; font-weight: bold;" if:false={journalEntOther.debit}>
+                                    (<lightning-formatted-number value={journalEntOther.credit} format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>)
+                                </td>
+                                <td class="slds-form-element slds-size--1-of-12 td-fixed-width">
+                                    <div class="slds-cell-wrap">{journalEntOther.reference}</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                    <tr style="background-color: #EBEBEB; font-weight: bold;">
+                        <td style="font-weight: bold;">TOTAL OTHER</td>
+                        <td></td>
+                        <td style="color: red; font-weight: bold;">
+                            (<lightning-formatted-number value={totalOtherJE} format-style="currency"
+                                currency-code="USD">
+                            </lightning-formatted-number>)
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                <!-- GrandTotal table-->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 100%; margin-top: 20px;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th></th>
+                            <th>Total Revenue</th>
+                            <th>Total Cost</th>
+                            <th>Total Margin $</th>
+                            <th>Total Margin %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: green; font-weight: bold; width: 20%;">Grand Totals</td>
+                            <td style="font-weight: bold; width: 20%;">
+                                <lightning-formatted-number value={grandTotalSO} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                            <td style="font-weight: bold; color: red; width: 20%;">
+                                (<lightning-formatted-number value={grandTotalCost} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>)
+
+                            </td>
+                            <td style="color: green; font-weight: bold; width: 20%;">
+                                <lightning-formatted-number value={grandTotalMargin} format-style="currency"
+                                    currency-code="USD">
+                                </lightning-formatted-number>
+                            </td>
+                            <td style="color: green; font-weight: bold; width: 20%;">{grandTotalMarginPercentage}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- Salesman Split-->
+                <table aria-multiselectable="true"
+                    class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                    role="grid" style="width: 100%; margin-top: 20px;">
+                    <thead>
+                        <tr class="slds-line-height_reset" style="height: 25px;">
+                            <th style="width: 50%;">SALESMAN</th>
+                            <th style="width: 50%;">SPLIT</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={salesEngSplitList} for:item="split">
+                            <tr key={split.SplitName}>
+                                <td>{split.SplitName}</td>
+                                <td>{split.splitCommision}%</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+    <br>
+    <div if:true={showCommissionTable}>
+    <div class="lgc-bg">
+        <div class="slds-float_right" style="padding: 0px 6px 6px 0px;">
+          <lightning-button-icon icon-name="utility:refresh" variant="brand" alternative-text="Refresh" onclick={handleRefresh}></lightning-button-icon>
+        </div>
+        <div class="slds-float_right" style="padding: 0px 6px 6px 0px;">
+            <lightning-button-icon icon-name="utility:download" variant="brand" alternative-text="Download" onclick={handleExport}></lightning-button-icon>
+        </div>
+    </div>
+
+    <table aria-multiselectable="true" class="my-table slds-table_edit slds-table_bordered " role="grid"
+        style="width: 100%;" data-id="expTbl">
+        <thead style="font-size: small;">
+            <tr class="slds-line-height_reset" style="height: 25px;">
+                <th style="width: 10%; padding: 0px 3px 0px 3px;">
+                    <div style=" text-align:center;">OPPORTUNITY NAME</div>
+                </th>
+                <th style="width: 10%; padding: 0px 3px 0px 3px;">
+                    <div style="text-align:center;">OPPORTUNITY NUMBER</div>
+                </th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">LEDGER</th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">PROJECT MANAGER</th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;" colspan="2">INVOICED</th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">COMMISSION % INVOICED</th>
+                <th style="width: 10%;">
+                    <div style="padding: 0px 3px 0px 3px; text-align:center;">BR % INVOICED</div>
+                </th>
+                <th style="width: 10%;">
+                    <div style="padding: 0px 3px 0px 3px; text-align:center;">$ COST TO BE EXPENSED</div>
+                </th>
+                <th style="width: 10%;">
+                    <div style="padding: 0px 3px 0px 3px; text-align:center;">ACTUAL EXPENSED COSTS</div>
+                </th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">DEFFERED</th>
+                <th style="width: 10%; text-align: center; padding: 0px 3px 0px 3px;">EXPENSES TO ACCRUE</th>
+                <th style="width: 10%; text-align: center; padding: 0px 3px 0px 3px;">MOVE EXPENSES TO WIP</th>
+                <th style="width: 10%; text-align: center; padding: 0px 3px 0px 3px;">AMOUNT UNDERBILLED (OVERBILLED)
+                </th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th style="text-align: center;">$</th>
+                <th style="text-align: center;">%</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width: 10%; text-align: center;">{opportunityName}</td>
+                <td style="width: 10%; text-align: center;">{opportunityNumber}</td>
+                <td style="width: 10%; text-align: center; padding: 0px 3px 0px 0px">{ledger}</td>
+                <td style="width: 10%; text-align: center; padding: 0px 0px 0px 3px">{projectManager}</td>
+                <td style="width: 4%; text-align: center; padding: 0px 5px 0px 5px;">
+                    <lightning-formatted-number value={total.totalInvoiced} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+                <td style="width: 4%; text-align: center; padding: 0px 5px 0px 5px;">{finalInvoicedPercentage}%</td>
+                <td style="width: 10%; text-align: center;">{commissionInvoiced}%</td>
+                <td style="width: 10%; text-align: center;">{brInvoiced}%</td>
+                <td style="width: 10%; text-align: center;">
+                    <lightning-formatted-number value={costToBeExpensed} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+                <td style="width: 10%; text-align: center;">
+                    <lightning-formatted-number value={grandTotalCost} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+                <td style="width: 10%; text-align: center;">
+                    <lightning-formatted-number value={deffered} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+                <td style="width: 10%; text-align: center;">
+                    <lightning-formatted-number value={expensesToAccrue} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+                <td style="width: 10%; text-align: center;">
+                    <lightning-formatted-number value={moveExpensesToWip} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+                <td style="width: 10%; text-align: center;">
+                    <lightning-formatted-number value={amountUnderBilled} format-style="currency" currency-code="USD">
+                    </lightning-formatted-number>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+    <div style="height: 70px;">
+    </div>
+</template>

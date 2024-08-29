@@ -1,0 +1,88 @@
+<template>
+    <lightning-record-edit-form object-api-name='Product2'
+                            onsuccess={handleSuccess}
+                            onerror={handleError}
+                            onsubmit={loading}>
+        <!--
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-1 slds-align_absolute-center">
+                <lightning-button class="slds-m-top_small" type="submit" label="Save"
+                                    variant="brand" >
+                </lightning-button>
+            </div>
+        </div>
+        -->
+        <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container" 
+            style="margin-bottom: 1%;margin-top: 1%;">
+            <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
+                Product Information
+            </span>
+            
+        </h3>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input-field field-name="Name" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-2" style="padding-left:4%;">
+                <lightning-input-field field-name="Manufacturer__c" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input-field field-name="ProductCode" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-2" style="padding-left:4%;">
+                <lightning-input-field field-name="Product_Type__c" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input-field field-name="Description" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-2" style="padding-left:4%;">
+                <lightning-input-field field-name="IsActive" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input-field field-name="Weight__c" variant="label-inline">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-1" style="padding-top:2%;">
+                <lightning-input-field field-name="Product_Description__c" variant="label-hidden">
+                </lightning-input-field>    
+            </div>
+
+            <div class="slds-col slds-size_1-of-1 slds-align_absolute-center">
+                <lightning-button class="slds-m-top_small" type="submit" label="Save"
+                                    variant="brand" >
+                </lightning-button>
+            </div>
+        </div>
+
+
+    </lightning-record-edit-form>
+    <div if:true={isLoading} class="exampleHolder">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+              <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+              </div>
+            </div>
+          </div>
+    </div>
+    <!--
+    <div class="modal-footer slds-modal__footer">
+        footer
+    </div>
+    -->
+</template>

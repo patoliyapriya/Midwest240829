@@ -1,0 +1,26 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-26-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right slds-m-around_large">
+        <c-design-quote-group-header group-wrapper={groupDetails}
+                                     onaccordion={handleAccordianChange}
+                                     onheadertogglechange={handleHeaderToggleChange}>
+        </c-design-quote-group-header>
+            <template for:each={groupDetails.subGroupDetails} for:item="subGroupItem" lwc:if={groupDetails.isOpen}>
+                <div key={subGroupItem.subGroupId}>
+                <c-design-quote-sub-group sub-group-wrapper={subGroupItem}
+                                        ontogglechange={handleToggleChange}
+                                        onaccordion={handleSubGroupAccordion}>
+                </c-design-quote-sub-group>
+                </div>
+            </template>
+        <c-design-quote-group-footer group-wrapper={groupDetails} 
+                                    onfootertogglechange={handleFooterToggleChange}>
+        </c-design-quote-group-footer>
+    </div>
+</template>

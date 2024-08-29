@@ -1,0 +1,27 @@
+<template>
+        <template if:true={submittedExpense}>
+          <lightning-card title="Submitted Expense">
+                <lightning-datatable 
+                    key-field="id" 
+                    columns={columns} 
+                    data={submittedExpense} 
+                    hide-checkbox-column>
+                </lightning-datatable>
+
+                <lightning-datatable 
+                    key-field="id" 
+                    columns={columns} 
+                    data={totalLineForSubExp}
+                    hide-checkbox-column
+                    hide-table-header="true"
+                    class="noRowHover">
+                </lightning-datatable>
+         </lightning-card>
+        </template>
+
+
+    <template if:false={submittedExpense}>
+        <lightning-card style="font-weight: bold ;"><div style="margin-left: 1%;">{errorMessage}</div></lightning-card>
+    </template>
+    
+</template>

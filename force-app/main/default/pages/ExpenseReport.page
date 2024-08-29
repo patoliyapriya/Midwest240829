@@ -1,0 +1,816 @@
+<apex:page sidebar="false" controller="ExpenseReportController" lightningStylesheets="true">
+    <style>
+       
+
+        #table td {
+            padding: 5px !important;
+           
+        }
+
+        .tblYear td {
+            border: 1px solid black;
+        
+        }
+    
+    </style>
+    <!-- <apex:slds /> -->
+    <apex:tabPanel switchType="client" selectedTab="ExpanceRpt" id="theTabPanel"  tabClass="activeTab" inactiveTabClass="inactiveTab">
+     <apex:tab label="EXPENSE REPORT" style="font-size: 12px" name="ExpanceRpt" id="tabOne">
+      
+    <table id="table" class="tblYear">
+        <tr style="background-color: #1797c0; ">
+            <td rowspan="2" style="font-weight: bold; color: white;">Brian Gomski</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">January</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">February</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">March</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">April</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">May</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">June</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">July</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">August</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">September</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">October</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">November</td>
+            <td colspan="2" style="font-weight: bold;text-align: center;color: white;">December</td>
+        </tr>
+        <tr style="background-color: #1797c0;">
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+
+            <td style="font-weight: bold;text-align: center;color: white;">Company Card</td>
+            <td style="font-weight: bold;text-align: center;color: white;">Personal Card</td>
+        </tr>
+        <apex:repeat value="{!lstExpenseReport}" var="expense">
+            <tr>
+                <td>{!expense.expenseType}</td>
+
+                <td style="text-align: right;">
+                    <!-- data for companycard column jan-->
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJanuary.companyAmount}"/>
+                    </apex:outputText>
+                    <!-- It is calculating total expense of company card for jan -->
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJanuary.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <!-- personal card data of column  for jan -->
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJanuary.personalCardAmount}"/>
+                    </apex:outputText>
+                    <!-- total expense of personal card of jan -->
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJanuary.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountFebruary.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountFebruary.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountFebruary.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountFebruary.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMarch.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMarch.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMarch.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMarch.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountApril.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountApril.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountApril.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountApril.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMay.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMay.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMay.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountMay.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJune.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJune.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJune.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJune.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJuly.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJuly.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJuly.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountJuly.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+                <!-- August  compsny ard-->
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountAugust.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountAugust.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountAugust.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountAugust.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountSeptember.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountSeptember.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountSeptember.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountSeptember.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountOctober.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountOctober.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountOctober.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountOctober.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountNovember.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountNovember.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountNovember.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountNovember.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountDecember.companyAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountDecember.totalCompanyAmount}"/>
+                    </apex:outputText>
+                </td>
+                <td style="text-align: right;">
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType != 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountDecember.personalCardAmount}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!expense.expenseType == 'TOTAL EXPENSES'}">
+                        <apex:param value="{!expense.expenseAmountDecember.totalPersonalCardAmount}"/>
+                    </apex:outputText>
+                </td>
+            </tr>
+        </apex:repeat>
+    
+        <apex:repeat value="{!lstExpenseMiles}" var="miles">
+            <tr>
+                <td>{!miles.expenseType}</td>
+                <td colspan="2" style="text-align: right;">
+                    <!-- total miles mileage Reimbursment  -->
+                    <apex:outputText value="{!miles.expenseAmountJanuary.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountJanuary.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountJanuary.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountJanuary.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountFebruary.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountFebruary.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountFebruary.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountFebruary.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountMarch.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountMarch.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountMarch.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountMarch.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountApril.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountApril.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountApril.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountApril.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountMay.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountMay.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountMay.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountMay.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountJune.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountJune.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountJune.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountJune.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountJuly.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountJuly.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountJuly.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountJuly.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountAugust.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountAugust.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountAugust.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountAugust.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountSeptember.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountSeptember.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountSeptember.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountSeptember.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountOctober.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountOctober.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountOctober.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountOctober.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountNovember.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountNovember.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountNovember.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountNovember.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+                <td colspan="2" style="text-align: right;">
+                    <apex:outputText value="{!miles.expenseAmountDecember.totalMiles}" rendered="{!miles.expenseType == 'TOTAL MILES'}" />
+                    <apex:outputText value="{0, Number, Currency}" rendered="{!miles.expenseType == 'MILEAGE REIMBURSMENT'}">
+                        <apex:param value="{!miles.expenseAmountDecember.mileageReimbursment}"/>
+                    </apex:outputText>
+                    <apex:outputText value="{!miles.expenseAmountDecember.otherReimbursement}" rendered="{!miles.expenseType == 'Other Reimbursement'}" />
+                    <apex:outputText value="{!miles.expenseAmountDecember.totalReimbursement}" rendered="{!miles.expenseType == 'Total Reimbursement'}" />
+                </td>
+            </tr>
+        </apex:repeat>
+    </table>
+    
+  </apex:tab>
+         <apex:tab label="FOR ACCOUNTING USE ONLY"  style="font-size: 12px" name="ForAccount" id="tabTwo">
+            <table id="table" class="tblYear">
+                <tr style="background-color: #1797c0;">
+                    <td rowspan="2" style="font-weight: bold; color: white; background-color: black;">FOR ACCOUNTING USE ONLY</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">January</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">February</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">March</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">April</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">May</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">June</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">July</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">August</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">September</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">October</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">November</td>
+                    <td colspan="2" style="font-weight: bold;text-align: center;color: white;">December</td>
+                </tr>
+                <tr style="background-color: #1797c0;">
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+
+                    <td style="font-weight: bold;text-align: center;color: white;">DEBIT</td>
+                    <td style="font-weight: bold;text-align: center;color: white;">CREDIT</td>
+                </tr>
+
+                <!-- 610 code -->
+                <tr>
+                    <td style="text-align: right;">610-00</td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountJanuary.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountJanuary.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountFebruary.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountFebruary.credit}"/>
+                        </apex:outputText>
+                        
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountMarch.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountMarch.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountApril.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountApril.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountMay.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountMay.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountJune.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountJune.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountJuly.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountJuly.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountAugust.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountAugust.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountSeptember.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountSeptember.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountOctober.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountOctober.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountNovember.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountNovember.credit}"/>
+                        </apex:outputText>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <!-- debit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, false, true)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountDecember.sixZeroOne}"/>
+                        </apex:outputText>
+                    </td>
+                    <td style="text-align: right;">
+                        <!-- credit -->
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!IF(lstExpenseTotal[0].expenseCode = currentUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountDecember.credit}"/>
+                        </apex:outputText>
+                        <apex:outputText value="{0, Number, Currency}" rendered="{!If(lstExpenseTotal[0].expenseCode = checkToUserName, true, false)}">
+                            <apex:param value="{!lstExpenseTotal[0].expenseAmountDecember.credit}"/>
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <!-- end of 610 -->
+                <apex:repeat value="{!lstExpenseTotal}" var="expense">
+                    <tr>
+                        <td style="text-align: right;">{!expense.expenseCode}</td>
+    
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountJanuary.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit  for brian total on credit-->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountJanuary.credit}"/>
+                            </apex:outputText>
+                            <!-- Check to  Row (credit total from brian) - (expense totalCompanyAmount)-->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountJanuary.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountFebruary.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountFebruary.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountFebruary.credit}"/>
+                            </apex:outputText>
+                            
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountMarch.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountMarch.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountMarch.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountApril.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountApril.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountApril.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountMay.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountMay.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountMay.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountJune.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountJune.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountJune.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountJuly.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountJuly.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountJuly.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountAugust.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountAugust.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountAugust.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountSeptember.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountSeptember.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountSeptember.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountOctober.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountOctober.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountOctober.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountNovember.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountNovember.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountNovember.credit}"/>
+                            </apex:outputText>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <!-- debit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, false, true)}">
+                                <apex:param value="{!expense.expenseAmountDecember.debit}"/>
+                            </apex:outputText>
+                        </td>
+                        <td style="text-align: right;">
+                            <!-- credit -->
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!IF(expense.expenseCode = currentUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountDecember.credit}"/>
+                            </apex:outputText>
+                            <apex:outputText value="{0, Number, Currency}" rendered="{!If(expense.expenseCode = checkToUserName, true, false)}">
+                                <apex:param value="{!expense.expenseAmountDecember.credit}"/>
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </apex:repeat>
+
+            </table>
+            <h1 style="font-weight:bold; color:red;">BETA TESTING TOOL - DO NOT REFERENCE</h1>
+        </apex:tab>
+        
+    </apex:tabPanel>
+</apex:page>

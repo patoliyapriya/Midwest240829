@@ -1,0 +1,74 @@
+.edit-icon {
+    display: none;
+}
+
+.slds-cell-edit:hover .edit-icon {
+    display: inline-block;
+}
+
+.tableWidth {
+    width:60px;
+}
+
+td {
+    padding-left: 6px !important;
+    padding-right: 3px !important;
+}
+
+.wrapText {
+    text-wrap: balance;
+}
+
+th {
+    padding-left: 5px !important;
+}
+
+.addcolor{
+    background-color: var(--slds-g-color-error-base-40,#b94a48);
+    color: #ffffff;
+}
+
+.removecolor{
+    background-color: #ffffff !important;
+}
+
+.decriptionRow{
+    min-height: 1.8rem;
+    display: block;
+}
+
+.displayBlock {
+    display: block;
+}
+
+.displayNone {
+    display: none;
+}
+
+.slds-table:not(.slds-no-row-hover) tbody tr.tr-hover:hover > td {
+    background-color: var(--slds-g-color-error-base-40,#b94a48) !important;
+}
+
+.color_black {
+    color: black !important;
+}
+
+.slds-table tbody tr[draggable="true"] {
+    cursor: move;
+}
+
+.smooth-transition {
+    transition: all 2 ease;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+}
+
+.smooth-transition.open {
+    max-height: 1000px; /* adjust as necessary */
+    opacity: 1;
+}
+
+.dragClass {
+    cursor: move !important;
+}

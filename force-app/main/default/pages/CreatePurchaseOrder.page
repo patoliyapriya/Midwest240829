@@ -1,0 +1,87 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 10-29-2023
+  @last modified by  : Nilesh Badrakiya
+-->
+<apex:page extensions="CreatePurchaseOrderCtrl" standardController="AcctSeedERP__Sales_Order__c" sidebar="false" lightningStyleSheets="true">
+    <script>
+        function doCheckRun(preview){
+             document.getElementById("spinner").style.display = "block";
+             Controller.remoteActionFunction(function(result) {
+                 document.getElementById("spinner").style.display = "none";
+             });
+        }    
+    </script>
+    <apex:form >
+        <apex:pageMessages ></apex:pageMessages>
+        <apex:pageBlock title="Sales Order Products">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="View Draft Purchase Orders"
+                                    action="{!prepareDraftPO}"
+                                    onclick="doCheckRun(true);return false;"/>
+                <apex:commandButton value="Back"
+                                    action="{!goToOrder}"
+                                    immediate="true"/> 
+                                    <div id="spinner" style="margin-top: -2%;margin-left: 18%;display: none">
+                                        <img src="/img/loading.gif" />
+                                     </div> 
+            </apex:pageBlockButtons>
+  
+            <apex:pageBlockSection collapsible="false" title="Sales Order Products" columns="1">
+            <apex:pageBlockTable value="{!orderLineWrapperList}" var="lineItem">
+                <apex:column value="{!lineItem.orderLine.Name}" width="5%"/>
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Product__r.Name}" width="20%"/>
+                <apex:column value="{!lineItem.tag}" width="10%" headerValue="Tag"/>
+                <apex:column value="{!lineItem.orderLine.Quote_Line_Item__r.Descriptions__c}" width="20%"/>
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Product__r.ProductCode}" width="15%"/>
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Product__r.Manufacturer__c}" width="15%"/>
+                <apex:column headerValue="Vendor" width="15%">
+                    <apex:inputField value="{!lineItem.PurchaseOrder.AcctSeedERP__Vendor__c}" />
+            </apex:column>
+            </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+    
+    <apex:pageBlock title="Draft Purchase Orders" rendered="{!isViewDraft}">
+        <apex:pageBlockButtons >
+            <apex:commandButton value="Create Purchase Orders"
+                                action="{!createPurchaseOrderAndPOLines}"/>
+            <apex:commandButton value="Back"
+                                action="{!goToOrder}"
+                                immediate="true"/> 
+        </apex:pageBlockButtons>
+        <apex:repeat value="{!orderPOWrapperByVendor}" var="vendor">
+            <apex:pageBlockSection collapsible="false" title="Purchase Order" columns="1">
+                <apex:outputField value="{!orderPOWrapperByVendor[vendor][0].PurchaseOrder.AcctSeedERP__Vendor__c}" />
+                <apex:inputField value="{!orderPOWrapperByVendor[vendor][0].PurchaseOrder.AcctSeedERP__Type__c}" label="PO Type" />
+            </apex:pageBlockSection>
+            <apex:pageBlockTable value="{!orderPOWrapperByVendor[vendor]}" var="lineItem">
+                
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Product__r.Name}" width="15%"/>
+                <apex:column value="{!lineItem.orderLine.Quote_Line_Item__r.Descriptions__c}" width="19%"/>
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Quantity_Needed__c}" width="8%"/>
+                <apex:column headerValue="Quantity Unreceived" width="8%">
+                    <apex:outputText value="{!lineItem.QuantityUnreceived}" />
+                </apex:column>
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Product__r.AcctSeedERP__Minimum_Order_Quantity__c}" width="8%"/>
+                <apex:column value="{!lineItem.orderLine.AcctSeedERP__Product__r.AcctSeedERP__Safety_Stock_Quantity__c}" width="8%"/>
+                <apex:column headerValue="Quantity" width="8%">
+                    <apex:outputText value="{!lineItem.POItem.AcctSeedERP__Quantity__c}" style="width: 80%"/>
+                </apex:column>
+                <apex:column headerValue="Unit Price" width="8%">
+                    <apex:outputText value="{!lineItem.POItem.AcctSeedERP__Unit_Price__c}" style="width: 80%"/>
+                </apex:column>
+                <apex:column headerValue="Total" width="10%">
+                    <apex:outputText value="{0, number, Currency}">
+                    <apex:param value="{!lineItem.POItem.AcctSeedERP__Quantity__c * lineItem.POItem.AcctSeedERP__Unit_Price__c}" />
+                    </apex:outputText>
+                </apex:column>
+        </apex:pageBlockTable>
+        </apex:repeat>
+    </apex:pageBlock>
+
+</apex:form>
+</apex:page>

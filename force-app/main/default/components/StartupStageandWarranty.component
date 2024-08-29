@@ -1,0 +1,192 @@
+<apex:component controller="EmailStartupStageAndWarranty" access="global">
+    <apex:attribute name="projectName" description="This is the value for the project." type="String" 
+            assignTo="{!projectId}"/>        
+               
+            <apex:variable var="setFieldHistory" value="{!''}{!setFieldChange}" />
+    
+            <table width="100%" cellspacing="0" border="1" cellpadding="3" style="font-size:12px;">
+                <tr>
+                    <td colspan="12" style="font-family:Arial;font-size:16px;color:#2e75b6;font-weight:bold;">STAGE STATUS</td>
+                </tr>
+                <tr style="background-color:#0B7EC7;">
+                    <td style="color:white;"><b>Product Group Name</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Tag__c, 'none', 'table-cell')};"><b>Tag</b></td>
+                    <td style="color:white;"><b>Submittals</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Release__c, 'none', 'table-cell')}"><b>Release #</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Released_to_Mfgr__c, 'none', 'table-cell')}"><b>Released to mfgr</b></td>
+                    <td style="color:white;"><b>Est. Ship</b></td>
+                    <td style="color:white;"><b>Tracking #</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Act_Ship__c, 'none', 'table-cell')}"><b>Act. Ship</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_IOM_Done__c, 'none', 'table-cell')}"><b>IOM Done</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Billing_Status__c, 'none', 'table-cell')}"><b>Billing Status</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Date_of_Billing__c, 'none', 'table-cell')}"><b>Date of Billing</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Payment_Received__c, 'none', 'table-cell')}"><b>Payment Received</b></td>
+                    <td style="color:white;display: {!IF(currentProject.Hide_Note__c, 'none', 'table-cell')}"><b>Note</b></td>
+                </tr>
+                <apex:repeat value="{!lstProductStageStatus}" var="pg">
+                    <tr>
+                        <td colspan="12" style="font-size:14px;font-weight:bold;">{!pg.productGroup.Name}</td>
+                    </tr>
+                    <apex:repeat value="{!pg.lstProductSubGroup}" var="psg">
+                        <tr>
+                            <td colspan="12" style="font-weight:bold;">{!psg.productGroup.Name} </td>
+                        </tr>
+                        <apex:repeat value="{!psg.lstProductSelected}" var="product">
+                            <tr>
+                                <td >
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Product_Name__c'),'green','')}">
+                                        {!product.productDetails.Product_Name__c}
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Tag__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Tag__c'),'green','')}">
+                                        {!product.productDetails.Tag__c}
+                                    </div>
+                                </td>
+                                <td >
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Submittals__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.Submittals__c}" />
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Release__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Release_pick__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.Release_pick__c}" />
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Released_to_Mfgr__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Release_Date__c'),'green','')}">
+                                        <apex:outputText value="{0, date, MM/dd/yy}" > 
+                                            <apex:param value="{!product.productDetails.Release_Date__c}" /> 
+                                        </apex:outputText>
+                                    </div>
+                                </td>
+                                <td >
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Estimated_Ship_Date__c'),'green','')}">
+                                        <apex:outputText value="{0, date, MM/dd/yy}" > 
+                                            <apex:param value="{!product.productDetails.Estimated_Ship_Date__c}" /> 
+                                        </apex:outputText>
+                                    </div>
+                                </td>
+                                <td >
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Tracking_Number__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.Tracking_Number__c}" > 
+                                        </apex:outputText>
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Act_Ship__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Act_Ship__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.Act_Ship__c}" />
+                                    </div>
+                                </td>
+                               
+                                <td style="display: {!IF(currentProject.Hide_IOM_Done__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'IOM_Completed__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.IOM_Completed__c}" rendered="{!product.productDetails.IOM_Completed__c == true}" />
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Billing_Status__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Billing_Status__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.Billing_Status__c}" />
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Date_of_Billing__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Date_of_Billing__c'),'green','')}">
+                                        <apex:outputText value="{0, date, MM/dd/yy}" > 
+                                            <apex:param value="{!product.productDetails.Date_of_Billing__c}" /> 
+                                        </apex:outputText>
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Payment_Received__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Payment_Received__c'),'green','')}">
+                                        <apex:outputText value="{0, date, MM/dd/yy}" > 
+                                            <apex:param value="{!product.productDetails.Payment_Received__c}" /> 
+                                        </apex:outputText>
+                                    </div>
+                                </td>
+                                <td style="display: {!IF(currentProject.Hide_Note__c, 'none', 'table-cell')};">
+                                    <div style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Note__c'),'green','')}">
+                                        <apex:outputText value="{!product.productDetails.Note__c}" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </apex:repeat>
+                </apex:repeat>
+            </table>
+        
+            <br/>
+            <br/>
+            
+            <table width="100%" border="1" cellspacing="0" cellpadding="3" style="font-size:12px;">
+                <tr>
+                    <td colspan="11" style="font-family:Arial;font-size:16px;color:#2e75b6;font-weight:bold;"><apex:outputText >STARTUP AND WARRANTY</apex:outputText></td>
+                </tr>
+                <tr style="background-color:#0B7EC7;">
+                    <td style="color:white;"><b>Product Group Name</b></td>
+                    <td style="color:white;"><b>Product Code</b></td>
+                    <td style="color:white;"><b>Serial Number</b></td>
+                    <td style="color:white;"><b>Schedule Startup</b></td>
+                    <td style="color:white;"><b>Completed Startup</b></td>
+                    <td style="color:white;"><b>Warranty</b></td>
+                    <td style="color:white;"><b>Warranty Type</b></td>
+                    <td style="color:white;"><b>Parts Covered</b></td>
+                    <td style="color:white;"><b>Warranty Start</b></td>
+                    <td style="color:white;"><b>Warranty End</b></td>
+                </tr>
+                <apex:repeat value="{!lstProductStartupAndWarranty}" var="pg">
+                    <tr>
+                        <td colspan="10" style="font-weight:bold;font-size:14px;">{!pg.productGroup.Name}</td>
+                    </tr>
+                    <apex:repeat value="{!pg.lstProductSubGroup}" var="psg">
+                        <tr>
+                            <td colspan="10" style="font-weight:bold;">
+                                {!psg.productGroup.Name} 
+                            </td>
+                        </tr>
+                        <apex:repeat value="{!psg.lstProductSelected}" var="product">
+                            <tr>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Product_Name__c'),'green','')}">
+                                    {!product.productDetails.Product_Name__c}
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Product_Code__c'),'green','')}">
+                                    {!product.productDetails.Product_Code__c}
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Serial_Number__c'),'green','')}">
+                                    <apex:outputText value="{!product.productDetails.Serial_Number__c}" />
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Schedule_Startup_Date__c'),'green','')}">
+                                    <apex:outputText value="{0,date,MM/dd/yy}" > 
+                                        <apex:param value="{!product.productDetails.Schedule_Startup_Date__c}" /> 
+                                    </apex:outputText>
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Completed_Startup_Date__c'),'green','')}">
+                                    <apex:outputText value="{0,date,MM/dd/yy}" > 
+                                        <apex:param value="{!product.productDetails.Completed_Startup_Date__c}" /> 
+                                    </apex:outputText>
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Warranty_Term__c'),'green','')}">
+                                    <apex:outputText value="{!product.productDetails.Warranty_Term__c}" />
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Warranty_Type__c'),'green','')}">
+                                    <apex:outputText value="{!product.productDetails.Warranty_Type__c}" />
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Warranty_Parts_Covered__c'),'green','')}">
+                                    <apex:outputText value="{!product.productDetails.Warranty_Parts_Covered__c}" />
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Warranty_Start_Date__c'),'green','')}">
+                                    <apex:outputText value="{0,date,MM/dd/yy}" > 
+                                        <apex:param value="{!product.productDetails.Warranty_Start_Date__c}" /> 
+                                    </apex:outputText>
+                                </td>
+                                <td style="background-color: {!IF(CONTAINS(setFieldHistory, product.productDetails.Id + 'Warranty_End_Date__c'),'green','')}">
+                                    <apex:outputText value="{0,date,MM/dd/yy}" > 
+                                        <apex:param value="{!product.productDetails.Warranty_End_Date__c}" /> 
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </apex:repeat>
+                </apex:repeat>
+            </table>
+        
+</apex:component>

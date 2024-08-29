@@ -1,0 +1,124 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-30-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <template if:true={showModal}>
+        <c-new-sub-group-modal quoteid={quoteid} 
+                            groupid={groupDetails.groupId} 
+                            onhidemodal={handleHideModal}>
+        </c-new-sub-group-modal>
+    </template>
+    <template if:true={showDeleteModal}>
+        <c-delete-modal record-id={groupDetails.groupId} 
+                        is-from="Group" 
+                        onhidedeletemodal={handleHideDeleteModal}>
+        </c-delete-modal>
+    </template>
+    <div class="slds-border_bottom slds-p-around_x-small headerbg" 
+        data-header={groupDetails.groupId}>
+        <div class="slds-grid">
+            <div class="slds-col slds-medium-size_1-of-3 slds-large-size_1-of-3 slds-text-color_inverse slds-text-heading_small slds-p-top_xx-small"
+                onmouseenter={handleShowButton} 
+                onmouseleave={handleHideButton}>
+                <div class="slds-grid headerfont">
+                    <div class="slds-col slds-size_7-of-12 slds-m-left_small">
+                        <template if:false={editFirstName}>
+                            {groupDetails.groupName}
+                            <lightning-button-icon class="slds-float_right" 
+                                                icon-name="utility:edit"
+                                                alternative-text="Update First Name" 
+                                                title="Edit Group Name" 
+                                                variant="bare-inverse"
+                                                size="medium" 
+                                                onclick={handleFirstNameEdit} 
+                                                if:true={showButton}>
+                            </lightning-button-icon>
+                        </template>
+                        <template if:true={editFirstName}>
+                            <!-- <lightning-input name="fileExpirationDate" 
+                                            value={groupDetails.groupName} 
+                                            label=""
+                                            onchange={handleFirstNameChange} 
+                                            onfocusout={handleUpdateFirstName} 
+                                            class="edit-input editableTextColor">
+                            </lightning-input> -->
+                            <input type="text" 
+                                name="fileExpirationDate" 
+                                            value={groupDetails.groupName} 
+                                            onchange={handleFirstNameChange} 
+                                            onfocusout={handleUpdateFirstName} 
+                                class="edit-input editableTextColor" />
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="slde-col slds-medium-size_2-of-3 slds-large-size_2-of-3 slds-clearfix">
+                <div class="slds-float_right slds-button-group-list slds-align_absolute-center">
+                    <lightning-layout>
+                        <lightning-layout-item flexibility="auto" 
+                                                class="slds-p-right_small slds-p-top_xx-small"
+                                                if:false={isMarrs}>
+                            <div class="slds-text-align_center">
+                                <label class="slds-grid slds-m-right_medium">
+                                    <span class="slds-form-element__label labelcolor">
+                                        Alternate
+                                    </span>
+                                    <lightning-input type="toggle" 
+                                                    name="input1" 
+                                                    message-toggle-inactive=""
+                                                    message-toggle-active="" 
+                                                    checked={groupDetails.alternate} 
+                                                    onchange={handleToggleChange}>
+                                    </lightning-input>
+                                </label>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto" 
+                                            class="slds-p-right_large">
+                            <div class="slds-text-align_center">
+                                <div class="slds-button-group-list slds-align_absolute-center"> 
+                                    <lightning-button label="New Subgroup"
+                                                    variant="brand"
+                                                    onclick={handleNewSubGroup}>
+                                    </lightning-button>
+                                    <lightning-button-menu alternative-text="Show menu" 
+                                                        menu-alignment="right"
+                                                        variant="border-filled" 
+                                                        icon-name="utility:down">
+                                        <lightning-menu-item label="Clone" 
+                                                            onclick={handleCloneGroup}>
+                                        </lightning-menu-item>
+                                        <lightning-menu-item label="Delete" 
+                                                            onclick={handleShowDeleteModal}>
+                                        </lightning-menu-item>
+                                    </lightning-button-menu>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto" 
+                                            class="slds-p-right_xx-small slds-p-top_xx-small">
+                            <div class="slds-text-align_center">
+                                <lightning-button-icon icon-name="utility:chevrondown"
+                                                    size="large" 
+                                                    variant="bare" 
+                                                    onclick={handleAccordion}
+                                                    if:true={groupDetails.isOpen}>
+                                </lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:chevronright" 
+                                                    size="large"
+                                                    variant="bare" 
+                                                    onclick={handleAccordion} 
+                                                    if:false={groupDetails.isOpen}>
+                                </lightning-button-icon>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

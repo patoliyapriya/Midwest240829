@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This Lightning Message Channel sends information LWC to LWC/VF, Specifically Used in Dashboard</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>The message to communicate to others</description>
+        <fieldName>messageToSend</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>Who Is Saying This?</description>
+        <fieldName>sourceSystem</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>The message to communicate to others</description>
+        <fieldName>newUserId</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>The message to communicate to others</description>
+        <fieldName>newUserName</fieldName>
+    </lightningMessageFields>
+    <masterLabel>SelectedUser</masterLabel>
+</LightningMessageChannel>

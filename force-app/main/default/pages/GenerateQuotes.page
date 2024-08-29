@@ -1,0 +1,21 @@
+<apex:page extensions="GenerateQuoteDocumentController" standardController="Quote" action="{!generateAttachment}">
+    <!--
+    <apex:form >
+        <apex:sectionHeader title="Generate Document" subtitle="{!quote.Name}"/>
+        <apex:pageBlock title="Generate Quote">
+            <apex:pageBlockButtons >   
+                <apex:commandButton value="Generate" action="{!generateDocument}"/>
+                <apex:commandButton value="Cancel" action="{!redirectBackToQuote}"/>
+            </apex:pageBlockButtons>  
+            <apex:pageBlockSection >
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Document Output Format</apex:outputLabel>
+                    <apex:selectRadio value="{!strSelectedDocumentOutputFormat}">
+                        <apex:selectOptions value="{!lstSelectDocumentOutputFormat}" />
+                    </apex:selectRadio>     
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>   
+    </apex:form>
+    -->
+</apex:page>

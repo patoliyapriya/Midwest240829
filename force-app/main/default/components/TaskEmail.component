@@ -1,0 +1,4 @@
+<apex:component controller="TaskEmail"  access="global">
+  <apex:attribute description="whatId" name="whatId" type="String" required="required" assignTo="{!strWhatId}"/>
+  <apex:outputText value="{!opportunityNumber}"></apex:outputText>
+</apex:component>

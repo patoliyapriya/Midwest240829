@@ -1,0 +1,122 @@
+<template>
+  <div if:true={isLoading} >
+    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+  </div>
+  <lightning-card>
+      <h3 slot="title">
+          Backlog
+      </h3>
+      <template if:true={dashboardBack}>
+      <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered">
+          <tbody>
+            <tr class="slds-line-height_reset">
+              <th scope="col" style="width: 50%;">
+                <div class="slds-truncate"></div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: 700;" >Margin (Booked Not Invoiced)</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: 700;">Revenue (Booked Not Invoiced)</div>
+              </th>
+            </tr>
+            <tr class="slds-hint-parent" style="background-color: #f3f3f3;">
+              <th scope="row">
+                <div class="slds-truncate">
+                  Total
+                </div>
+              </th>
+              <td>
+                <div class="slds-truncate"><lightning-formatted-number value={TotalMargin} format-style="currency" currency-code="USD" ></lightning-formatted-number>
+                  <lightning-helptext  content ="For Project Line which are not billed if {Sales Type is C/R} then add (CR * Commision) else use ((Sales Price - Extended Cost) * Commision)"></lightning-helptext>
+                </div>
+              </td>
+              <td>
+                <div class="slds-truncate"><lightning-formatted-number value={TotalRevenue} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                   <lightning-helptext  content ="For Project Line which are not billed and Sale Type is not D/S add (Sales Price * Commission) to total"></lightning-helptext>
+                </div>
+              </td>
+            </tr>
+            <tr class="slds-line-height_reset">
+              <th scope="col">
+                <div class="slds-truncate">Year End Total</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" ><lightning-formatted-number value={YearEndMarginTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date falls within (Past Date to This Year) then calculate same as total margin."></lightning-helptext>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate"><lightning-formatted-number value={YearEndRevenueTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date falls within (Past Date to This Year) then calculate same as total revenue."></lightning-helptext>
+                </div>
+              </th>
+            </tr>
+            <tr class="slds-line-height_reset">
+              <th scope="col">
+                <div class="slds-truncate">Next 365 Days</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" ><lightning-formatted-number value={lYearMarginTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext content ="Est. Ship or Project Ship Date (From Past Date + Next 365 Days) then calculate same as total margin."></lightning-helptext>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate"><lightning-formatted-number value={lYearRevenueTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 365 Days) then calculate same as total revenue."></lightning-helptext>
+                </div>
+              </th>
+            </tr>
+            <tr class="slds-line-height_reset">
+              <th scope="col">
+                <div class="slds-truncate">Next 180 Days</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" ><lightning-formatted-number value={HalfYearMarginTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 180 Days) then calculate same as total margin."></lightning-helptext>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate"><lightning-formatted-number value={HalfYearRevenueTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 180 Days) then calculate same as total revenue."></lightning-helptext>
+                </div>
+              </th>
+            </tr>
+            <tr class="slds-line-height_reset">
+              <th scope="col">
+                <div class="slds-truncate">Next 90 Days</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" ><lightning-formatted-number value={ThreeMonthMarginTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 90 Days) then calculate same as total margin."></lightning-helptext>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate"><lightning-formatted-number value={ThreeMonthRevenueTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 90 Days) then calculate same as total revenue."></lightning-helptext>
+                </div>
+              </th>
+            </tr>
+            <tr class="slds-line-height_reset">
+              <th scope="col">
+                <div class="slds-truncate">Next 30 Days</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" ><lightning-formatted-number value={OneMonthMarginTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 30 Days) then calculate same as total margin."></lightning-helptext>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate"><lightning-formatted-number value={OneMonthRevenueTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                  <lightning-helptext  content ="Est. Ship or Project Ship Date (From Past Date + Next 30 Days) then calculate same as total revenue."></lightning-helptext>
+                </div>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </template>      
+  </lightning-card>
+  <template if:false={dashboardBack}>
+    <lightning-card>No data to display : {errormessage} </lightning-card>
+</template>
+</template>

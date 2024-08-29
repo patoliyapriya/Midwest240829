@@ -1,0 +1,54 @@
+<template>
+    <div style="width:100%;">
+        <lightning-card > 
+            <c-dashboard-back-log></c-dashboard-back-log>
+        </lightning-card>
+    </div> 
+
+    <div class="slds-m-top_medium" style="display: flex; width: 100%;">
+        <!-- <div style="width: 50%;">
+             <lightning-card title="Backlog" style="height: 100%;">
+                <c-sales-back-log></c-sales-back-log>
+            </lightning-card> 
+        </div> -->
+        <div style="width: 50%;" >
+            <lightning-card title="Percentage Goals" style="height: 100%;">
+                <c-sales-percentage-goal></c-sales-percentage-goal>
+            </lightning-card>
+        </div>
+    </div>
+
+    <div class="slds-m-top_medium" style="width: 100%;">
+        <lightning-card title="Sales Activity">
+            <c-sales-activity></c-sales-activity>
+        </lightning-card>
+    </div>
+
+    <div class="slds-m-top_medium" style="width: 100%;">
+        <lightning-card title="Sales Result">
+            <c-sales-results></c-sales-results>
+        </lightning-card>
+    </div>
+    <div class="slds-m-top_medium" style="width: 100%;">
+        <lightning-card> 
+            <c-top-opportunities stage-name="Target/Negotiating" ></c-top-opportunities>
+        </lightning-card>
+    </div>
+    <div class="slds-m-top_medium" style="width: 100%;">
+        <lightning-card >
+            <c-top-opportunities stage-name="Post Bid" ></c-top-opportunities>
+        </lightning-card>
+    </div>
+    <!-- title="Top 10 Bidding Opportunities" (title added dynamical to topOpp..)-->
+    <div class="slds-m-top_medium" style="width: 100%;">
+        <lightning-card>
+            <c-top-opportunities stage-name="Bidding" ></c-top-opportunities>
+            <!-- <c-top-opportunities stage-name="BIDDING" ></c-top-opportunities> -->
+        </lightning-card>
+    </div>
+    <div class="slds-m-top_medium" style="width: 100%;">
+        <lightning-card >
+            <c-top-opportunities stage-name="Lead, DD/Budget" ></c-top-opportunities>
+        </lightning-card>
+    </div>
+</template>

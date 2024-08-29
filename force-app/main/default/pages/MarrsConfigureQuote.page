@@ -1,0 +1,1149 @@
+<apex:page standardController="Quote" extensions="MarrsConfigureQuoteController" sidebar="false" showHeader="false" docType="html-5.0" id="pageId">
+
+    <apex:slds />
+    <apex:form id="formId">
+
+        <apex:actionFunction name="updateDescriptionActionFunction" action="{!updateDescription}" rerender="pnlMain" status="splashStatus"/>
+        <apex:actionFunction action="{!searchProducts}" name="searchProducts" reRender="pnlSelectProducts" status="splashStatus"/>
+        <apex:actionFunction action="{!addNewGroup}" name="createGroup" reRender="pnlMain" status="splashStatus" oncomplete="return hideCreateGroupPopup();"/>
+        <apex:actionFunction action="{!addNewSubGroup}" name="createSubGroup" reRender="pnlMain" status="splashStatus" oncomplete="return hideCreateSubGroupPopup();"/>
+        <apex:actionFunction action="{!addProduct}" name="addNewProductActionFunction" reRender="pnlSelectProducts" status="splashStatus" oncomplete="return openAddProductPopup();"/>
+        
+        <style>
+
+            #tblLineItems th {
+                padding: 5px;
+            }
+    
+            #tblLineItems td {
+                padding: 5px;
+            }
+    
+            #tblLineItemsFooter td {
+                background-color: white;
+                font-size: 14px;
+            }
+    
+            .fixed-header {
+                width: 100%;
+                position: fixed;
+                z-index: 150;
+                background-color: white;
+            }
+    
+            .fixed-header {
+                top: 0;
+            }
+
+            .fixed-footer {
+                position: fixed;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                display: flex; 
+                font-weight: bold; 
+                color: white; 
+                background-color: green; 
+                padding: 8px; 
+                float: right;
+                font-size: 16px;
+            }
+    
+            .groupBody {
+                width: 99%; 
+                margin: auto;
+                margin-top: 80px;
+            }
+    
+            .section-open {
+                display: block;
+            }
+    
+            .section-close {
+                display: none;
+            }
+    
+            .section-icon-open {
+                flex-shrink: 0;
+            }
+    
+            .section-icon-close {
+                flex-shrink: 0;
+                transform: rotate(-90deg);
+            }
+            
+            tr:nth-child(even) {background-color: #f2f2f2;}
+
+            .slds-pill_container {
+                border: 0px !important;
+                background-color: #f3f2f2 !important;
+            }
+
+            .error {
+                border:2px solid red !important;
+            }
+
+        </style>
+    
+        <script>
+            
+            function isNumberKey(evt) {
+                var charCode = (evt.which) ? evt.which : evt.keyCode;
+                if (charCode != 46 && charCode > 31 
+                    && (charCode < 48 || charCode > 57))
+                    return false;
+
+                return true;
+            }
+
+            function closeSection(divName, groupIndex, subGroupIndex) {
+    
+                var divId = divName + groupIndex + subGroupIndex;
+                var divSection = document.getElementById(divId);
+                
+                if (divSection.classList.contains('section-open')) {
+                    divSection.classList.remove('section-open');
+                    divSection.classList.add('section-close');
+                } else {
+                    divSection.classList.add('section-open');
+                    divSection.classList.remove('section-close');
+                }
+
+                var hidGroupSectionId;
+                if(divName.includes('divGroupSection')) {
+                    hidGroupSectionId = 'pageId:formId:rptGroup:' + groupIndex + ':hidGroupSectionClose';
+                } else {
+                    hidGroupSectionId = 'pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:' + subGroupIndex + ':hidSubGroupSectionClose';
+                }
+
+                var hidGroupSecion = document.getElementById(hidGroupSectionId);
+                hidGroupSecion.value = divSection.classList.contains('section-open') ? false : true;
+
+                var svgIconId = 'svg' + divName + groupIndex + subGroupIndex;
+                var svgIcon = document.getElementById(svgIconId);
+    
+                if (svgIcon.classList.contains('section-icon-open')) {
+                    svgIcon.classList.remove('section-icon-open');
+                    svgIcon.classList.add('section-icon-close');
+                } else {
+                    svgIcon.classList.add('section-icon-open');
+                    svgIcon.classList.remove('section-icon-close');
+                }
+    
+                return false;
+            }
+    
+            function startSplash() {                        
+                var divObj = document.getElementById('divLoading');            
+                divObj.style.display='block';                                                   
+            }
+            
+            function endSplash() {              
+                document.getElementById('divLoading').style.display='none';                      
+            }
+            
+            function addNewProduct(groupId, subGroupId) {
+                var hidGroupId = document.getElementById('pageId:formId:hidGroupId');
+                hidGroupId.value = groupId;
+
+                var hidSubGroupId = document.getElementById('pageId:formId:hidSubGroupId');
+                hidSubGroupId.value = subGroupId;
+
+                addNewProductActionFunction();
+
+                return false;
+            }
+
+            function openAddProductPopup() {
+
+                var divAddProducts = document.getElementById('divAddProductPopup');
+                divAddProducts.style.display = 'block';
+
+                return false;
+            }
+
+            function selectProduct(hideDivId, showDivId, productName, productId) {
+    
+                var divHide = document.getElementById(hideDivId);
+                var divShow = document.getElementById(showDivId);
+
+                divHide.style.display = 'none';
+                divShow.style.display = 'block';
+
+                var divChecked = document.getElementById('divChecked' + productId);
+                var hidSelectProduct = divChecked.childNodes[0];
+
+                if(hideDivId.includes('divUnchecked')) {
+                    selectedProduct(productName, productId);
+                    hidSelectProduct.value = true;
+                } else {
+                    removeSelectedProduct(productId);
+                    hidSelectProduct.value = false;
+                }
+
+                return false;
+            }
+
+            function selectedProduct(productName, productId) {
+
+                var item = '<li class="slds-listbox-item" role="presentation" id="' + productId + '">';
+                item += '<span class="slds-pill" role="option" tabindex="0" aria-selected="true">';
+                item += '<span class="slds-pill__label">' + productName + '</span>';
+                item += '<span class="slds-icon_container slds-pill__remove" title="Remove">';
+                item += '<svg class="slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true" onclick="return removeSelectedProduct(' + '\'' + productId + '\'' + ');">';
+                item += '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>';
+                item += '</svg>';
+                item += '<span class="slds-assistive-text">Press delete or backspace to remove</span>';
+                item += '</span>';
+                item += '</span>';
+                item += '</li>';
+
+                var listSelectedProducts = document.getElementById('ulSelectedProducts');
+                listSelectedProducts.innerHTML += item;
+
+                var divCounter = document.getElementById('divCountItemSelected');
+                divCounter.innerHTML = listSelectedProducts.childElementCount + ' Item(s) Selected';
+            }
+
+            function removeSelectedProduct(productId) {
+    
+                var item = document.getElementById(productId);
+                item.parentNode.removeChild(item);
+                
+                var listSelectedProducts = document.getElementById('ulSelectedProducts');
+                var divCounter = document.getElementById('divCountItemSelected');
+                divCounter.innerHTML = listSelectedProducts.childElementCount + ' Item(s) Selected';
+
+                var divHide = document.getElementById('divChecked' + productId);
+                var divShow = document.getElementById('divUnchecked' + productId);
+                if(divHide != null) {
+                    divHide.style.display = 'none';
+                    divShow.style.display = 'block';
+
+                    var divChecked = document.getElementById('divChecked' + productId);
+                    var hidSelectProduct = divChecked.childNodes[0];
+                    hidSelectProduct.value = false;
+                }
+
+            }
+
+            function closeAddProductPopup() {
+
+                var divAddProducts = document.getElementById('divAddProductPopup');
+                divAddProducts.style.display = 'none';
+
+                return false;
+            }
+            
+            function openDescriptionPopup(groupIndex, subGroupIndex, rowIndex){
+    
+                var descBody = document.getElementById('cke_pageId:formId:txtAreaDescription');
+                
+                var divObj = document.getElementById('divDescriptionPopup');            
+                divObj.style.display='block'; 
+                
+                var tblAttributs = 'pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:' + subGroupIndex + ':rptLineItem:' + rowIndex + ':';
+                
+                var txtDescription = document.getElementById(tblAttributs + 'hidDescription');
+                
+                var iframeElement = descBody.childNodes[1].childNodes[1].childNodes[1];
+                iframeElement.contentDocument.body.innerHTML = txtDescription.value;
+                
+                var hidGroupIndex = document.getElementById('pageId:formId:hidGroupIndex');
+                var hidSubGroupIndex = document.getElementById('pageId:formId:hidSubGroupIndex');
+                var hidProductRowIndex = document.getElementById('pageId:formId:hidLineItemIndex');
+                
+                hidGroupIndex.value = groupIndex;
+                hidSubGroupIndex.value = subGroupIndex;
+                hidProductRowIndex.value = rowIndex;
+            }
+
+            function closePopupDescription(){
+                var divObj = document.getElementById('divDescriptionPopup');            
+                divObj.style.display='none'; 
+                return false;
+            }
+
+            function updateDescription(){
+    
+                var descBody = document.getElementById('cke_pageId:formId:txtAreaDescription');
+                var iframeElement = descBody.childNodes[1].childNodes[1].childNodes[1];
+                
+                var hidRichTextAreaDescriptions = document.getElementById('pageId:formId:hidRichTextAreaDescriptions');
+                hidRichTextAreaDescriptions.value = iframeElement.contentDocument.body.innerHTML;
+                
+                closePopupDescription();
+                updateDescriptionActionFunction();
+                
+                return false;
+                
+            }
+
+            function setGroupNameOnFooter(groupName, groupIndex){
+    
+                var txtGroupName = document.getElementById('pageId:formId:rptGroup:' + groupIndex + ':txtGroupNameFooter');
+                txtGroupName.innerText = groupName.value;
+            }
+
+            function setSubGroupNameOnFooter(subGroupName, groupIndex, subGroupIndex){
+    
+                var txtSubGroupName = document.getElementById('pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:' + subGroupIndex + ':txtSubGroupNameFooter');
+                txtSubGroupName.innerText = subGroupName.value;
+                
+            }
+
+            function calculateSubGroupPrice(groupIndex, subGroupIndex) {
+                
+                var sellPriceTotal = 0;
+                
+                var tblAttributs = 'pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:' + subGroupIndex + ':rptLineItem:'
+    
+                for (var i=0, iLen=-1; i>iLen; i++) {
+                    var txtBoxSellPrice = document.getElementById(tblAttributs + i + ':textBoxSalesPrice');
+
+                    if (txtBoxSellPrice == null){
+                        break;
+                    }
+
+                    if (txtBoxSellPrice.value != null && txtBoxSellPrice.value != '') {
+                        sellPriceTotal = sellPriceTotal + parseFloat(txtBoxSellPrice.value);
+                    }
+                    
+                }
+
+                var hidSubGroupTotal = document.getElementById('pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:' + subGroupIndex + ':hidSubGroupSalePriceTotal');
+                hidSubGroupTotal.value = sellPriceTotal.toFixed(2);
+
+                var subGroupTotal = document.getElementById('pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:' + subGroupIndex + ':txtSubGroupSalePriceTotal');
+                subGroupTotal.innerText = '$' + hidSubGroupTotal.value.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+
+                calculateGroupPrice(groupIndex);
+            }
+
+            function calculateGroupPrice(groupIndex) {
+
+                var sellPriceTotal = 0;
+                
+                var tblAttributs = 'pageId:formId:rptGroup:' + groupIndex + ':rptSubGroup:';
+    
+                for (var i=0, iLen=-1; i>iLen; i++) {
+
+                    var txtBoxSellPrice = document.getElementById(tblAttributs + i + ':hidSubGroupSalePriceTotal');
+
+                    if (txtBoxSellPrice == null){
+                        break;
+                    }
+                    
+                    if (txtBoxSellPrice.value != null && txtBoxSellPrice.value != '') {
+                        sellPriceTotal = sellPriceTotal + parseFloat(txtBoxSellPrice.value);
+                    }
+                    
+                }
+
+                var hidGroupTotal = document.getElementById('pageId:formId:rptGroup:' + groupIndex + ':hidGroupSalePriceTotal');
+                hidGroupTotal.value = sellPriceTotal.toFixed(2);
+
+                var groupTotal = document.getElementById('pageId:formId:rptGroup:' + groupIndex + ':txtGroupSalePriceTotal');
+                groupTotal.innerText = '$' + hidGroupTotal.value.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+
+                calculateGrandTotal();
+            }
+
+            function calculateGrandTotal() {
+
+                var grandTotal = 0;
+                
+                var tblAttributs = 'pageId:formId:rptGroup:'
+    
+                for (var i=0, iLen=-1; i>iLen; i++) {
+
+                    var hidGroupSalePriceTotal = document.getElementById(tblAttributs + i + ':hidGroupSalePriceTotal');
+
+                    if(hidGroupSalePriceTotal == null){
+                        break;
+                    }
+
+                    if (hidGroupSalePriceTotal.value != null && hidGroupSalePriceTotal.value != '') {
+                        grandTotal = grandTotal + parseFloat(hidGroupSalePriceTotal.value);
+                    }
+                    
+                }
+
+                var hidGrandTotal = document.getElementById('pageId:formId:hidGrandTotalSellPrice');
+                hidGrandTotal.value = grandTotal.toFixed(2);
+
+                var grandTotal = document.getElementById('pageId:formId:txtGrandTotalSellPrice');
+                grandTotal.innerText = '$' + hidGrandTotal.value.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+            }
+
+            function previewQuote(quoteId) {
+                window.open('/apex/MarrsQuotePdf?Id='+quoteId, '_blank');
+                return false;
+            }
+
+            function validateGroupAndSubGroupName() {
+
+                var txtSubGroupName = document.getElementById('pageId:formId:txtSubGroupName');
+
+                if(isNotNullOrEmpty(txtSubGroupName.value)) {
+                    txtSubGroupName.className = txtSubGroupName.className.replace(" error", "");
+                } else {
+                    txtSubGroupName.className = txtSubGroupName.className + " error";
+                }
+
+                if(isNotNullOrEmpty(txtSubGroupName.value)) {
+                    createGroup();
+                } 
+
+                return false;
+            }
+
+            function hideCreateGroupPopup() {
+                var divObj = document.getElementById('divCreateGroup');
+                divObj.style.display = 'none';
+                return false;
+            }
+
+            function showCreateGroupPopup() {
+
+                resetCreateGroupPopup();
+
+                var divObj = document.getElementById('divCreateGroup');
+                divObj.style.display = 'block';
+
+                return false;
+            }
+
+            function resetCreateGroupPopup() {
+                
+                var txtSubGroupName = document.getElementById('pageId:formId:txtSubGroupName');
+                txtSubGroupName.className = txtSubGroupName.className.replace(" error", "");
+                txtSubGroupName.value = '';
+
+            }
+
+            function isNotNullOrEmpty(str) {
+                if(str != null && str.trim() != '') {
+                    return true;
+                }
+                return false;
+            }
+
+            function showCreateSubGroupPopup(groupId) {
+                
+                resetCreateSubGroupPopup();
+
+                var hidGroupId = document.getElementById('pageId:formId:hidGroupId');
+                hidGroupId.value = groupId;
+
+                var divObj = document.getElementById('divCreateSubGroup');
+                divObj.style.display = 'block';
+
+                return false;
+            }
+
+            function hideCreateSubGroupPopup() {
+                var divObj = document.getElementById('divCreateSubGroup');
+                divObj.style.display = 'none';
+                return false;
+            }
+
+            function resetCreateSubGroupPopup() {
+                var txtSubGroupName = document.getElementById('pageId:formId:subGroupName');
+                txtSubGroupName.className = txtSubGroupName.className.replace(" error", "");
+                txtSubGroupName.value = '';
+            }
+
+            function validateSubGroupName() {
+
+                var txtSubGroupName = document.getElementById('pageId:formId:subGroupName');
+
+                if(isNotNullOrEmpty(txtSubGroupName.value)) {
+                    txtSubGroupName.className = txtSubGroupName.className.replace(" error", "");
+                    createSubGroup();
+                } else {
+                    txtSubGroupName.className = txtSubGroupName.className + " error";
+                }
+
+                return false;
+            }
+
+        </script>
+
+        <apex:outputPanel id="pnlMain">
+
+            <div id="content">
+                
+                <!-- Header -->
+                <div class="fixed-header">
+                    <div class="slds-page-header slds-page-header_record-home" style="padding: 15px;">
+                        <div class="slds-page-header__row">
+                            <div class="slds-page-header__col-title">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <span class="slds-icon_container slds-icon-standard-opportunity">
+                                            <svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#quotes"></use>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-page-header__name">
+                                            <div class="slds-page-header__name-title">
+                                                <h1>
+                                                    <span>Quote</span>
+                                                    <span class="slds-page-header__title slds-truncate" title="{!quote.Name}">{!quote.Name}</span>
+                                                </h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-page-header__col-actions">
+                                <div class="slds-page-header__controls">
+                                    <div class="slds-page-header__control">
+                                        <ul class="slds-button-group-list">
+                                            <li>
+                                                <apex:commandLink styleClass="slds-button slds-button_neutral"
+                                                                    value="Preview Quote"
+                                                                    onclick="return previewQuote('{!quote.Id}');" />
+                                            </li>
+                                            <li>
+                                                <apex:commandButton styleClass="slds-button slds-button_neutral"  
+                                                                    status="splashStatus" 
+                                                                    rerender="pnlMain" 
+                                                                    value="New Group"
+                                                                    onclick="return showCreateGroupPopup()" />
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-page-header__col-actions">
+                                <div class="slds-page-header__controls">
+                                    <div class="slds-page-header__control">
+                                        <ul class="slds-button-group-list">
+                                            <li>
+                                                <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                    action="{!saveAndExit}"
+                                                                    value="Save And Exit" />
+                                            </li>
+                                            <li>
+                                                <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                    action="{!quickSave}" 
+                                                                    value="Quick Save" 
+                                                                    rerender="pnlMain"
+                                                                    status="splashStatus"/>
+                                            </li>
+                                            <li>
+                                                <apex:commandButton styleClass="slds-button slds-button_neutral"
+                                                                    immediate="true" 
+                                                                    value="Cancel" 
+                                                                    action="{!redirectToQuote}" />
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Group -->
+                <div class="groupBody" style="margin-bottom: 45px;">
+                    <apex:variable value="{!-1}" var="groupIndex" />
+                    <apex:repeat value="{!lstGroups}" var="group" id="rptGroup">
+                        <apex:variable value="{!groupIndex + 1}" var="groupIndex" />
+                        <!-- Group -->
+                        <div style="margin-bottom: 20px; border: 1px solid #A4A4A4;">
+
+                            <div style="display: flex; padding: 7px; background-color: #011242;" id="groupHeaderRow{!groupIndex}">
+                                <div style="margin-top: auto; margin-bottom: auto;">
+                                    <button onclick="return closeSection('divGroupSection', '{!groupIndex}', '');" aria-controls="accordion-details-01" aria-expanded="true"
+                                        class="slds-button slds-button_reset">
+                                        <svg class="slds-button__icon slds-button__icon--large {!IF(group.grp.Is_Section_Closed__c, 'section-icon-close', 'section-icon-open')}" aria-hidden="true" style="color:white" id="svgdivGroupSection{!groupIndex}">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                                        </svg>
+                                    </button>
+                                    <apex:inputHidden value="{!group.grp.Is_Section_Closed__c}" id="hidGroupSectionClose" />
+                                </div>
+                                
+                                <div style="color: white;font-size: 14px; font-weight: bold;padding-left: 10px;padding-top: 3px;">
+                                    <apex:outputText value="{!group.grp.Name}" />
+                                </div>
+                                
+                                <div class="slds-button-group" role="group" style="margin-left: auto;">
+                                    <apex:commandButton action="{!cloneGroup}"
+                                                        value="Clone Group"
+                                                        rerender="pnlMain" 
+                                                        status="splashStatus"
+                                                        styleClass="slds-button slds-button_neutral" >
+                                        <apex:param name="cloneGroupId" value="{!group.grp.Id}" assignTo="{!hidGroupId}" />                
+                                    </apex:commandButton>
+                                    <apex:commandButton onclick="return showCreateSubGroupPopup('{!group.grp.Id}');"
+                                                        rerender="pnlMain" 
+                                                        status="splashStatus"
+                                                        styleClass="slds-button slds-button_neutral"
+                                                        value="New Subgroup" >
+                                        <apex:param name="newSubGroupId" value="{!group.grp.Id}" assignTo="{!hidGroupId}" /> 
+                                    </apex:commandButton>
+                                    <apex:commandLink action="{!deleteGroup}"
+                                                        rerender="pnlMain" 
+                                                        status="splashStatus"
+                                                        styleClass="slds-button slds-button_neutral">
+                                        <svg class="slds-button__icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#delete"></use>
+                                        </svg>
+                                        <span class="slds-assistive-text">Delete</span>
+                                        <apex:param name="groupId" value="{!group.grp.Id}" assignTo="{!hidGroupId}" />
+                                        <apex:param name="groupIndex" value="{!groupIndex}" assignTo="{!hidgroupIndex}" />
+                                    </apex:commandLink>
+                                </div>
+                            </div>
+                            
+                            <!-- Subgroup -->
+                            <div id="divGroupSection{!groupIndex}" class="{!IF(group.grp.Is_Section_Closed__c, 'section-close', 'section-open')}">
+                                <apex:variable value="{!-1}" var="subGroupIndex" />
+                                <apex:repeat value="{!group.lstSubGroups}" var="subGrp" id="rptSubGroup">
+                                    <apex:variable value="{!subGroupIndex + 1}" var="subGroupIndex" />
+                                    <div id="subGroupRow{!groupIndex}{!subGroupIndex}" style="border: 1px solid #A4A4A4; margin: 12px;">
+                                        
+                                        <div style="font-size: 12px; background-color: #f7f3f3; display: flex; padding: 7px;">
+                                            
+                                            <div style="margin-top: auto; margin-bottom: auto;">
+                                                <button onclick="return closeSection('sectionSubGroup', '{!groupIndex}', '{!subGroupIndex}');" aria-controls="accordion-details-01" aria-expanded="true"
+                                                    class="slds-button slds-button_reset">
+                                                    <svg class="slds-button__icon slds-button__icon--large {!IF(subGrp.subGroup.Is_Section_Closed__c, 'section-icon-close', 'section-icon-open')}" aria-hidden="true" id="svgsectionSubGroup{!groupIndex}{!subGroupIndex}">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                                                    </svg>
+                                                </button>
+                                                <apex:inputHidden value="{!subGrp.subGroup.Is_Section_Closed__c}" id="hidSubGroupSectionClose" />
+                                            </div>
+
+                                            <div class="slds-form-element slds-m-left_medium">
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputText value="{!subGrp.subGroup.Name}" 
+                                                                    styleClass="slds-input" 
+                                                                    onkeyup="setSubGroupNameOnFooter(this, '{!groupIndex}', '{!subGroupIndex}');" 
+                                                                    html-placeholder="Please enter Sub Group Name"/>
+                                                    <!--
+                                                    <apex:selectList value="{!subGrp.subGroup.Name}" size="1" styleClass="slds-input">
+                                                        <apex:selectOption itemLabel="Standard Ground" itemValue="Standard Ground" />
+                                                        <apex:selectOption itemLabel="2nd Day" itemValue="2nd Day" />
+                                                        <apex:selectOption itemLabel="Next Day" itemValue="Next Day" />
+                                                        <apex:selectOption itemLabel="Hotshot Carrier" itemValue="Hotshot Carrier" />
+                                                    </apex:selectList>
+                                                    -->
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-button-group" role="group" style="margin-left: auto;">
+                                                <apex:commandButton value="Add Product"
+                                                                    styleClass="slds-button slds-button_neutral"
+                                                                    onclick="return addNewProduct('{!group.grp.Id}', '{!subGrp.subGroup.Id}');" />
+                                                <apex:commandButton value="Clone SubGroup"
+                                                                    action="{!cloneSubGroup}"
+                                                                    rerender="pnlMain"
+                                                                    status="splashStatus"
+                                                                    styleClass="slds-button slds-button_neutral">
+                                                    <apex:param name="groupId" value="{!group.grp.Id}" assignTo="{!hidGroupId}" />
+                                                    <apex:param name="cloneSubGroupId" value="{!subGrp.subGroup.Id}" assignTo="{!hidSubGroupId}" />
+                                                </apex:commandButton>
+                                                <apex:commandLink action="{!deleteSubGroup}"
+                                                                    rerender="pnlMain" 
+                                                                    status="splashStatus"
+                                                                    styleClass="slds-button slds-button_neutral">
+                                                    <svg class="slds-button__icon" aria-hidden="true">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#delete"></use>
+                                                    </svg>
+                                                    <span class="slds-assistive-text">Delete</span>
+                                                    <apex:param name="subGroupId" value="{!subGrp.subGroup.Id}" assignTo="{!hidGroupId}" />
+                                                    <apex:param name="subGroupIndex" value="{!subGroupIndex}" assignTo="{!hidsubGroupIndex}" />
+                                                </apex:commandLink>
+                                            </div>
+
+                                        </div>
+                                        
+                                        <div id="sectionSubGroup{!groupIndex}{!subGroupIndex}" class="{!IF(subGrp.subGroup.Is_Section_Closed__c, 'section-close', 'section-open')}">
+                                            <table class="tblLineItem" style="width: 100%;" id="tblLineItems" cellpadding="3">
+                                                <thead>
+                                                    <tr id="lineItemHeader{!groupIndex}{!subGroupIndex}" style="background-color: #3F4042;" class="lineItemsRows">
+                                                        <th style="width: 2%;"></th>
+                                                        <th style="width: 2%;"></th>
+                                                        <th style="width: 2%; color: white;">#</th>
+                                                        <th style="width: 9%; color: white;">DETAILS</th>
+                                                        <th style="width: 15%; color: white;">PRODUCT NAME</th>
+                                                        <th style="width: 35%; color: white;">DESCRIPTION</th>
+                                                        <th style="width: 35%; color: white;">PRICE</th>
+                                                    </tr>
+                                                </thead>
+                                                <apex:variable value="{!0}" var="delProductIndex" />
+                                                <tbody class="tblLineItemBody">
+                                                    <apex:repeat value="{!subGrp.lstQuoteLineItems}" var="lineItem" id="rptLineItem">
+                                                        <tr id="quoteLineItemRow{!groupIndex}{!subGroupIndex}{!delProductIndex}" >
+                                                            <td>
+                                                                <center>
+                                                                    <apex:commandLink action="{!deleteLineItem}"
+                                                                                        rerender="pnlMain" 
+                                                                                        status="splashStatus"
+                                                                                        styleClass="slds-button">
+                                                                        <svg class="slds-button__icon slds-icon--x-small" aria-hidden="true" style="fill: #DA3D45;">
+                                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#delete"></use>
+                                                                        </svg>
+                                                                        <span class="slds-assistive-text">Delete</span>
+                                                                        <apex:param name="lineItemId" value="{!lineItem.Id}" assignTo="{!hidLineItemId}" />
+                                                                        <apex:param name="lineItemIndex" value="{!delProductIndex}" assignTo="{!hidLineItemIndex}" />
+                                                                    </apex:commandLink>
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    <apex:commandLink action="{!cloneLineItem}"
+                                                                                        rerender="pnlMain" 
+                                                                                        status="splashStatus"
+                                                                                        styleClass="slds-button">
+                                                                        <svg class="slds-button__icon slds-icon--x-small" >
+                                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/action-sprite/svg/symbols.svg#clone"></use>
+                                                                        </svg>
+                                                                        <span class="slds-assistive-text">Clone</span>
+                                                                        <apex:param name="subGroupId" value="{!subGrp.subGroup.Id}" assignTo="{!hidSubGroupId}" />
+                                                                        <apex:param name="lineItemId" value="{!lineItem.Id}" assignTo="{!hidLineItemId}" />
+                                                                    </apex:commandLink>
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText >
+                                                                    {!lineItem.Row_Index__c}
+                                                                </apex:outputText>
+                                                            </td>
+                                                            <td>
+                                                                <div class="slds-form-element">
+                                                                    <div class="slds-form-element__control">
+                                                                        <apex:inputText value="{!lineItem.Tag__c}" styleClass="slds-input" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{!lineItem.Product_Name__c}"  />
+                                                            </td>
+                                                            <td ondblclick="openDescriptionPopup('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');">
+                                                                <apex:outputText value="{!LEFT(lineItem.Descriptions__c,200)}..." id="txtDescription" escape="false" />
+                                                                <apex:inputhidden value="{!lineItem.Descriptions__c}" id="hidDescription" />
+                                                            </td>
+                                                            <td>
+                                                                <div class="slds-form-element">
+                                                                    <div class="slds-form-element__control">
+                                                                        <apex:inputText id="textBoxSalesPrice" 
+                                                                                styleClass="slds-input"
+                                                                                value="{!lineItem.Sales_Price__c}" 
+                                                                                onchange="calculateSubGroupPrice('{!groupIndex}','{!subGroupIndex}');"
+                                                                                onkeypress="return isNumberKey(event)"
+                                                                                style="width:200px;" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <apex:variable value="{!delProductIndex + 1}" var="delProductIndex" />
+                                                    </apex:repeat>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr id="subGroupTotalRowInner{!groupIndex}{!subGroupIndex}" style="background-color: #386DD5;">
+                                                        <td style="color: white; font-size: 14px; padding-left: 20px; font-weight: bold;" colspan="5">
+                                                            <apex:outputText value="{!subGrp.subGroup.Name}" id="txtSubGroupNameFooter"/>
+                                                        </td>
+                                                        <td style="text-align: right;color: white; font-size: 14px; font-weight: bold;">
+                                                            Sale Price Total
+                                                        </td>
+                                                        <td style="color: white; font-size: 14px;">
+                                                            
+                                                            <apex:outputText value="{0, Number, Currency}" id="txtSubGroupSalePriceTotal">
+                                                                <apex:param value="{!subGrp.subGroup.Total_Line_Items__c}" />
+                                                            </apex:outputText>
+                                                            <apex:inputHidden value="{!subGrp.subGroup.Total_Line_Items__c}" id="hidSubGroupSalePriceTotal"/>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+
+                                <div style="background-color: #63CD7F; color: white; font-size: 14px; display: flex; padding: 10px; font-weight: bold;">
+                                    <div style="padding-left: 10px; width: 80%;"><apex:outputText value="{!group.grp.Name}" id="txtGroupNameFooter"/></div>
+                                    <div style="text-align: right; width: 20%;">
+                                        Sale Price Total &nbsp;
+                                        <apex:outputText value="{0, Number, Currency}" id="txtGroupSalePriceTotal"  >
+                                            <apex:param value="{!group.grp.Total_Sub_Groups__c}"/>
+                                        </apex:outputText>
+                                        <apex:inputHidden value="{!group.grp.Total_Sub_Groups__c}" id="hidGroupSalePriceTotal" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </apex:repeat>
+                </div>
+
+                <div class="fixed-footer">
+                    <div style="width: 90%; text-align: right;">TOTAL SELL PRICE</div>
+                    <div style="width: 10%; padding-right: 15px; text-align: right;">
+                        <apex:outputText value="{0, Number, Currency}" id="txtGrandTotalSellPrice">
+                            <apex:param value="{!quote.Total_Base_Bid_Total__c}" />
+                        </apex:outputText>
+                        <apex:inputHidden value="{!quote.Total_Base_Bid_Total__c}" id="hidGrandTotalSellPrice" />
+                    </div>
+                </div>
+            </div>
+            
+            <apex:outputpanel id="pnlHidden">
+                <apex:inputhidden value="{!hidGroupId}" id="hidGroupId" />
+                <apex:inputhidden value="{!hidSubGroupId}" id="hidSubGroupId" />
+                <apex:inputhidden value="{!hidGroupIndex}" id="hidGroupIndex" />
+                <apex:inputhidden value="{!hidSubGroupIndex}" id="hidSubGroupIndex" />
+                <apex:inputhidden value="{!hidLineItemIndex}" id="hidLineItemIndex" />
+                <apex:inputHidden value="{!rickTextAreaValue.Descriptions__c}" id="hidRichTextAreaDescriptions"/>
+            </apex:outputpanel>
+
+            <apex:outputPanel id="pnlAddProduct">
+                <!-- Add Product div -->
+                <div id="divAddProductPopup" style="display:none;">
+                    <div class="parentDisable"></div>
+                    <div class="descPopup" style="width:70%;position: absolute;">
+                        <div class="demo-only demo-only_viewport" style="height:640px">
+                            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="id-of-modalheader-h2"
+                                aria-modal="true" aria-describedby="modal-content-id-1">
+                                <div class="slds-modal__container">
+                                    <header class="slds-modal__header">
+                                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="return closeAddProductPopup();">
+                                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Close</span>
+                                        </button>
+                                        <h2 id="id-of-modalheader-h2" class="slds-text-heading_medium">Add Products</h2>
+                                    </header>
+                                    <div class="slds-modal__content slds-grid slds-nowrap" id="modal-content-id-1">
+                                        <div class="slds-col slds-grid slds-grid_vertical slds-nowrap">
+                                            <div class="slds-p-vertical_x-small slds-p-horizontal_large slds-shrink-none slds-theme_shade">
+                                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                    <apex:inputText value="{!searchProduct}" 
+                                                                    styleClass="slds-input"
+                                                                    id="txtSearchProduct" 
+                                                                    onkeydown="if(event.keyCode==13){return false;}"
+                                                                    onblur="searchProducts();"/>
+                                                    <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                                        <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-pill_container slds-pill_container_bare">
+                                                    <ul class="slds-listbox slds-listbox_horizontal" role="listbox" aria-label="Selected Options:" aria-orientation="horizontal" id="ulSelectedProducts">
+                                                        
+                                                    </ul>
+                                                </div>
+                                                <div class="slds-text-title slds-m-top_x-small" aria-live="polite" id="divCountItemSelected">0 Item(s) Selected</div>
+                                            </div>
+                                            <apex:outputPanel id="pnlSelectProducts">
+                                                <div class="slds-scrollable slds-grow">
+                                                    <div class="slds-scrollable_none">
+                                                        <table aria-multiselectable="true" class="tblProducts slds-table slds-no-row-hover slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols"
+                                                            role="grid" >
+                                                            <thead>
+                                                                <tr class="slds-line-height_reset">
+                                                                    <th class="" scope="col" style="width:3.75rem; height: 35px;"></th>
+                                                                    <th aria-label="Product Name" scope="col">
+                                                                        <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                            <span class="slds-truncate" title="Product Code">Product Name</span>
+                                                                        </div>
+                                                                    </th>
+                                                                    <th aria-label="Product Code" scope="col">
+                                                                        <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                            <span class="slds-truncate" title="Product Code">Product Code</span>
+                                                                        </div>
+                                                                    </th>
+                                                                    <th aria-label="List Price" scope="col">
+                                                                        <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                            <span class="slds-truncate" title="Product Code">List Price</span>
+                                                                        </div>
+                                                                    </th>
+                                                                    <th aria-label="Product Summary" scope="col">
+                                                                        <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                            <span class="slds-truncate" title="Product Code">Product Summary</span>
+                                                                        </div>
+                                                                    </th>
+                                                                    <th aria-label="Manufacturer" scope="col">
+                                                                        <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                            <span class="slds-truncate" title="Product Code">Manufacturer</span>
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <apex:variable value="{!-1}" var="selectProductIndex"/>
+                                                                <apex:repeat value="{!Products}" var="prod" id="rptProducts">
+                                                                    <apex:variable value="{!selectProductIndex + 1}" var="selectProductIndex" />
+                                                                    <tr aria-selected="false" class="slds-hint-parent">
+                                                                        <td class="slds-text-align_right" role="gridcell" tabindex="0">
+                                                                            <div id="divUnchecked{!prod.product.Id}" style="display: {!IF(prod.isSelect, 'none', 'block')};">
+                                                                                <label class="slds-checkbox-button" for="unCheckSelectProduct{!selectProductIndex}" >
+                                                                                    <input type="checkbox" 
+                                                                                            onclick="return selectProduct('divUnchecked{!prod.product.Id}', 'divChecked{!prod.product.Id}', '{!prod.product.Product2.Name}', '{!prod.product.Id}');" 
+                                                                                            class="slds-assistive-text" id="unCheckSelectProduct{!selectProductIndex}" tabindex="-1"/>
+                                                                                    <span class="slds-icon_container slds-icon-utility-add slds-current-color">
+                                                                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#add"></use>
+                                                                                        </svg>
+                                                                                        <span class="slds-assistive-text">Add product</span>
+                                                                                    </span>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div id="divChecked{!prod.product.Id}" style="display: {!IF(prod.isSelect, 'block', 'none')};">
+                                                                                <apex:inputHidden value="{!prod.isSelect}" id="hidSelectedProductId" />
+                                                                                <label class="slds-checkbox-button slds-checkbox-button_is-checked" for="checkSelectProduct{!prod.product.Id}">
+                                                                                    <input type="checkbox" onclick="return selectProduct('divChecked{!prod.product.Id}', 'divUnchecked{!prod.product.Id}', '{!prod.product.Product2.Name}', '{!prod.product.Id}');" class="slds-assistive-text" 
+                                                                                            id="checkSelectProduct{!prod.product.Id}" tabindex="-1" />
+                                                                                    <span class="slds-icon_container slds-icon-utility-check slds-current-color" >
+                                                                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+                                                                                        </svg>
+                                                                                        <span class="slds-assistive-text">Add product</span>
+                                                                                    </span>
+                                                                                </label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td scope="gridcell">
+                                                                            <div class="slds-truncate">{!prod.product.Product2.Name}</div>
+                                                                        </td>
+                                                                        <td role="gridcell">
+                                                                            <div class="slds-truncate">{!prod.product.Product2.ProductCode}</div>
+                                                                        </td>
+                                                                        <td role="gridcell">
+                                                                            <div class="slds-truncate">{!prod.product.UnitPrice}</div>
+                                                                        </td>
+                                                                        <td role="gridcell">
+                                                                            <div class="slds-truncate">{!prod.product.Product2.Description}</div>
+                                                                        </td>
+                                                                        <td role="gridcell">
+                                                                            <!-- To Be Added
+                                                                            <div class="slds-truncate">{!prod.product.Product2.Manufacturer__c}</div>
+                                                                            -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </apex:repeat>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </apex:outputPanel>
+                                        </div>
+                                    </div>
+                                    <footer class="slds-modal__footer">
+                                        <apex:outputPanel id="pnlPaginationButton">
+                                            <table style="width: 100%;">
+                                                <tr>
+                                                    <td style="width: 33%;"></td>
+                                                    <td style="width: 34%;">
+                                                        <center>
+                                                            <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                                value="First" 
+                                                                                action="{!first}" 
+                                                                                status="splashStatus" 
+                                                                                oncomplete="paginationRemoveSelectedProduct();"
+                                                                                reRender="pnlSelectProducts, pnlPaginationButton"/>
+                                                            <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                                value="Previos" 
+                                                                                action="{!previous}" 
+                                                                                status="splashStatus" 
+                                                                                disabled="{! !hasPrevious}"
+                                                                                oncomplete="paginationRemoveSelectedProduct();"
+                                                                                reRender="pnlSelectProducts, pnlPaginationButton"/> 
+
+                                                            <span style="font-size: 14px; font-weight: bold; color: #3F71A5; margin-left: 10px; margin-right: 10px;">
+                                                                Page {!pageNumber} of {!totalPageNumber}
+                                                            </span>
+
+                                                            <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                                value="Next" 
+                                                                                action="{!next}" 
+                                                                                status="splashStatus" 
+                                                                                disabled="{! !hasNext}" 
+                                                                                oncomplete="paginationRemoveSelectedProduct();"
+                                                                                reRender="pnlSelectProducts, pnlPaginationButton"/>
+                                                            <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                                value="Last" 
+                                                                                action="{!last}" 
+                                                                                status="splashStatus" 
+                                                                                oncomplete="paginationRemoveSelectedProduct();"
+                                                                                reRender="pnlSelectProducts, pnlPaginationButton"/>
+                                                        </center>
+                                                    </td>
+                                                    <td style="width: 33%; text-align: right;">
+                                                        <apex:commandButton styleClass="slds-button slds-button_brand" value="Add to cart" action="{!addProductsToCart}" status="splashStatus" rerender="pnlMain" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </apex:outputPanel>
+                                        
+                                    </footer>
+                                </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open"></div>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+
+        </apex:outputPanel>
+        
+        <!--
+        <div id="divDelete" style="display: none;">
+            <div class="parentDisable"></div>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header" style="background-color: red;">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="return hideDeletePopup();">
+                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                            <apex:outputText value="Delete" style="color: white;"/>
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <center>
+                            <b>Are you sure, you want to delete?</b>
+                        </center>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <apex:commandButton styleClass="slds-button slds-button_neutral" value="Cancel" onclick="return hideDeletePopup();" />
+                        <apex:commandButton styleClass="slds-button slds-button_destructive" value="Delete" onclick="return deleteAction();" id="btnCreateCloneSubGroup"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        -->
+
+        <div id="divLoading" style="display: none;">
+            <div class="demo-only" style="height:100%">
+                <div class="slds-spinner_container" style="position: fixed;">
+                    <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </div>  
+        
+        <div id="divDescriptionPopup" style="display: none;">
+            <div class="parentDisable"></div>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="return closePopupDescription();">
+                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Description</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <center>
+                            <apex:inputTextarea value="{!rickTextAreaValue.Descriptions__c}" id="txtAreaDescription" richText="true"/>
+                        </center>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <apex:commandButton styleClass="slds-button slds-button_neutral" value="Cancel" onclick="return closePopupDescription();" />
+                        <apex:commandButton styleClass="slds-button slds-button_brand" value="Save" onclick="return updateDescription()" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+
+        <div id="divCreateGroup" style="display: none;">
+            <div class="parentDisable"></div>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="return hideCreateGroupPopup();">
+                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                            <apex:outputText value="Create Group" id="txtCreateGroupHeader" />
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <center>
+                            <table class="slds-cell-buffer_top">
+                                <tr>
+                                    <td style="font-weight:bold;">
+                                        SubGroup Name
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!subGroupNameCreateGroup}" styleClass="slds-input" id="txtSubGroupName" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </center>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <apex:commandButton styleClass="slds-button slds-button_neutral" value="Cancel" onclick="return hideCreateGroupPopup();" />
+                        <apex:commandButton styleClass="slds-button slds-button_brand" value="Create Group" onclick="return validateGroupAndSubGroupName()"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+
+        <div id="divCreateSubGroup" style="display: none;">
+            <div class="parentDisable"></div>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="return hideCreateSubGroupPopup();">
+                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                            <apex:outputText value="Create Sub Group" id="txtCreateSubGroupHeader" />
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <center>
+                            <table>
+                                <tr>
+                                    <td style="font-weight:bold;width: 20%;">
+                                        SubGroup Name
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!subGroupNameCreateSubGroup}" styleClass="slds-input" id="subGroupName" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </center>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <apex:commandButton styleClass="slds-button slds-button_neutral" value="Cancel" onclick="return hideCreateSubGroupPopup();" />
+                        <apex:commandButton styleClass="slds-button slds-button_brand" value="Create Sub Group" onclick="return validateSubGroupName();" id="btnCreateCloneSubGroup"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+
+    </apex:form>
+
+</apex:page>

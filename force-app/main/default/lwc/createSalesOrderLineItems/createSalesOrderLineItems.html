@@ -1,0 +1,82 @@
+<template>
+    <template if:true={lineItemDetails}>
+        <div>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered"
+            aria-labelledby="element-with-table-label other-element-with-table-label">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">
+                            <lightning-input type="checkbox" label="BC" name="input1" variant="label-hidden">
+                            </lightning-input>
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">PRODUCT NAME</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">TAG</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">DESCRIPTION</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">QUANTITY ORDERED</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">UNIT PRICE</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">AMOUNT</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate wrapText">COMMENT</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={lineItemDetails} for:item="lineItem">
+                    <tr key={lineItem.lineItemId} data-tr={lineItem.lineItemId}>
+                        <td>
+                            <template if:true={lineItem.isSelected}>
+                                <lightning-input type="checkbox" label="BC" name="input1" variant="label-hidden" checked={lineItem.isSelected} disabled>
+                                </lightning-input>
+                            </template>
+                            <template if:false={lineItem.isSelected}>
+                                <lightning-input type="checkbox" label="BC" name="input1" data-id={lineItem.lineItemId} variant="label-hidden" checked={lineItem.isSelected} onclick={handleLineItems}>
+                                </lightning-input>
+                            </template>
+                            <!-- <lightning-input type="checkbox" label="BC" name="input1" variant="label-hidden" checked={lineItem.isSelected}>
+                            </lightning-input> -->
+                        </td>
+                        <td data-label="Product" class="thWidth wrapText">
+                            <a href={lineItem.productId}>{lineItem.productName}</a>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            {lineItem.tag}
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode wrapText thWidth" role="gridcell">
+                            <lightning-formatted-rich-text value={lineItem.description}
+                                                        class="decriptionRow" 
+                                                        data-id={lineItem.lineItemId}>
+                            </lightning-formatted-rich-text>
+                        </td>
+                        <td role="gridcell">
+                            {lineItem.quantity}
+                        </td>
+                        <td data-label="Unit Cost">
+                            <div class="slds-truncate">
+                                {lineItem.unitCost}
+                            </div>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            {lineItem.salePrice}
+                        </td>
+                        <td><lightning-textarea name="input1"></lightning-textarea></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        </div>
+    </template>
+</template>

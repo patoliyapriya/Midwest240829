@@ -1,0 +1,86 @@
+.statusHeader{
+    width:80px
+}
+.align-right{
+    text-align:right
+}
+.tableCell{
+    height:37px;
+    display:table-cell;
+    vertical-align:middle
+}
+.mid-width{
+    min-width:100px
+}
+.large-width{
+    min-width:160px
+}
+.matchingRecord{
+    background-color:#c7ffe1;
+    border-bottom:2px solid #fff
+}
+.selectedRow{
+    background-color:#93ffe2
+}
+.nowrap{
+    white-space:nowrap
+}
+.customLabelWidth{
+    width:5%!important
+}
+.customDataWidth{
+    width:20%!important
+}
+.helpOrbCommon{
+    background-image:url(/img/help/helpOrbs.gif);
+    background-position:0 0;
+    width:20px;
+    height:15px
+}
+.padding-left{
+    padding-left:20px!important
+}
+div.tooltip{
+    width:20px;
+    float:right;
+    display:inline
+}
+div.tooltip span{
+    display:none;
+    font-weight:400;
+    text-align:left;
+    padding:3px 5px;
+    margin-left:8px;
+    width:250px
+}
+div.tooltip:hover span{
+    display:inline;
+    position:absolute;
+    border:1px solid #ccc;
+    background:#ffc;
+    color:#000;
+    z-index:10000
+}
+.pbButton,.pbButtonb{
+    text-align:left!important
+}
+.pbButtonb{
+    padding-left:13px!important
+}
+.pbTitle{
+    width:30%!important;
+    display:table-cell!important
+}
+body textarea{
+    overflow: auto;
+}
+.negativeAmount{
+    color:red!important
+}
+
+.slds-vf-scope .detailList .dataCol input[type="text"],
+.slds-vf-scope .detailList .dataCol input[type="date"],
+.slds-vf-scope .detailList .dataCol input[type="password"],
+.slds-vf-scope .detailList .dataCol textarea {
+	min-width: 18rem;
+}

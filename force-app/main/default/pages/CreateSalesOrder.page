@@ -1,0 +1,489 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 12-09-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<apex:page standardController="Quote" extensions="CreateSalesOrderController"
+            lightningStyleSheets="true"
+            sidebar="false"
+            showHeader="false"
+            id="pageId">
+
+    <script>
+        function closeSection(divName, groupIndex, subGroupIndex) {
+            var divId = divName + groupIndex + subGroupIndex;
+            var divSection = document.getElementById(divId);
+
+            if (divSection.classList.contains('slds-is-open')) {
+                divSection.classList.remove('slds-is-open');
+            } else {
+                divSection.classList.add('slds-is-open');
+            }
+
+            return false;
+        }
+
+        function updateChildFlags(grpIndx, subGrpIndx) {
+            var allSelection = document.getElementById('pageId:theForm:rptGroup:'+grpIndx+':rptSubGroup:'+subGrpIndx+':isAllSelected'); 
+            for(var i=0;i<1000;i++){
+                elementId = 'pageId:theForm:rptGroup:'+grpIndx+':rptSubGroup:'+subGrpIndx+':rptLineItem:'+i+':isSelected';
+                var lineItem = document.getElementById(elementId);
+                if(lineItem) {
+                    console.log('is disabled='+lineItem.disabled);
+                    if(lineItem.disabled == false) {
+                        lineItem.checked = allSelection.checked;
+                    }
+                    
+                } 
+            }
+        }
+
+        function updateParentFlag(grpIndx, subGrpIndx, newValue) {
+            var parentFlag = document.getElementById('pageId:theForm:rptGroup:'+grpIndx+':rptSubGroup:'+subGrpIndx+':isAllSelected'); 
+            if(newValue == false) {
+                parentFlag.checked = newValue;
+            } else if(newValue == true)  {
+                var flagValueforParent = true;
+                for(var i=0;i<1000;i++){
+                    elementId = 'pageId:theForm:rptGroup:'+grpIndx+':rptSubGroup:'+subGrpIndx+':rptLineItem:'+i+':isSelected';
+                    var lineItem = document.getElementById(elementId);
+                    if(lineItem == null) {
+                        break;
+                    }
+                    
+                    if(lineItem.checked == false) {
+                        flagValueforParent = false;
+                    }
+                    
+                }
+                parentFlag.checked = flagValueforParent;
+            }
+            
+        }
+
+        function startSplash() {                        
+            var divObj = document.getElementById('divLoading');            
+            divObj.style.display='block';                                                   
+        }
+
+        function endSplash() {              
+            document.getElementById('divLoading').style.display='none';                      
+        }
+
+        function openQuote() {
+            var quoteId = "{!quote.Id}";
+            var url = window.origin+'/'+quoteId;
+            
+            window.open(url,'_self');
+        }
+    </script>
+
+    <style>
+
+        .tblProducts tr:nth-child(odd) {
+            background-color: #FFFFFF !important;
+        }
+
+        .tblProducts tr:nth-child(even) {
+            background-color: #F2F2F2 !important;
+        }
+
+        table.tblSubGroupHeader td {
+            padding-left: 10px !important;
+        }
+
+        table.tblSubGroupHeader {
+            margin: 10px !important;
+        }
+
+        table.tblLineItem td {
+            padding: 5px;
+        }
+
+        table.tblLineItem th {
+            padding-left: 5px;
+        }
+
+        .tblLineItem tr:nth-child(odd) {
+            background-color: #FFFFFF;
+        }
+
+        .tblLineItem tr:nth-child(even) {
+            background-color: #F2F2F2;
+        }
+
+        .tblMain {
+            border-collapse: inherit !important;
+        }
+
+        .tblLineItemsFooter td {
+            color: white !important;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .tblTotalFooter td {
+            padding: 1px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .tblGroupFooter td{
+            padding: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .slds-accordion__summary {
+            margin-bottom: 0px !important;
+        }
+
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .fixed-header,
+        .fixed-footer {
+            width: 100%;
+            position: fixed;
+            padding: 10px;
+            z-index: 150;
+            background-color: white;
+        }
+
+        .fixed-header {
+            top: 0;
+        }
+
+        .fixed-footer {
+            bottom: 0;
+        }
+
+        .container {
+            top: 0;
+        }
+
+        input[type="text"] {
+            width: 90%;
+        }
+
+    </style>
+
+
+    <apex:slds />
+    <apex:form id="theForm">
+
+        <div id="divLoading" style="display: none;">
+            <div class="demo-only" style="height:100%">
+                <div class="slds-spinner_container" style="position: fixed;">
+                    <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </div>  
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>   
+
+        <apex:outputPanel id="errorPanel" style="{!(IF(iserror, '', 'display : none;'))}">
+            <div class="demo-only" style="height:4rem">
+                <div class="slds-notify_container slds-is-relative" >
+                    <div class="slds-notify slds-notify_toast slds-theme_error"  role="status">
+                        <span class="slds-assistive-text">error</span>
+                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+                            <svg class="slds-icon slds-icon_small" aria-hidden="false">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                            </svg>
+                        </span>
+                        <div class="slds-notify__content">
+                            <h2 class="slds-text-heading_small ">{!message}
+                                <!-- <a href="javascript:void(0);">another lead</a> has the same name. -->
+                            </h2>
+                        </div>
+                        <div class="slds-notify__close">
+                            <button style="color:white" class="slds-button slds-button_icon slds-button_icon-small slds-button_icon-inverse" title="Close" >
+                                <svg class="slds-button__icon" >
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                                    
+                                </svg>
+                                
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </apex:outputPanel>
+
+        <div class="fixed-header">
+            <div class="container">
+                <div class="slds-page-header slds-page-header_record-home">
+                    <div class="slds-page-header__row">
+                        <div class="slds-page-header__col-title">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-standard-opportunity">
+                                        <svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#quotes"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name">
+                                        <div class="slds-page-header__name-title">
+                                            <h1>
+                                                <span>Quote</span>
+                                                <span class="slds-page-header__title slds-truncate" title="{!quote.Name}">
+                                                    
+                                                    <a onclick="openQuote()" target="_blank">{!quote.Name}</a>
+                                                </span>
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                              <div class="slds-checkbox">
+                                <apex:inputCheckbox value="{!quote.Opportunity.Account.Is_Taxable__c}" 
+                                                    id="isSelected"
+                                                    label="Is Customer Taxable"
+                                                    disabled="true" />
+                                <label class="slds-checkbox__label" for="checkbox-unique-id-73">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">Is Customer Taxable</span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          
+
+                        <div class="slds-page-header__col-actions">
+                            <div class="slds-page-header__controls">
+                                <div class="slds-page-header__control">
+                                    <apex:commandButton styleClass="slds-button slds-button_neutral" 
+                                                                immediate="true"
+                                                                action="{!backToQuote}"
+                                                                value="Cancel" />
+
+                                    <apex:commandButton styleClass="slds-button slds-button_brand" 
+                                                                value="Create Sales Order" 
+                                                                action="{!createSalesOrder}"
+                                                                status="splashStatus"
+                                                                reRender="pnlError,errorPanel"
+                                                                rendered="{! (!iserror)}"/>
+
+                                    <apex:commandButton styleClass="slds-button slds-button_brand" 
+                                                        value="Update Sales Order" 
+                                                        action="{!updateSalesOrder}"
+                                                        status="splashStatus"
+                                                        reRender="pnlError,errorPanel"
+                                                        rendered="{!IF(mode='edit' ,true,false)}"/>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; margin-bottom: 50px;">
+            <apex:variable value="{!-1}" var="groupIndex" />
+            
+            <apex:repeat value="{!lstGroups}" var="group" id="rptGroup">
+                <apex:variable value="{!0}" var="groupTotal" />
+                <apex:variable value="{!groupIndex + 1}" var="groupIndex" />
+                <ul class="slds-accordion">
+                    <li class="slds-accordion__list-item groupItems">
+                        <section class="slds-accordion__section {!IF(group.grp.Is_Section_Closed__c, '', 'slds-is-open')}" id="groupDiv{!groupIndex}">
+                            <div class="slds-accordion__summary"
+                                    id="groupHeaderRow{!groupIndex}" 
+                                    style="background-color: {!IF(group.grp.Alternate__c = true, '#C53831', '#011242')}; display: block !important;border: 1px solid #A4A4A4;">
+                                <div class="slds-accordion__summary-heading" style="font-size: 14px;">
+                                    <table style="width: 99%; margin: 10px;">
+                                        <tr>
+                                            <td style="width: 96%">
+                                                <apex:outputText value="{!group.grp.Name}" style="color: white; font-weight: bold; font-size: 14px;"/>
+                                            </td>
+                                            <td style="width: 4%;">
+                                                <button onclick="return closeSection('groupDiv', '{!groupIndex}', '');" aria-controls="accordion-details-01" aria-expanded="true"
+                                                    class="slds-button slds-button_reset slds-accordion__summary-action">
+                                                    <svg class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon--large" aria-hidden="true" style="color:white">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="slds-accordion__content" id="divGroupSection{!groupIndex}" style="border: 1px solid #A4A4A4;margin-top: 8px;">
+                                <table>
+                                    <tbody class="subGroupItems">
+                                        <apex:variable value="{!-1}" var="subGroupIndex" />
+                                        <apex:repeat value="{!group.lstSubGroups}" var="subGrp" id="rptSubGroup">
+                                            <apex:variable value="{!subGroupIndex + 1}" var="subGroupIndex" />
+                                            <tr>
+                                                <td>
+                                                    <ul class="slds-accordion ">
+                                                        <li class="slds-accordion__list-item">
+                                                            <section class="slds-accordion__section {!IF(subGrp.subGroup.Is_Section_Closed__c, '', 'slds-is-open')}" id="subGroupDiv{!groupIndex}{!subGroupIndex}">
+                                                                <div class="slds-accordion__summary" style="border: 1px solid #A4A4A4;">
+                                                                    <div class="slds-accordion__summary-heading" style="font-size: 12px;">
+                                                                        <table class="tblSubGroupHeader">
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <apex:outputText value="{!subGrp.subGroup.Name}" style="font-size: 14px; font-weight: bold;"/>
+                                                                                </td>
+                                                                                <td style="text-align: right;">
+                                                                                    <button onclick="return closeSection('subGroupDiv', '{!groupIndex}', '{!subGroupIndex}');" aria-controls="accordion-details-01" aria-expanded="true"
+                                                                                        class="slds-button slds-button_reset slds-accordion__summary-action">
+                                                                                        <svg class="slds-accordion__summary-action-icon slds-button__icon slds-button__icon--large" aria-hidden="true">
+                                                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-accordion__content" id="sectionSubGroup{!groupIndex}{!subGroupIndex}" style="border: 1px solid #A4A4A4;margin-top: 5px;">
+                                                                    <table class="tblLineItem" style="width: 100%;font-size: 12px;" id="tblLineItems">
+                                                                        <apex:variable value="{!0}" var="subtotal" />
+                                                                        <thead>
+                                                                            <tr style="background-color: {!IF(subGrp.subGroup.Alternate__c == true,'#C53831','#3F4042')};" class="lineItemsRows">
+                                                                                <td style="width: 5%;">
+                                                                                    <center><apex:inputCheckbox id="isAllSelected" 
+                                                                                                    onchange="updateChildFlags({!groupIndex},{!subGroupIndex})"/></center>
+                                                                                </td>
+                                                                                <td style="width: 20%; color: white;">PRODUCT NAME</td>
+                                                                                <td style="width: 10%; color: white;">TAG</td>
+                                                                                <td style="width: 20%; color: white;">DESCRIPTION</td>
+                                                                                <td style="width: 10%; color: white;">QUANTITY ORDERED</td>
+                                                                                <td style="width: 10%; color: white;">UNIT PRICE</td>
+                                                                                <td style="width: 10%; color: white;">AMOUNT</td>
+                                                                                <td style="width: 20%; color: white;">COMMENT</td>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <apex:variable value="{!-1}" var="itemLineIndex" />
+                                                                            
+                                                                            <apex:repeat value="{!subGrp.lstOrderLineItems}" var="lineItem" id="rptLineItem">
+                                                                                <apex:variable value="{!itemLineIndex + 1}" var="itemLineIndex" />
+                                                                                <tr style="background-color: {!IF(lineItem.isAlternate, '#FAE9EB', '')};font-size: 14px;">
+                                                                                    <td>
+                                                                                        <center>
+                                                                                            <apex:inputCheckbox value="{!lineItem.isSelect}" id="isSelected"
+                                                                                            disabled="{!IF(lineItem.orderLineItem.Id != null,'true','false')}"
+                                                                                            onchange="updateParentFlag({!groupIndex},{!subGroupIndex}, this.checked)" />
+                                                                                        </center>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:outputField value="{!lineItem.orderLineItem.AcctSeedERP__Product__c}"/>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:outputText value="{!lineItem.tag}"/>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:outputText value="{!lineItem.descriptions}" escape="false"></apex:outputText>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:outputText value="{!lineItem.orderLineItem.AcctSeedERP__Quantity_Ordered__c}" 
+                                                                                                        rendered="{!IF(mode='create' || lineItem.orderLineItem.Id = null,true,false)}" />
+                                                                                        <apex:inputField value="{!lineItem.orderLineItem.AcctSeedERP__Quantity_Ordered__c}"
+                                                                                                        rendered="{!IF(mode='edit' && lineItem.orderLineItem.Id != null ,true,false)}"/>  
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:outputText value="{!lineItem.orderLineItem.AcctSeedERP__Unit_Price__c}" 
+                                                                                                        rendered="{!IF(mode='create' || lineItem.orderLineItem.Id = null,true,false)}" />
+                                                                                        <apex:inputField value="{!lineItem.orderLineItem.AcctSeedERP__Unit_Price__c}"
+                                                                                                        rendered="{!IF(mode='edit' && lineItem.orderLineItem.Id != null ,true,false)}"/>  
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:outputText value="{!lineItem.orderLineItem.AcctSeedERP__Total__c}"
+                                                                                                        rendered="{!IF(lineItem.orderLineItem.Id != null,true,false)}" >
+                                                                                            <apex:variable value="{!subtotal+lineItem.orderLineItem.AcctSeedERP__Total__c}" var="subtotal" />
+                                                                                        </apex:outputText>
+                            
+                                                                                        <apex:outputText value="{!ROUND(lineItem.orderLineItem.AcctSeedERP__Quantity_Ordered__c * lineItem.orderLineItem.AcctSeedERP__Unit_Price__c,2)}"
+                                                                                                        rendered="{!IF(lineItem.orderLineItem.Id == null,true,false)}" >
+                                                                                                        <apex:variable value="{!subtotal+(lineItem.orderLineItem.AcctSeedERP__Quantity_Ordered__c * lineItem.orderLineItem.AcctSeedERP__Unit_Price__c)}" var="subtotal" />
+                                                                                        </apex:outputText>
+                                                                                        
+                                                                                        
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <apex:inputField value="{!lineItem.orderLineItem.AcctSeedERP__Comment__c}" styleClass="slds-input" />
+                                                                                    </td>
+                                                                                </tr>
+                                                                                
+                                                                            </apex:repeat>
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr style="background-color: {!IF(subGrp.subGroup.Alternate__c, '#FAE9EB', '')}">
+                                                                                <td colspan="18" style="padding: 5px;">
+                                                                                    <table style="width: 100%;" class="tblLineItemsFooter">
+                                                                                        <tr Style="background-color: {!IF(subGrp.subGroup.Alternate__c=true,'#C53831','#386DD5')};">
+                                                                                            <td style="width: 40%;">
+                                                                                                <apex:outputText value="{!subGrp.subGroup.Name}" id="txtSubGroupNameFooter"/>
+                                                                                            </td>
+                                                                                            <td style="width: 20%;">
+                                                                                                Sale Price Total &nbsp;
+                                                                                                <apex:outputText value="{0, Number, Currency}" id="txtSubGroupSalePriceTotal">
+                                                                                                    <apex:param value="{!subtotal}" />
+                                                                                                </apex:outputText>
+                                                                                                <apex:variable value="{!groupTotal+subtotal}" var="groupTotal" />
+                                                                                                <apex:inputHidden value="{!subGrp.subGroup.Total_Line_Items__c}" id="hidSubGroupSalePriceTotal"/>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </table>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </section>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                        <tr class="sort-disabled">
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style="background-color: {!IF(group.grp.Alternate__c = true, '#891716', '#63CD7F')}; padding: 5px;" id="groupFooterRow{!groupIndex}">
+                                    <table style="width: 100%;" class="tblGroupFooter">
+                                        <tr>
+                                            <td style="width: 40%">
+                                                <apex:outputText value="{!group.grp.Name}" id="txtGroupNameFooter"/>
+                                            </td>
+                                            <td style="width: 20%">
+                                                Sale Price Total &nbsp;
+                                                <apex:outputText value="{0, Number, Currency}" id="txtGroupSalePriceTotal"  >
+                                                    <apex:param value="{!groupTotal}"/>
+                                                </apex:outputText>
+                                                <apex:inputHidden value="{!group.grp.Total_Sub_Groups__c}" id="hidGroupSalePriceTotal" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    
+                                </div>
+                            </div>
+                        </section>
+                    </li>
+                </ul>
+            </apex:repeat>
+        </div>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,35 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-19-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-grid slds-wrap footerbg">
+        <div class="slds-col slds-size_9-of-12 slds-p-left_x-small slds-p-top_small slds-p-bottom_small">
+            <div class="slds-float_left slds-text-color_default labelcolor slds-text-heading_small">
+                {subGroupDetails.subGroupName}
+            </div>
+            <div class="slds-float_right slds-text-heading_small slds-p-right_small slds-text-color_default">
+                {label.subGroupPriceTotal} : {subGroupDetails.subGroupTotal}
+            </div>
+        </div>
+        <div class="slds-col slds-size_3-of-12 borders slds-p-top_small slds-p-bottom_small">
+            <div class="slds-form-element slds-float_right slds-p-right_small">
+                <label class="slds-checkbox_toggle slds-grid">
+                    <span class="slds-form-element__label slds-m-bottom_none">
+                        {label.showSubGroupPricing}
+                    </span>
+                    <lightning-input type="toggle" 
+                                    data-name="hidePricing"
+                                    message-toggle-inactive="" 
+                                    message-toggle-active=""
+                                    checked={subGroupDetails.hidePricing}
+                                    onchange={handleToogle}>
+                    </lightning-input>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>

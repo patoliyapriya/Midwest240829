@@ -1,0 +1,39 @@
+.addcolor{
+    background-color: var(--slds-g-color-error-base-40,#b94a48);
+    color: #ffffff !important;
+}
+
+.headerbg {
+    background: #EFF3F2;
+    color: black;
+}
+
+.headerfont {
+    font-weight: bold;
+}
+
+.inputWidth {
+    width:65px;
+}
+
+input {
+    border: 1px solid gray;
+    outline: none;
+}
+
+.labelcolor {
+    color: white !important;
+}
+
+.color_black {
+    color: black !important;
+}
+
+.dragClass {
+    cursor: move !important;
+}
+
+td {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}

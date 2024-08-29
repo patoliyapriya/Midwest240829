@@ -1,0 +1,28 @@
+<aura:component implements="lightning:recordHomeTemplate" description="Custom Approval Request Page Layout">
+    
+    <!-- header -->
+    <aura:attribute name="header" type="Aura.Component[]" />
+    
+    <!-- two columns -->
+    <aura:attribute name="left_col" type="Aura.Component[]" />
+    <aura:attribute name="right_col" type="Aura.Component[]" />
+	
+    <!-- layout -->
+    <div>
+        <lightning:layout>
+            <lightning:layoutItem size="12" class="slds-m-vertical-small">
+                {!v.header}
+            </lightning:layoutItem>
+        </lightning:layout>
+        
+        <lightning:layout>
+            <lightning:layoutItem size="{! $Browser.isDesktop ? '9' : '12' }" class="slds-m-top_small">
+                {!v.left_col}
+            </lightning:layoutItem>
+            <lightning:layoutItem size="{! $Browser.isDesktop ? '3' : '12' }" class="slds-p-left_small slds-m-top_small">
+                {!v.right_col}
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    
+</aura:component>

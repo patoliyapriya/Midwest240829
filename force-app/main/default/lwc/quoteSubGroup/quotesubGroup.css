@@ -1,0 +1,9 @@
+/* .subGroupContent {
+    border-radius: 20px !important;
+    border: 1px solid black;
+    /* width: 200px;
+  height: 150px; */
+/* } */ 
+.custom-border-radius {
+  border-radius: 100px !important; /* Adjust the value as needed */
+}

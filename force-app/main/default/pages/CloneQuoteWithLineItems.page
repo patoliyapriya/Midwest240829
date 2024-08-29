@@ -1,0 +1,76 @@
+<apex:page standardController="Quote" extensions="CloneQuoteWithLineItems" >
+    
+    <script>
+        function openQuoteUpdatePopup() {
+            
+            var popup = document.getElementById('divQuoteName');
+            popup.style.display = 'block';
+            
+            var saveQuoteDiv = document.getElementById('divSaveQuote');
+            saveQuoteDiv .style.display = 'none';
+            
+            return false;
+        }
+         
+        function closeQuoteUpdatePopup() {
+            var popup = document.getElementById('divQuoteName');
+            popup.style.display = 'none';
+            
+            var saveQuoteDiv = document.getElementById('divSaveQuote');
+            saveQuoteDiv .style.display = 'block';
+            
+            return false;
+        }
+    </script>
+    
+    <apex:form id="formId">
+    
+        <div id="divQuoteName" style="display:none;">
+            <apex:outputPanel styleClass="popupBackground" layout="block" />
+                <apex:outputPanel styleClass="Popup" layout="block" >
+                    <apex:pageBlock title="Update Quote Name">
+                        <apex:pageBlockSection columns="1">
+                            <apex:inputField label="Quote Name" value="{!newQuote.Name}" style="width: 100%" id="quoteName"/>
+                            
+                        </apex:pageBlockSection>
+                        <apex:pageBlockButtons location="bottom" style="margin-top: 0%">
+                            <apex:commandButton value="Save" action="{!cloneQuote}" />
+                            <apex:commandButton value="Cancel" onClick="return closeQuoteUpdatePopup();" />
+                        </apex:pageBlockButtons>
+                    </apex:pageBlock>
+             </apex:outputPanel>
+        </div>
+        
+        <div id="divSaveQuote">
+            <apex:sectionHeader subtitle="Clone Quote" title="Quote"/>
+            <apex:pageBlock title="Quote Edit" mode="Edit" >
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Save" action="{!saveQuote}" 
+                                            onComplete="return openQuoteUpdatePopup();" 
+                                            reRender="quoteName"
+                                            immediate="true"/>
+                    <apex:commandButton value="Cancel" immediate="true" action="{!Cancel}"/>  
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection title="Quote Information" collapsible="false">
+                    <apex:inputField value="{!oldQuote.Bid_Date__c}"/>
+                    <apex:inputfield value="{!oldQuote.Bidding_To__c}" />
+                    <apex:inputField value="{!oldQuote.Submitted_By__c}" />
+                    <apex:outputfield value="{!oldQuote.Opportunity_Name__c}" />
+                    <apex:inputField value="{!oldQuote.prepared_by_user__c}" />
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Opportunity Number</apex:outputLabel>
+                        <apex:outputText value="{!oldQuote.Opportunity_Number__c}"></apex:outputText>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Bid Date</apex:outputLabel>
+                        <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                            <apex:param value="{!oldQuote.opportunity.Bid_Date__c}" /> 
+                        </apex:outputText>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </div>
+    </apex:form>
+
+</apex:page>

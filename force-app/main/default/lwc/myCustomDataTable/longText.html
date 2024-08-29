@@ -1,0 +1,13 @@
+<template>
+    <template if:true={wrapText}>
+        <lightning-formatted-text value={value} 
+                                class="slds-truncate" 
+                                title={value}>
+        </lightning-formatted-text>
+    </template>
+    <template if:false={wrapText}>
+        <lightning-formatted-text value={value} 
+                                title={value}>
+        </lightning-formatted-text>
+    </template>
+</template>

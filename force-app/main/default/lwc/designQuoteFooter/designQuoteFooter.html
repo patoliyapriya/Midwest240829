@@ -1,0 +1,56 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-10-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+	<div class="footer">
+		<div class="slds-float_left">
+		</div>
+		<div class="slds-float_right slds-m-right_medium">
+			<div class="slds-grid slds-wrap footerbgblack slds-m-around_none">
+				<div class="slds-grid slds-gutters">
+					<div class="slds-col">
+						<div class="slds-text-heading_small slds-p-top_small slds-p-left_large slds-p-right_x-small">
+							{label.quotetotals}
+						</div>
+					</div>
+					<div class="slds-col slds-p-top_x-small slds-p-bottom_x-small slds-m-right_small borders">
+						<span>
+							<div class="slds-p-left_xx-large">
+								<label class="slds-checkbox_toggle slds-grid">
+									<span class="slds-form-element__label labelcolor">
+										{label.showGrandTotal}
+									</span>
+									<lightning-input type="toggle" 
+													name="input1" 
+													message-toggle-inactive=""
+													message-toggle-active="" 
+													checked={quoteDetails.grandTotal}
+													onchange={handleChange}>
+									</lightning-input>
+								</label>
+							</div>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div class="slds-p-around_medium slds-border_left slds-border_bottom slds-border_right">
+					<div class="slds-grid slds-wrap footerbggreen">
+						<div
+							class="slds-float_left slds-text-color_inverse slds-text-heading_small slds-p-right_xx-large slds-p-left_large slds-p-top_x-small slds-p-bottom_x-small">
+							{label.totalSellPrice}
+						</div>
+						<div
+							class="slds-float_right slds-text-heading_small slds-text-color_inverse slds-p-left_xx-large slds-p-top_x-small slds-p-bottom_x-small">
+							{quoteDetails.sellPrice} 
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

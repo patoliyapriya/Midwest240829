@@ -1,0 +1,103 @@
+<template>
+
+    <lightning-record-edit-form object-api-name="Opportunity" record-id={searchKey}
+                                                                         
+     onerror={showError} onsuccess={showSuccessToast}>
+     
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-6 slds-align_absolute-center">
+                <lightning-button class="slds-m-top_small" 
+                                    variant="brand" 
+                                    type="submit" 
+                                    name="Save" 
+                                    label="Save"
+                                    onclick ={handleSubmit}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <lightning-accordion class="example-accordion"
+                                onsectiontoggle={handleToggleSection} 
+                                allow-multiple-sections-open>
+            <lightning-accordion-section name="A" label="Turnover Information">
+                <template for:each={turnoverRows} for:item="fields">
+                    <div class="slds-grid slds-grid--pull-padded" style="padding-bottom: 4%;background:white;padding-top: 10px;" key={fields.picklist}>
+                        <div class="slds-col--padded" style="width: 10%;">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-2" style="text-align: right;">
+                                    {fields.label}
+                                </div>
+                                <div class="slds-col slds-size_1-of-4" style="margin-left: 1%;">
+                                    <lightning-input-field  
+                                                            variant="label-hidden" 
+                                                            field-name={fields.picklist}>
+                                    </lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col--padded">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-6" style="text-align: right;">
+                                    Note
+                                </div>
+                                <div class="slds-col slds-size_1-of-2" style="margin-left: 1%;width: 75%;">
+                                    <lightning-input-field 
+                                                            variant="label-hidden" 
+                                                            field-name={fields.note}>
+                                    </lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </lightning-accordion-section>
+            
+            <lightning-accordion-section name="B" label="Project Margin Information">
+                <template for:each={marginRows} for:item="fields">
+                    <div class="slds-grid slds-grid--pull-padded" style="padding-bottom: 4%;" key={fields.picklist}>
+                        <div class="slds-col--padded" style="width: 10%;">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-2" style="text-align: right;">
+                                    {fields.label}
+                                </div>
+                                <div class="slds-col slds-size_1-of-4" style="margin-left: 1%;">
+                                    <lightning-input-field  
+                                                            variant="label-hidden" 
+                                                            field-name={fields.picklist}>
+                                    </lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col--padded">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-6" style="text-align: right;">
+                                    Note
+                                </div>
+                                <div class="slds-col slds-size_1-of-2" style="margin-left: 1%;width: 75%;">
+                                    <lightning-input-field 
+                                                            variant="label-hidden" 
+                                                            field-name={fields.note}>
+                                    </lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </lightning-accordion-section>
+
+        </lightning-accordion>  
+
+        <div if:true={isLoading} class="exampleHolder">
+            <div class="demo-only" style="height:6rem">
+                <div class="slds-spinner_container">
+                  <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                  </div>
+                </div>
+              </div>
+        </div>
+
+    </lightning-record-edit-form>
+</template>

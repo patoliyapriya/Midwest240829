@@ -1,0 +1,6 @@
+<aura:component implements="lightning:isUrlAddressable,force:hasRecordId" description="c:AddressableLWC component">
+    <aura:attribute name="quoteId" type="String"></aura:attribute>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" description="Handler for valueInit event fired when the component has been initialised"/>
+
+<c:quotecontainers quoteid="{!v.quoteId}"></c:quotecontainers>
+</aura:component>

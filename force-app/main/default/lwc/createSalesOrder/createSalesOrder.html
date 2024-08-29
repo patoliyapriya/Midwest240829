@@ -1,0 +1,147 @@
+<template>
+    <div class="slds">
+        <div class="fixed-header">
+            <div class="container">
+                <div class="slds-page-header slds-page-header_record-home">
+                    <div class="slds-page-header__row">
+                        <div class="slds-page-header__col-title">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="standard:quotes" alternative-text="Quotes" title="Quotes"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name">
+                                        <div class="slds-page-header__name-title">
+                                            <h1>
+                                                <span>Quote</span>
+                                                <span class="slds-page-header__title slds-truncate" title="Quote Name">Quote Name</span>
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-page-header__col-actions">
+                            <div class="slds-page-header__controls">
+                                <div class="slds-page-header__control">
+                                    <ul class="slds-button-group-list">
+                                        <li>
+                                            <lightning-button label="Cancel" title="Cancel"></lightning-button>
+                                        </li>
+                                        <li>
+                                            <lightning-button variant="Brand" label="Create Sales Order" 
+                                                                onclick={createSalesOrderWithLineItems} 
+                                                                class="slds-m-left_x-small">
+                                                </lightning-button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 100px;">
+            <template for:each={OrderLineItemStruct} for:item="group" for:index="groupIndex">
+                <ul class="slds-accordion" key={group}>
+                    <li class="slds-accordion__list-item groupItems">
+                        <section class="slds-accordion__section slds-is-open">
+                            <div class="slds-accordion__summary"
+                                    style="background-color: #011242; display: block !important;border: 1px solid #A4A4A4;">
+                                <div class="slds-accordion__summary-heading" style="font-size: 14px;">
+                                    <table style="width: 99%; margin: 10px;">
+                                        <tr>
+                                            <td style="width: 40%">
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control" style="color: white;">
+                                                        {group.groupName}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="slds-accordion__content" style="border: 1px solid #A4A4A4;">
+                                <table>
+                                    <template for:each={group.subGrpdetail} for:item="subGroup" for:index="subGroupIndex">
+                                        <ul class="slds-accordion" key={subGroup}>
+                                            <li class="slds-accordion__list-item">
+                                                <section class="slds-accordion__section slds-is-open">
+                                                    <div class="slds-accordion__summary" style="border: 1px solid #A4A4A4;">
+                                                        <div class="slds-accordion__summary-heading" style="font-size: 12px;">
+                                                            <table class="tblSubGroupHeader">
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="slds-form-element">
+                                                                            <div class="slds-form-element__control">
+                                                                                {subGroup.childGrpName}
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-accordion__content" style="border: 1px solid #A4A4A4;">
+                                                        <table class="tblLineItem" style="width: 100%;font-size: 10px;">
+                                                            <thead>
+                                                                <tr style="background-color: #3F4042;" class="lineItemsRows">
+                                                                    <th style="width: 20%; color: white;">QUANTITY ORDERED</th>
+                                                                    <th style="width: 20%; color: white;">UNIT PRICE</th>
+                                                                    <th style="width: 20%; color: white;">AMOUNT</th>
+                                                                    <th style="width: 20%; color: white;">PRODUCT</th>
+                                                                    <th style="width: 20%; color: white;">COMMENT</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <template for:each={subGroup.orderLineItems} for:item="lineItem" for:index="lineItemIndex">
+                                                                    <tr key={lineItem}>
+                                                                        <td>
+                                                                            <div class="slds-form-element__control">
+                                                                                {lineItem.AcctSeedERP__Quantity_Ordered__c}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{lineItem.AcctSeedERP__Unit_Price__c}</td>
+                                                                        <td>{lineItem.total}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-record-edit-form object-api-name="AcctSeedERP__Sales_Order_Line__c">
+                                                                                    <lightning-input-field variant="label-hidden" 
+                                                                                                            field-name="AcctSeedERP__Product__c" 
+                                                                                                            value={lineItem.AcctSeedERP__Product__c}  
+                                                                                                            read-only="true"
+                                                                                                            disabled>
+                                                                                    </lightning-input-field>
+                                                                                </lightning-record-edit-form> 
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <lightning-input value={lineItem.AcctSeedERP__Comment__c} 
+                                                                                            maxlength="2000" 
+                                                                                            onchange={updatedComment}
+                                                                                            label= {index}
+                                                                                            variant="label-hidden">
+                                                                            </lightning-input>
+                                                                        </td>
+                                                                    </tr>
+                                                                </template>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </section>
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </table>
+                            </div>
+                        </section>
+                    </li>
+                </ul>
+            </template>
+        </div>
+    </div>
+        
+
+</template>

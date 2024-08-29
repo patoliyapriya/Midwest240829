@@ -1,0 +1,46 @@
+<template>
+    <div class="header myStickyHeader sticky" id="myHeader">
+        <div class="slds-page-header slds-page-header_record-home">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-account">
+                                <lightning-icon icon-name="standard:quotes" 
+                                                size="medium"
+                                                alternative-text="Quote Icon">
+                                </lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>{cartWrapper.quoteDetails.quoteNumber}</span>
+                                        <a onclick={openQuote}>
+                                            <span class="slds-page-header__title slds-truncate"
+                                                title="Quote Name">
+                                                {cartWrapper.quoteDetails.quoteName}
+                                        </span>
+                                    </a>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <!-- <lightning-input type="checkbox" label="Is Customer Taxable" name="input3" value={cartWrapper.quoteDetails.Opportunity.Account.Is_Taxable__c} disabled></lightning-input> -->
+                <lightning-input type="checkbox" label="Is Customer Taxable" checked={isTaxable} name="input3" disabled></lightning-input>
+                <lightning-button onclick={handleCancel}
+                                class="slds-m-left_x-small"
+                                label={label.cancelLabel}>
+                </lightning-button>
+                <lightning-button onclick={handlecreateSalesOrder}
+                                variant="brand"
+                                class="slds-m-left_x-small"
+                                label={label.CreateSalesOrder}>
+                </lightning-button>
+            </div>
+        </div>
+    </div>
+</template>

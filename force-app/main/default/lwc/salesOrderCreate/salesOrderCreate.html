@@ -1,0 +1,26 @@
+<template>
+    <div class="container">
+    <div class="slds-p-bottom_xx-large">
+        <lightning-spinner alternative-text="Loading" 
+                        size="large" 
+                        variant="brand" 
+                        if:true={isLoading}>
+        </lightning-spinner>
+        <template if:true={cartWrapper}>
+                <c-create-sales-order-header quoteid={quoteId} 
+                                cart-wrapper={cartWrapper}
+                                is-taxable={cartWrapper.quoteDetails.isTaxable}>
+                </c-create-sales-order-header>
+                <template for:each={cartWrapper.groupDetails} for:item="groupItem">
+                    <div class="quoteContent" key={groupItem.groupId}>
+                        <c-create-sales-order-group group-wrapper={groupItem} 
+                                    quoteid={quoteId} 
+                                    quote-details={cartWrapper.quoteDetails}
+                                    onlineitemchange={handleLineItemChange}>
+                        </c-create-sales-order-group>
+                    </div>
+                </template> 
+        </template>
+    </div>
+    </div>
+</template>

@@ -1,0 +1,145 @@
+<!-- sldsValidatorIgnore -->
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-30-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <template if:true={addProducts}>
+        <c-manage-product onhideaddproduct={handleHideAddProduct} 
+                    quote-details={quoteDetails} 
+                        subgroup-id={subGroupDetails.subGroupId}
+                        is-marrs={isMarrs}>
+        </c-manage-product>
+    </template>
+    <template if:true={showDeleteModal}>
+        <c-delete-modal record-id={subGroupDetails.subGroupId} 
+                        is-from="Sub Group" 
+                        onhidedeletemodal={handleHideDeleteModal}>
+        </c-delete-modal>
+    </template>
+    <template if:true={showNegotiationCalculator}>
+       <c-negotiation-calculation sub-grp-wrapper={subGroupWrapper}
+                                onhideaddproduct={handleHideNegotiationCalculation}
+                                ondetailchange={handleDetailChange}>
+        </c-negotiation-calculation>
+    </template>
+    <div class="slds-border_bottom slds-p-around_x-small headerbg dragClass"  style="border-top-left-radius: 10px !important; border-top-right-radius: 10px !important;"
+        data-header={subGroupDetails.subGroupId} draggable="true" data-id={subGroupDetails.subGroupId} ondragstart={handleDragStart} ondragover={handleDragOver} ondrop={handleDrop}>
+        <table>
+            <tr>
+                <th style="width:49%;" onmouseenter={handleShowButton}
+                                    onmouseleave={handleHideButton} 
+                                    class="slds-m-left_large slds-text-heading_small">
+                    <template if:false={editFirstName}>{subGroupDetails.subGroupName}
+                        <lightning-button-icon class="slds-float_right" 
+                                        icon-name="utility:edit"
+                                        alternative-text="Update First Name" 
+                                        title="Edit SubGroup Name" 
+                                        variant="bare"
+                                        size="medium" 
+                                        onclick={handleFirstNameEdit} 
+                                        if:true={showButton}>
+                        </lightning-button-icon>
+                    </template>
+                    <template if:true={editFirstName}>
+                        <input type="text" 
+                                name="fileExpirationDate" 
+                                value={subGroupDetails.subGroupName}
+                                onchange={handleFirstNameChange} 
+                                onfocusout={handleUpdateFirstName} 
+                                class="edit-input color_black" />
+                    </template>
+                </th>
+                <td style="width:8%;" if:false={isMarrs}><div class="slds-text-align_center">
+                    <div class="slds-grid">
+                        <div class="slds-align_absolute-center slds-p-right_x-small">
+                            {label.multiplier}
+                        </div>
+                        <lightning-input label="Subgroup Multiplier"
+                                        step="any" 
+                                        type="number"
+                                        variant="label-hidden"
+                                        onfocusout={handleMultiplierChange}
+                                        onchange={handleInputChange} 
+                                        class="inputWidth color_black">
+                        </lightning-input>
+                    </div>
+                </div>
+                </td>
+                <td style="width:7%;"></td>
+                <td style="width:8%;" if:false={isMarrs}>
+                    <div class="slds-text-align_center">
+                        <div class="slds-grid">
+                            <div class="slds-align_absolute-center slds-p-right_x-small">
+                                {label.marginPercent}
+                            </div>
+                            <lightning-input label="Subgroup Margin Percentage"
+                                            step="any" 
+                                            type="number"
+                                            onfocusout={handleMarginChange}
+                                            onchange={handleInputChange}
+                                            variant="label-hidden" 
+                                            class="inputWidth color_black">
+                            </lightning-input>
+                        </div>
+                    </div>
+                </td>
+                <td style="width:10%;"></td>
+                <td style="width:5%;" if:false={isMarrs}><div class="slds-text-align_center">
+                    <label class="slds-grid slds-m-right_medium">
+                        <span>
+                            Alternate
+                        </span>                                    
+                        <lightning-input type="toggle" 
+                                        checked={subGroupDetails.alternate}
+                                        data-id={subGroupDetails.subGroupId} 
+                                        message-toggle-active=""
+                                        message-toggle-inactive="" 
+                                        onchange={handleToggleChange}>
+                        </lightning-input>
+                    </label>
+                </div></td>
+                <td style="width:12%;"><div class="slds-text-align_center">
+                    <div class="slds-button-group-list slds-align_absolute-center">
+                        <lightning-button label="Add Product" 
+                                        variant="brand"
+                                        onclick={handleShowAddProduct}>
+                        </lightning-button>
+                        <lightning-button-menu alternative-text="Show menu" 
+                                            menu-alignment="right" 
+                                            icon-name="utility:down" 
+                                            variant="border-filled"
+                                            class="slds-m-right_xx-small">
+                            <lightning-menu-item label="Clone" 
+                                                onclick={handleCloneSubGroup}>
+                            </lightning-menu-item>
+                            <lightning-menu-item label="Delete" 
+                                                onclick={handleShowDeleteModal}>
+                            </lightning-menu-item>
+                            <lightning-menu-item label="Negotiation Calculator" 
+                                                onclick={handleNegotiationCalculator}>
+                            </lightning-menu-item>
+                        </lightning-button-menu>
+                    </div>
+                </div></td>
+                <td style="width:5%;"><div class="slds-text-align_center">
+                    <lightning-button-icon icon-name="utility:chevrondown" 
+                                        size="large"
+                                        variant="bare" 
+                                        onclick={handleSubGroupAccordion}
+                                        if:true={subGroupDetails.isOpen}>
+                    </lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:chevronright" 
+                                        size="large"
+                                        variant="bare" 
+                                        onclick={handleSubGroupAccordion} 
+                                        if:false={subGroupDetails.isOpen}>
+                    </lightning-button-icon>
+                </div></td>
+            </tr>
+        </table>
+    </div>
+</template>

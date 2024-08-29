@@ -1,0 +1,221 @@
+<apex:page standardController="AcctSeedERP__Shipment__c" extensions="PickTicketPdfCtrl" renderAs="PDF">
+<body>
+    <apex:outputPanel >
+        <div>
+            <table style="Width:100%;">
+                <tr style="text-align:center;">
+                    <td>
+                        <div>
+                            <b>Picking Sheet</b>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="Width:100%;margin-top:50px;">
+                            <tr>
+                                <td style="text-align:left;">
+                                    ORDER NUMBER: {!IF(orderSO.Sales_Order_Number__c == '', orderSO.Name, orderSO.Sales_Order_Number__c)}
+                                </td>
+                                <td style="text-align:right;">
+                                    ORDER DATE:
+                                    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!orderSO.CreatedDate}" />
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="Width:100%;">
+                            <tr>
+                                <td style="text-align:right;">
+                                    <b>REQUESTED SHIP DATE:</b>
+                                    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!shipmentSO.AcctSeedERP__Shipment_Date__c}" />
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="margin-top:50px;Width:100%">
+                            <tr>
+                                <td style="text-align:left;">
+                                    <b>SOLD TO: </b> <br/>
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Customer__r.Name)}">
+                                        {!orderSO.AcctSeedERP__Customer__r.Name} <br/>
+                                    </apex:outputText>
+
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Billing_Street__c)}">
+                                        {!orderSO.AcctSeedERP__Billing_Street__c}<br/>
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Billing_City__c)}">
+                                        {!orderSO.AcctSeedERP__Billing_City__c},
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Billing_State__c)}">
+                                        {!orderSO.AcctSeedERP__Billing_State__c} 
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Billing_PostalCode__c)}">
+                                        {!orderSO.AcctSeedERP__Billing_PostalCode__c}<br/>
+                                    </apex:outputText>
+                                </td>
+                                <td style="margin-left:70px;">
+                                    <b>SHIP TO:</b> <br/>
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.Shipping_Name__c)}">
+                                        {!orderSO.Shipping_Name__c} <br/>
+                                    </apex:outputText>
+
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Shipping_Street__c)}">
+                                        {!orderSO.AcctSeedERP__Shipping_Street__c}<br/>
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Shipping_City__c)}">
+                                        {!orderSO.AcctSeedERP__Shipping_City__c},
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Shipping_State__c)}">
+                                        {!orderSO.AcctSeedERP__Shipping_State__c} 
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!!ISBLANK(orderSO.AcctSeedERP__Shipping_PostalCode__c)}">
+                                        {!orderSO.AcctSeedERP__Shipping_PostalCode__c}<br/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr style="background: black;">
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="Width:100%;">
+                            <tr>
+                                <td>
+                                    <b>Customer P.O.</b> <br/>
+                                    {!orderSO.Customer_PO_Number__c}
+                                </td>
+                                <td>
+                                    <b>F. O. B</b>
+                                </td>
+                                <td style="text-align:right">
+                                    <b>SHIP VIA</b><br/>
+                                    {!orderSO.Ship_Via__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr style="background: black;">
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="width:100%">
+                            <tr>
+                                <td style="text-align:right;">
+                                    <b>Freight Terms:</b>
+                                    {!orderSO.Freight_Terms__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr style="background: black;">
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top:25px;padding-bottom:10px;">
+                        <table style="width:100%" cellspacing="0">
+                            <tr style="border-bottom: 5px solid black;padding-bottom:5px;">
+                                <td style="border-bottom: 2px solid black;">
+                                    ITEM NO.
+                                </td>
+                                <td style="border-bottom: 2px solid black;">
+                                    UNIT
+                                </td>
+                                <td style="border-bottom: 2px solid black;">
+                                    ORDERED
+                                </td>
+                                <td style="border-bottom: 2px solid black;">
+                                    SHIPPED
+                                </td>
+                                <td style="border-bottom: 2px solid black;">
+                                    BACK ORD
+                                </td>
+                            </tr>
+                            <apex:repeat value="{!shipmentLines}" var="shipmentItem">
+                                <tr style="padding-top:10px;">
+                                    <td style="padding-top:10px;">
+                                        {!shipmentItem.AcctSeedERP__Sales_Order_Line__r.AcctSeedERP__Product__r.ProductCode}<br/>
+                                        <apex:outputText value="{!shipmentItem.AcctSeedERP__Sales_Order_Line__r.Quote_Line_Item__r.Descriptions__c}"
+                                                        rendered="{!orderSO.Quote__c != null}"
+                                                        escape="false">
+
+                                        </apex:outputText>
+                                        <apex:outputText value="{!shipmentItem.AcctSeedERP__Sales_Order_Line__r.AcctSeedERP__Product__r.Name}"
+                                                        rendered="{!orderSO.Quote__c == null}"
+                                                        escape="false">
+
+                                        </apex:outputText>
+                                    </td>
+                                    <td>EACH</td>
+                                    <td>
+                                        <apex:outputText value="{0, number, ###,###,###,###,##0.00}">
+                                                    <apex:param value="{!shipmentItem.AcctSeedERP__Sales_Order_Line__r.AcctSeedERP__Quantity_Allocated__c}"/>
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="border-bottom:2px solid black;"></td>
+                                    <td style="border-bottom:2px solid black;padding-left:5px;"></td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="width:100%;text-align:right;padding-top:150px;">
+                            <tr style="padding-top:10px;">
+                                <td>
+                                    <b>WEIGHT</b>
+                                </td>
+                                <td style="border-bottom: 2px solid black;width:18%;align:left;"></td>
+                                <td style="width:18%;">
+                                    <b># of CARTONS</b>
+                                </td>
+                                <td style="border-bottom: 2px solid black;width:18%;"></td>
+                                <td style="width:18%;">
+                                    <b>PACKED By:</b>
+                                </td>
+                                <td style="border-bottom: 2px solid black;width:18%;"></td>
+                            </tr>
+                            <tr style="padding-top:30px;">
+                                <td style="padding-top:50px;">
+                                    <b>DATE</b>
+                                </td>
+                                <td style="border-bottom: 2px solid black;width:18%;align:left;padding-top:50px;"></td>
+                                <td style="width:18%;padding-top:50px;">
+                                    <b>STOP TIME</b>
+                                </td>
+                                <td style="border-bottom: 2px solid black;width:18%;padding-top:50px;"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </apex:outputPanel>
+</body>
+</apex:page>

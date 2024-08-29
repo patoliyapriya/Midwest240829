@@ -1,0 +1,22 @@
+<template>
+        <div if:true={isLoding}>
+
+        </div>
+        <div if:false={isLoding}>
+            <lightning-card title="Expense Accounting">
+                <template if:true={getExpenseAccounting}>
+                    <lightning-datatable 
+                                key-field="id" 
+                                columns={columns} 
+                                data={getExpenseAccounting} 
+                                class="noRowHover"
+                                hide-checkbox-column>
+                    </lightning-datatable>
+                </template>
+            
+                <template if:false={getExpenseAccounting}>
+                    <lightning-card style="font-weight: bold ;"><div style="margin-left: 2%;">No data to display</div></lightning-card>
+                </template>
+            </lightning-card>
+        </div>
+</template>

@@ -1,0 +1,2 @@
+<apex:page extensions="GenerateSubmittalController" standardController="Quote" action="{!generateAttachment}">
+</apex:page>

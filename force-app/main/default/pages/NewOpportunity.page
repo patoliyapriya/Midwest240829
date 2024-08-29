@@ -1,0 +1,303 @@
+<apex:page standardController="Opportunity" extensions="NewOpportunityController" id="pageId" lightningStylesheets="true">
+    <apex:stylesheet value="{!$Resource.NewOppCustomCSS}"/>
+    
+    <apex:form id="formId">
+        <script>
+            function testAbc(contactId){
+                //alert(contactId.value);
+                var a = document.getElementById('pageId:formId:pbId:pbsGeneralContractor:lkupGeneralContractor_lkid');
+                if(a.value.includes('003')){
+                    populateGeneralContractorAccount(a.value);
+                }
+                
+            }
+
+            function enableButton(button) {
+                button.disabled = false;
+            }
+
+            function createOpportunity(button) {
+                button.disabled = true;
+                saveOpportunity();
+            }
+        </script>
+        <apex:actionFunction action="{!populateGeneralContractorAccount}" name="populateGeneralContractorAccount" reRender="pbsGeneralContractor" immediate="true">
+            <apex:param value="" name="generalContractorContactId" assignTo="{!generalContractorContactId }" />
+        </apex:actionFunction>
+
+        <apex:actionFunction action="{!saveOpportunity}" name="saveOpportunity">
+            
+        </apex:actionFunction>
+
+        <apex:sectionHeader title="Opportunity Edit" subtitle="New Opportunity"/>
+        <apex:pagemessages />
+        
+        <apex:pageBlock title="Opportunity Edit" mode="edit" rendered="{!opp.RecordTypeId == '0124N000000MdMpQAK'}" id="pbMarsId">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" onclick="createOpportunity(this);" oncomplete="enableButton(this);"/>
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Opportunity Information">
+            
+                <apex:inputField value="{!opp.Name}" taborderhint="1"/>
+                <apex:inputField value="{!opp.Office__c}" required="true" taborderhint="6"/>
+                <apex:inputField value="{!opp.OwnerId}" taborderhint="2"/>
+                <apex:inputField value="{!opp.Opportunity_Source__c}" taborderhint="7"/>
+                <apex:inputField value="{!opp.StageName}" taborderhint="3"/>
+                <apex:inputField value="{!opp.Probability}" taborderhint="8"/>
+                <apex:inputField value="{!opp.Loss_Reason__c}" taborderhint="4"/>
+                <apex:inputField value="{!opp.CloseDate}" taborderhint="9"/>
+                <apex:inputField value="{!opp.AccountId}" required="true" taborderhint="5"/>
+               <!-- <apex:outputField value="{!opp.RecordTypeId}" /> -->
+                
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Service Details" columns="3">
+
+                <apex:inputField value="{!opp.OriginalName__c}" taborderhint="11"/>
+                <apex:inputField value="{!opp.Consolidation__c}" taborderhint="17"/>
+                <apex:inputField value="{!opp.Destination__c}" taborderhint="23"/>
+                
+                <apex:inputField value="{!opp.Origin_Street__c}" taborderhint="12"/>
+                <apex:inputField value="{!opp.Consolidation_Street__c}" taborderhint="18"/>
+                <apex:inputField value="{!opp.Destination_Street__c}" taborderhint="24"/>
+
+                <apex:inputField value="{!opp.Origin_City__c}" taborderhint="13"/>
+                <apex:inputField value="{!opp.Consolidation_City__c}" taborderhint="19"/>
+                <apex:inputField value="{!opp.Destination_City__c}" taborderhint="25"/>
+
+                <apex:inputField value="{!opp.Origin_State__c}" taborderhint="14"/>
+                <apex:inputField value="{!opp.Consolidation_State__c}" taborderhint="20"/>
+                <apex:inputField value="{!opp.Destination_State__c}" taborderhint="26"/>
+
+                <apex:inputField value="{!opp.Origin_PostalCode__c}" taborderhint="15"/>
+                <apex:inputField value="{!opp.Consolidation_PostalCode__c}" taborderhint="21"/>
+                <apex:inputField value="{!opp.Destination_PostalCode__c}" taborderhint="27"/>
+
+                <apex:inputField value="{!opp.Origin_Country__c}" taborderhint="16"/>
+                <apex:inputField value="{!opp.Consolidation_Country__c}" taborderhint="22"/>
+                <apex:inputField value="{!opp.Destination_Country__c}" taborderhint="28"/>
+                
+                <apex:inputField value="{!opp.Service__c}" taborderhint="29"/>
+                <apex:inputField value="{!opp.Order__c}" taborderhint="30"/>
+                <apex:inputField value="{!opp.PO_Number__c}" taborderhint="31"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="Opportunity Edit" mode="edit" rendered="{!opp.RecordTypeId == '012610000006nAPAAY'}" id="pbId">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!saveOpportunity}" />
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Opportunity Information">
+                <apex:inputField value="{!opp.Name}" />
+                <apex:inputField value="{!opp.Office__c}" required="true"/>
+                <apex:inputField value="{!opp.OwnerId}" />
+                <apex:inputField value="{!opp.Opportunity_Source__c}" />
+                <apex:inputField value="{!opp.StageName}" />
+                <apex:inputField value="{!opp.Opportunity_Info_Source__c}" />
+                <apex:inputField value="{!opp.Probability}" />
+                <apex:inputField value="{!opp.Industry__c}" />
+                <apex:inputField value="{!opp.Loss_Reason__c}" />
+                <apex:inputField value="{!opp.Description}" />
+                <apex:inputField value="{!opp.Bid_Date__c}" />
+                <apex:inputField value="{!opp.Job_Location__c}" />
+                <apex:inputField value="{!opp.CloseDate}" />
+                <apex:inputField value="{!opp.Targeted__c}" />
+                <apex:inputField value="{!opp.Ship_Date__c}" />
+             <!--   <apex:outputText />
+                <apex:outputField value="{!opp.RecordTypeId}" /> 
+                <apex:outputText />
+                <apex:inputField value="{!opp.PM_Phase_del__c}" /> -->
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection title="Important Opportunity Notes" columns="1">
+                <apex:inputField value="{!opp.Notes__c}" />             
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Additional Opportunity Contacts" id="pbsGeneralContractor">
+                <apex:inputField value="{!opp.Consulting_Engineer_Contact_Person__c}" />
+                <apex:inputField value="{!opp.End_User_Contact_Name__c}" />
+                <apex:inputField value="{!opp.General_Contractor__c}" />
+                <apex:inputField value="{!opp.General_Contractor_Contact__c}" onfocus="return testAbc(this);" id="lkupGeneralContractor"/>
+                <apex:inputField value="{!opp.Application_Engineer__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock title="Opportunity Edit" mode="edit" rendered="{!opp.RecordTypeId == '012610000006nAKAAY'}">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveOpportunity}" value="Save" />
+                <apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection >
+                <apex:inputField value="{!opp.Office__c}" required="true"/>
+                <apex:inputField value="{!opp.OwnerId}" />
+                <apex:inputField value="{!opp.Name}" />
+                <apex:inputField value="{!opp.CloseDate}" />
+                <apex:inputField value="{!opp.Attention_to__c}" required="true"/>
+                <apex:inputField value="{!opp.StageName}" />
+                <apex:inputField value="{!opp.Opportunity_Source__c}" required="true"/>
+                <apex:inputField value="{!opp.Probability}" />
+                <apex:inputField value="{!opp.AccountId}" required="true"/>
+           <!--     <apex:inputField value="{!opp.RecordTypeId}" /> -->
+                <apex:inputField value="{!opp.Parts_Needed__c}" required="true"/>
+                <apex:inputField value="{!opp.Sync_Quote__c}" />
+                <apex:inputField value="{!opp.Bid_Contact__c}" />
+                <apex:inputField value="{!opp.Receipt_of_Order_Date__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Part(s) Information">
+                <apex:inputField value="{!opp.Part_Type__c}" />
+                <apex:inputField value="{!opp.Tower_Location__c}" />
+                <apex:inputField value="{!opp.Tower_Model__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Equipment_Serial_Number__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Job Information">
+                <apex:inputField value="{!opp.End_User_Contact_Name__c}" />
+                <apex:inputField value="{!opp.Order_Lead_Time__c}" />
+                <apex:inputField value="{!opp.Preferred_Quote_Date__c}" />
+                <apex:inputField value="{!opp.Industry__c}" />
+                <apex:inputField value="{!opp.Do_they_need_install_labor__c}" />
+                <apex:inputField value="{!opp.Preferred_Service_Contractor__c}" />
+                <apex:inputField value="{!opp.Description}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Order Information">
+                <apex:inputField value="{!opp.Credit_Card__c}" />
+                <apex:inputField value="{!opp.PO_Number__c}" />
+                <apex:inputField value="{!opp.Tax_Status__c}" />
+                <apex:inputField value="{!opp.Vendor_Order_Number_package_a__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Materials Shipping Information">
+                <apex:inputField value="{!opp.Confirmed_Ship_Date__c}" />
+                <apex:inputField value="{!opp.Tag__c}" />
+                <apex:inputField value="{!opp.Delivery_Date__c}" />
+                <apex:inputField value="{!opp.Company_Shipping__c}" />
+                <apex:inputField value="{!opp.Freight__c}" />
+                <apex:inputField value="{!opp.Street_material__c}" />
+                <apex:inputField value="{!opp.Shipping_Account_Number__c}" />
+                <apex:inputField value="{!opp.City_material__c}" />
+                <apex:inputField value="{!opp.Carrier__c}" />
+                <apex:inputField value="{!opp.State_material__c}" />
+                <apex:inputField value="{!opp.Shipment_Tracking_Number__c}" />
+                <apex:inputField value="{!opp.Zip_material__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock title="Opportunity Edit" rendered="{!opp.RecordTypeId == '012610000006sUTAAY'}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!saveOpportunity}" />
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection >
+                <apex:inputField value="{!opp.Name}" />
+                <apex:inputField value="{!opp.Office__c}" required="true"/>
+                <apex:inputField value="{!opp.OwnerId}" />
+                <apex:inputField value="{!opp.Opportunity_Source__c}" />
+                <apex:inputField value="{!opp.CloseDate}" />
+                <apex:inputField value="{!opp.Attention_to__c}" />
+                <apex:inputField value="{!opp.Bid_Date__c}" />
+                <apex:inputField value="{!opp.AccountId}" />
+                <apex:inputField value="{!opp.StageName}" />
+                <apex:inputField value="{!opp.Receipt_of_Order_Date__c}" />
+             <!--   <apex:outputField value="{!opp.RecordTypeId}" /> -->
+                <apex:inputField value="{!opp.Targeted__c}" />
+                <apex:inputField value="{!opp.Probability}" />
+                <apex:inputField value="{!opp.Sync_Quote__c}" />
+                <apex:inputField value="{!opp.Amount}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Part(s) Detail">
+                <apex:inputField value="{!opp.Part_Type__c}" />
+                <apex:inputField value="{!opp.Freight__c}" />
+                <apex:inputField value="{!opp.Equipment_Serial_Number__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Tower_Model__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Number_of_Cells__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Parts_Needed__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Labor Information">
+                <apex:inputField value="{!opp.Job_Site_Contact__c}" />
+                <apex:inputField value="{!opp.Disposal_Dumpster__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Fork__c}" />
+                <apex:inputField value="{!opp.Job_Site_Street__c}" />
+                <apex:inputField value="{!opp.Lull__c}" />
+                <apex:inputField value="{!opp.Job_Site_City__c}" />
+                <apex:inputField value="{!opp.Man_Lift_JLG__c}" />
+                <apex:inputField value="{!opp.Job_Site_State__c}" />
+                <apex:inputField value="{!opp.On_site_Safety_Training__c}" />
+                <apex:inputField value="{!opp.Job_Site_Zipcode__c}" />
+                <apex:inputField value="{!opp.Drug_Test__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Background_Checks__c}" />
+                <apex:inputField value="{!opp.Tower_Location__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Height_of_Building__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Height_ft_of_Tower_Grillage__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Site_Details__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Receiving__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Unloading__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Crane_Equipment_del__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Job Information">
+                <apex:inputField value="{!opp.End_User_Contact_Name__c}" />
+                <apex:inputField value="{!opp.Do_they_need_install_labor__c}" />
+                <apex:inputField value="{!opp.Order_Lead_Time__c}" />
+                <apex:inputField value="{!opp.Preferred_Service_Contractor__c}" />
+                <apex:inputField value="{!opp.Tax_Status__c}" />
+                <apex:inputField value="{!opp.Industry__c}" />
+                <apex:inputField value="{!opp.PO_Number__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Estimated Labor and Parts">
+                <apex:inputField value="{!opp.Estimated_Labor__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Materials Shipping Information">
+                <apex:inputField value="{!opp.Street_material__c}" />
+                <apex:inputField value="{!opp.Shipping_Account_Number__c}" />
+                <apex:inputField value="{!opp.City_material__c}" />
+                <apex:inputField value="{!opp.Shipment_Tracking_Number__c}" />
+                <apex:inputField value="{!opp.State_material__c}" />
+                <apex:outputText />
+                <apex:inputField value="{!opp.Zip_material__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+         <!-- <apex:pageBlock title="Opportunity Edit" mode="edit" rendered="{!opp.RecordTypeId == '0123J0000004ZyvQAE'}" Id="generalContractorId">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!saveOpportunity}" />
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Opportunity Information">
+                <apex:inputField value="{!opp.Name}" />
+                <apex:inputField value="{!opp.Office__c}" required="true"/>
+                <apex:inputField value="{!opp.OwnerId}" />
+                <apex:inputField value="{!opp.Opportunity_Source__c}" />
+                <apex:inputField value="{!opp.StageName}" />
+                <apex:inputField value="{!opp.Opportunity_Info_Source__c}" />
+                <apex:inputField value="{!opp.Probability}" />
+                <apex:inputField value="{!opp.Industry__c}" />
+                <apex:inputField value="{!opp.Loss_Reason__c}" />
+                <apex:inputField value="{!opp.Description}" />
+                <apex:inputField value="{!opp.Bid_Date__c}" />
+                <apex:inputField value="{!opp.Job_Location__c}" />
+                <apex:inputField value="{!opp.CloseDate}" />
+                <apex:inputField value="{!opp.Targeted__c}" />
+                <apex:inputField value="{!opp.Ship_Date__c}" />
+                <apex:outputText />
+                <apex:outputField value="{!opp.RecordTypeId}" /> 
+                <apex:outputText />
+                <apex:inputField value="{!opp.PM_Phase_del__c}" />
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection title="Important Opportunity Notes" columns="1">
+                <apex:inputField value="{!opp.Notes__c}" />             
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Additional Opportunity Contacts" id="pbsGeneralContractor">
+                <apex:inputField value="{!opp.Consulting_Engineer_Contact_Person__c}" />
+                <apex:inputField value="{!opp.End_User_Contact_Name__c}" />
+                <apex:inputField value="{!opp.General_Contractor__c}" />
+                <apex:inputField value="{!opp.General_Contractor_Contact__c}" onfocus="return testAbc(this);" id="lkupGeneralContractor"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock> -->
+    </apex:form>
+</apex:page>

@@ -1,0 +1,20 @@
+<template>
+    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right slds-m-around_xx-small">
+        <c-create-sales-order-group-header group-wrapper={groupDetails}
+                        quoteid={quoteid}
+                        onaccordion={handleAccordianChange}>
+        </c-create-sales-order-group-header>
+        <template for:each={groupDetails.subGroupDetails} for:item="subGroupItem" lwc:if={groupDetails.isOpen}>
+            <div key={subGroupItem.subGroupId}>
+                <c-create-sales-order-sub-group sub-group-wrapper={subGroupItem}
+                                quote-details={quoteDetails} 
+                                group-wrapper={groupDetails}
+                                onaccordion={handleSubGroupAccordion}>
+                </c-create-sales-order-sub-group>
+            </div>
+        </template>
+        <c-create-sales-order-group-footer group-wrapper={groupDetails}
+                        is-marrs={isMarrs}>
+        </c-create-sales-order-group-footer>
+    </div>
+</template>

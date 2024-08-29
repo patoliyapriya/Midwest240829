@@ -1,0 +1,38 @@
+<template>
+    <div if:true={isLoading} >
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+    <template if:true={SalesPercentageGoal}> 
+    <div style="width: 95%; font-weight: bold; margin: 15px;">
+        <div style="text-align: right; width: 100%; border-top: 1px solid #e5e5e5; background-color: #f3f3f3; padding: 6px;">All Projects</div>
+        <div style="display: flex; padding: 6px;">
+            <div style="width: 70%;">B/R Sales Margin %</div>
+            <div style="text-align: right; width: 30%;">
+                <lightning-formatted-number value={brSalesMargin} format-style="percent"></lightning-formatted-number>
+            </div>
+        </div>
+        <div style="display: flex; border-top: 1px solid #e5e5e5; padding: 6px;">
+            <div style="width: 70%;">Direct Sales Margin %</div>
+            <div style="text-align: right; width: 30%;">
+                <lightning-formatted-number value={directSalesMargin} format-style="percent"></lightning-formatted-number>
+            </div>
+        </div>
+        <div style="display: flex; border-top: 1px solid #e5e5e5; padding: 6px;">
+            <div style="width: 70%;">Total Sales Margin %</div>
+            <div style="text-align: right; width: 30%;">
+                <lightning-formatted-number value={totalSalesMargin} format-style="percent"></lightning-formatted-number>
+            </div>
+        </div>
+    </div>
+</template>
+    <!--
+    <lightning-datatable columns={columns}
+                            data={salesPercentageGoals}
+                            key-field="id"
+                            hide-checkbox-column>
+    </lightning-datatable>
+    -->
+<template if:false={SalesPercentageGoal}>
+    <lightning-card>No data to display : {errormessage} </lightning-card>
+</template>
+</template>

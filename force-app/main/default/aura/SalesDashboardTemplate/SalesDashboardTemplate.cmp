@@ -1,0 +1,18 @@
+<aura:component implements="lightning:homeTemplate" description="Sales Dashboard Template">
+    <aura:attribute name="activityGoal" type="Aura.Component[]" />
+    <aura:attribute name="marginGoal" type="Aura.Component[]" />
+    <aura:attribute name="revenueGoal" type="Aura.Component[]" />
+    <aura:attribute name="activityRanking" type="Aura.Component[]" />
+    <aura:attribute name="container" type="Aura.Component[]" />
+    <div style="width: 99.2%;">
+        <lightning:layout>
+            <lightning:layoutItem size="3">{!v.activityGoal}</lightning:layoutItem>
+            <lightning:layoutItem size="3" class="slds-m-left_small">{!v.marginGoal}</lightning:layoutItem>
+            <lightning:layoutItem size="3" class="slds-m-left_small">{!v.revenueGoal}</lightning:layoutItem>
+            <lightning:layoutItem class="slds-m-left_small">{!v.activityRanking}</lightning:layoutItem>
+        </lightning:layout>
+        <lightning:layout class="slds-m-top_small">
+            <lightning:layoutItem>{!v.container}</lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

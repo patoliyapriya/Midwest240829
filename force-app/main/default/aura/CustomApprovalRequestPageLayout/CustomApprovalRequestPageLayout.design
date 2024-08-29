@@ -1,0 +1,11 @@
+<design:component label="custom approval request page layout">
+    
+    <flexipage:template>
+        <flexipage:region name="header" defaultWidth="large">
+        </flexipage:region> 
+        
+        <flexipage:region name="left_col" defaultWidth="large" />
+        <flexipage:region name="right_col" defaultWidth="large" />
+    </flexipage:template>
+	
+</design:component>

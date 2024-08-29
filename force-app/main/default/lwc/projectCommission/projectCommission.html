@@ -1,0 +1,124 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 12-02-2023
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div if:true={isLoading} style="height: 100px;">
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </div>
+    <div if:false={isLoading}>
+    <div if:true={showCommissionTable}>
+    <div class="lgc-bg">
+        <div class="slds-float_right" style="padding: 0px 6px 6px 0px;">
+          <lightning-button-icon icon-name="utility:refresh" variant="brand" alternative-text="Refresh" onclick={handleRefresh}></lightning-button-icon>
+        </div>
+        <div class="slds-float_right" style="padding: 0px 6px 6px 0px;">
+            <lightning-button-icon icon-name="utility:download" variant="brand" alternative-text="Download" onclick={handleExport}></lightning-button-icon>
+        </div>
+    </div>      
+    <table aria-multiselectable="true" class="my-table slds-table_bordered slds-table_edit " role="grid"
+        style="width: 100%;">
+        <thead style="font-size: small;">
+            <tr class="slds-line-height_reset" style="height: 25px;">
+                <th style="width: 10%; padding: 0px 3px 0px 3px;">
+                    <div style=" text-align:center;">OPPORTUNITY NAME</div>
+                </th>
+                <th style="width: 10%; padding: 0px 3px 0px 3px;">
+                    <div style="text-align:center;">OPPORTUNITY NUMBER</div>
+                </th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">LEDGER</th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">SALESMAN</th>
+                <th style="width: 10%; padding: 0px 3px 0px 3px;">
+                    <div style="text-align:center;">SALESMAN SHARE</div>
+                </th>
+                <th style="width: 10%;">
+                    <div style="text-align:center; padding: 0px 3px 0px 3px;">TOTAL BOOKING</div>
+                </th>
+                <th style="width: 10%;">
+                    <div style="padding: 0px 3px 0px 3px; text-align:center;">COMPANY BOOKING</div>
+                </th>
+                <th style="width: 10%;">
+                    <div style="padding: 0px 3px 0px 3px; text-align:center;">TOTAL COGS</div>
+                </th>
+                <th style="width: 10%;">
+                    <div style="padding: 0px 3px 0px 3px; text-align:center;">TOTAL MARGIN</div>
+                </th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;" colspan="2">INVOICED</th>
+                <th style="width: 10%; text-align:center; padding: 0px 3px 0px 3px;">PAID</th>
+                <th style="width: 20%; text-align: center; padding: 0px 3px 0px 3px;" colspan="2">% PAID ON</th>
+                <th style="width: 10%; text-align: center; padding: 0px 3px 0px 3px;">ARCHIVED</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th style="text-align: center;">$</th>
+                <th style="text-align: center;">%</th>
+                <th style="text-align: center;">$</th>
+                <th style="text-align: center; width: 10%; padding: 0px 3px 0px 3px">
+                    <div style="font-size: 10px; ">AMOUNT INVOICED</div>
+                </th>
+                <th style="text-align: center; width: 10%; padding: 0px 3px 0px 3px">
+                    <div style="font-size: 10px;">COMPANY BOOKINGS</div>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={salesEngSplitList} for:item="split">
+                <tr key={split.SplitName}>
+                    <td style="width: 10%; text-align: center;">{opportunityName}</td>
+                    <td style="width: 10%; text-align: center;">{opportunityNumber}</td>
+                    <td style="width: 10%; text-align: center;">{ledger}</td>
+                    <td style="width: 10%; text-align: center;">{split.SplitName}</td>
+                    <td style="width: 10%; text-align: center;">{split.splitCommision}%</td>
+                    <td style="width: 10%; text-align: center;">
+                        <lightning-formatted-number value={totalBooking} format-style="currency" currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td style="width: 10%; text-align: center;">
+                        <lightning-formatted-number value={companyBookingAmount} format-style="currency"
+                            currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td style="width: 10%; text-align: center;">
+                        <lightning-formatted-number value={totalCogs} format-style="currency" currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td style="width: 10%; text-align: center;">
+                        <lightning-formatted-number value={totalMargin} format-style="currency" currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td style="width: 4%; text-align: center; padding: 0px 5px 0px 5px;">
+                        <lightning-formatted-number value={invoicedAmount} format-style="currency" currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td style="width: 4%; text-align: center; padding: 0px 5px 0px 5px;">{invoicePercentage}%</td>
+                    <td style="width: 10%; text-align: center;">
+                        <lightning-formatted-number value={amountPaid} format-style="currency" currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td style="width: 4%; text-align: center;">{amountInvoicedPaidOn}%</td>
+                    <td style="width: 4%; text-align: center;">{companyBookingsPaidOn}%</td>
+                    <td style="width: 10%; text-align: center;">{archived}</td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+<div if:false={showCommissionTable}>
+    Commission Tool is not available for this project.
+</div>
+    <div style="height: 70px;">
+    </div>
+</div>
+</template>

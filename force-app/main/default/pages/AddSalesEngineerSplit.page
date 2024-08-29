@@ -1,0 +1,158 @@
+<apex:page controller="AddEditSalesEngineerSplitController" id="pageId">
+    <style>
+        .parentDisable{
+                position:fixed;
+                top:0;
+                left:0;
+                background:#000;
+                opacity:0.5; 
+                height:100%;
+                width:100%; 
+                z-index:80;
+        }
+        .button { 
+            background: url('{!$Resource.LoadingButton}') no-repeat left top; 
+            width:335px; 
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 45%;
+            left: 45%;
+            z-index:100;
+        }
+        
+        .descPopup{
+            width:500px;
+            position:fixed;
+            border: 0px;
+            top: 35%;
+            left: 45%;
+        }
+        
+        .descProductPopup{
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 10%;
+            left: 15%;
+        }
+        
+        .circle {
+            width:22px;
+            height:22px;
+            float:left;
+            margin-bottom:18px;
+            margin-top:18px;
+            margin-left: 55px;
+            z-index:100;
+        }
+                
+        .txt {
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+            font-size:13px;
+            color:#000000;
+            line-height:20px;
+            margin-left:15px;
+            margin-bottom:18px;
+            margin-top:18px;
+            width: 200px;
+            font-weight: bold;
+            float: left;
+            z-index:100;
+        }   
+        
+        .error {
+          border:3px solid red;
+        }
+        
+    </style>
+    
+    <script>
+        
+        function startSplash() {                        
+            var divObj = document.getElementById('divLoading');            
+            divObj.style.display='block';                                                   
+        }
+          
+        function endSplash() {              
+            document.getElementById('divLoading').style.display='none';                      
+        }
+        
+        function deleteSalesRep(salesRepId, rowIndex){
+            var hidSalesRepId = document.getElementById('pageId:formId:pb:pbsId:hidSalesRepId');
+            var hidRowIndex = document.getElementById('pageId:formId:pb:pbsId:hidRowIndex');
+            
+            hidSalesRepId.value = salesRepId;
+            hidRowIndex.value = rowIndex -1;
+            
+            deleteSalesRepActionFunction();
+        }
+        
+        function validateSplit(){
+            
+            var salesRepTable = document.getElementById('pageId:formId:pb:pbsId:pbt');
+            var totalCommision = 0;
+            
+            for(var i=0;i<salesRepTable.rows.length-1;i++){
+                var txtCommission = document.getElementById('pageId:formId:pb:pbsId:pbt:' + i + ':txtCommision');
+                if(txtCommission.value != ''){
+                    totalCommision = totalCommision + parseFloat(txtCommission.value);
+                }
+            }
+            
+            if(totalCommision == 100){
+                return true;
+            }
+            else{
+                alert('The total percentage of Split should be 100%.');
+                return false;
+            }
+            
+        }
+        
+    </script>
+    
+    <apex:form id="formId">
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+        <div id="divLoading" style="display:none;">
+            <div class="parentDisable"></div>
+            <div class="button" id="splashDiv">
+                <div class="circle"><apex:image value="{!$Resource.LoadingImage}"></apex:image></div>
+                <div class="txt">Please Wait. Loading...</div>
+            </div>
+        </div> 
+        <apex:pageBlock title="Add Sales Engineer" id="pb">
+            <apex:variable value="{!0}" var="rowIndex" />
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Add Sales Engineer" action="{!addSalesEngineer}" reRender="pb" status="splashStatus" immediate="true"/>
+                <apex:commandButton value="Save" action="{!Save}" onclick="return validateSplit();"/>
+                <apex:commandButton value="Cancel" action="{!redirectBackToOpportunity}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:variable value="{!0}" var="rowIndex" />
+            <apex:pageBlockSection id="pbsId" >
+                <apex:pageBlockTable value="{!lstSalesRep}" var="sr" id="pbt">
+                    <apex:column headerValue="#">
+                        <apex:variable value="{!rowIndex + 1}" var="rowIndex" />
+                        <apex:outputText value="{!rowIndex}"/>
+                    </apex:column>
+                    <apex:column headerValue="Delete">
+                        <apex:commandLink value="Del" action="{!deleteSalesEnginner}" reRender="pb" status="splashStatus" immediate="true">
+                            <apex:param value="{!rowIndex}" name="hidRowIndex" assignTo="{!hidRowIndex}"/>
+                            <apex:param value="{!sr.Id}" name="hidSalesRepId" assignTo="{!hidSalesRepId}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:column headerValue="Sales Rep">
+                        <apex:inputField value="{!sr.Sales_Rep__c}" required="true"/>
+                    </apex:column>
+                    <apex:column headerValue="Commision">
+                        <apex:inputField value="{!sr.Commision__c}" required="true" id="txtCommision"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+                <apex:inputHidden value="{!hidRowIndex}" id="hidRowIndex" />
+                <apex:inputHidden value="{!hidSalesRepId}" id="hidSalesRepId" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:actionFunction action="{!deleteSalesEnginner}" name="deleteSalesRepActionFunction" reRender="pbs" status="splashStatus" />
+    </apex:form>
+</apex:page>

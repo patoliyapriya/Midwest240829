@@ -1,0 +1,50 @@
+<apex:page standardController="QuoteLineItem" extensions="CustomQuoteLineItemCotroller" id="pageId">
+    <script>
+        var lastFocused = null;
+        function setFocusQuantity(){
+            //var ele = document.getElementById('pageId:formId:pbId:pbTable:0:txtQuantity');
+            var ele = document.getElementById(lastFocused.id);
+            if(ele != null){
+                ele.focus();
+                ele.select();
+            }
+            else{
+                ele = document.getElementById('pageId:formId:pb:pbs:txtQuantity');
+                ele.focus();
+                ele.select();
+            }
+        }
+    </script>
+    <apex:form id="formId">
+        <apex:actionFunction name="CalculateSalesPrice" action="{!CalculateSalesPrice}" reRender="pbs" oncomplete="setFocusQuantity();"/>
+        <apex:sectionHeader title="Quote Line Item Edit" subtitle="{!QuoteLineItem.Product2.Name}"/>
+        <apex:pageBlock mode="edit" title="Quote Line Item Edit" id="pb">
+            <apex:pageBlockButtons >
+                <!-- <apex:commandButton value="Calculate Sales Price" action="{!CalculateSalesPrice}" reRender="pbs" />  -->
+                <apex:commandButton value="Save" action="{!Save}" />
+                <apex:commandButton value="Cancel" action="{!Cancel}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Quote Line Item Information" id="pbs"> 
+                <apex:outputField value="{!QuoteLineItem.Quote.Name}"/>
+                <apex:inputField value="{!QuoteLineItem.Quantity}" id="txtQuantity" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();}" taborderhint="1"/>
+                <apex:outputText value="{!QuoteLineItem.Product2.Name}" />
+                <apex:inputField value="{!QuoteLineItem.ListPrice}" />
+                <apex:outputField value="{!QuoteLineItem.Product2.ProductCode}" />  
+                <apex:inputField value="{!QuoteLineItem.Multiplier__c}" id="txtMultiplier" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();}" taborderhint="2"/> 
+                <apex:inputField value="{!QuoteLineItem.Scope_Description__c}" taborderhint="5"/>
+                <apex:inputField value="{!QuoteLineItem.Freight__c}" id="txtFreight" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();}" taborderhint="3"/>
+                <apex:outputText value="" />
+                <apex:inputField value="{!QuoteLineItem.Margin_Percentage__c}" id="txtMarginPercentage" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();}" taborderhint="4"/>
+                <apex:outputText value="" /> 
+                <apex:outputField value="{!QuoteLineItem.UnitPrice}" />
+                <apex:outputText value="" />
+                <apex:outputField value="{!QuoteLineItem.Total_Price__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Conga Related Items" >
+                <apex:inputField value="{!QuoteLineItem.Show_in_Conga_Quote__c}" />
+                <apex:inputField value="{!QuoteLineItem.Show_price__c}" />
+                <apex:inputField value="{!QuoteLineItem.Show_description__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

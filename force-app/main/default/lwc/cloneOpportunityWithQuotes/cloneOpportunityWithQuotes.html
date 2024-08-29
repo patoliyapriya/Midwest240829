@@ -1,0 +1,131 @@
+<template>
+    <lightning-card>
+        <article class="slds-card">
+            <lightning-spinner alternative-text="Loading" 
+                        size="medium" 
+                        variant="brand" 
+                        if:true={isLoading}>
+            </lightning-spinner>
+            <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                <span class="slds-icon_container" title="Opportunity">
+                    <lightning-icon icon-name="standard:opportunity" alternative-text="Opportunity" title="Opportunity"></lightning-icon>
+                </span>
+                </div>
+                <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span>Opportunity</span>
+                </h2>
+                </div>
+            </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner form-content" style="padding-bottom: 5.5%;">
+
+                <div class="slds-m-vertical_small"><b>Clone Opportunity With Quotes</b></div>
+        
+                <lightning-layout class="sandal_color slds-var-p-vertical_small slds-box slds-box_xx-small">
+                    <lightning-layout-item flexibility="auto" class="slds-m-left_medium">
+                        <b>{title}</b>
+                    </lightning-layout-item>
+                    <lightning-layout-item flexibility="auto" class="slds-m-right_medium">
+                        <label class="slds-float_right">
+                            <abbr class="slds-required" title="required">*</abbr> Required Information
+                        </label>
+                    </lightning-layout-item>
+                </lightning-layout>
+    
+                <template if:false={showNext}>
+                    <div class="slds-grid slds-gutters slds-form-element slds-m-vertical_medium">
+                        
+                        <div class="slds-col">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                    <label class="slds-form-element__label  slds-text-heading_small" for="oppName">
+                                        Opportunity Name : 
+                                        <abbr class="slds-required" title="required">*</abbr>
+                                    </label>
+                                </div>
+                                <div class="slds-col slds-size_2-of-3">
+                                    <div>
+                                        <lightning-input type="text" id="oppName" variant="label-hidden" required="true" value={oppName} onchange={handleOppNameChange}  >
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </template>
+                <template if:true={showNext}>
+                    <div style="height: 275px; overflow: scroll;">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered  slds-border_left slds-border_right">
+                        <thead> 
+                            <tr class="slds-line-height_reset">
+                                <th scope="col">
+                                    <lightning-input type="checkbox" 
+                                            checked={checkboxTopVal} 
+                                            variant="label-hidden"
+                                            onchange={selectAllCheckboxes} >
+                                    </lightning-input>
+                                </th>
+                                <th scope="col">Quote Name</th>
+                                <th scope="col">Clone Quote Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template if:true={opportunityQuotes}>
+                                <template for:each={opportunityQuotes} for:item="opp">
+                                    <tr key={opp.oldQuote.Id}>
+                                        <td role="gridcell">
+                                            <lightning-input type="checkbox" 
+                                                    checked={checkboxVal} 
+                                                    onchange={handleChange}
+                                                    variant="label-hidden"
+                                                    data-id={opp.oldQuote.Id} 
+                                                    data-name="checkbox">
+                                            </lightning-input>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate">{opp.oldQuote.Name}</div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-form-element slds-grid">
+                                                <div class="slds-col slds-size_3-of-12">
+                                                    <label class="slds-form-element__label" for="cloneQuoteName"> opportunity# - </label>
+                                                </div>
+                                                <div class="slds-form-element__control slds-col slds-size_9-of-12">
+                                                    <lightning-input type="text" 
+                                                            value={opp.newQuote.Opportunity_Name__c} 
+                                                            id="cloneQuoteName" 
+                                                            variant="label-hidden" 
+                                                            onchange={handleChange} 
+                                                            data-id={opp.oldQuote.Id}
+                                                            required="true"
+                                                            data-name="cloneQuoteName" >
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                    </table>
+                    </div>
+                </template>
+            </div>
+            <footer class="slds-card__footer slds-docked-form-footer" style="position: absolute;">
+                <lightning-button label="Cancel" title="Cancel" onclick={handleCancel} class="slds-m-left_x-small">
+                </lightning-button>
+                <template if:false={showNext}>
+                    <button class="slds-button slds-button_brand slds-m-left_x-small" onclick={handleNext} >Next</button>
+                </template>
+                <template if:true={showNext}>
+                        <button class="slds-button slds-button_brand slds-m-left_x-small" onclick={handlePrevious} >Previous</button>
+                        <button class="slds-button slds-button_brand slds-m-left_x-small" onclick={handleSave} >Save</button>
+                </template>
+            </footer>
+        </article>
+    </lightning-card>
+</template>

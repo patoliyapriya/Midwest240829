@@ -1,0 +1,58 @@
+<apex:page sidebar="false" showHeader="false" docType="html-5.0" id="pageId">
+ <apex:form id="formId">
+<apex:slds />
+
+<script>
+function openAddProductPopup() {
+
+                var divAddProducts = document.getElementById('divAddProductPopup');
+                divAddProducts.style.display = 'block';
+
+                return false;
+            }
+</script>
+<apex:commandButton value="Add Product"
+            styleClass="slds-button slds-button_neutral"
+            onclick="return openAddProductPopup();" />
+<apex:outputPanel id="pnlAddProduct">
+  <div id="divAddProductPopup" style="display:none;">
+      <table aria-multiselectable="true" class="tblProducts slds-table slds-no-row-hover slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols"
+    role="grid" >
+    <thead>
+        <tr class="slds-line-height_reset">
+            <th class="" scope="col" style="width:3.75rem; height: 35px;"></th>
+            <th aria-label="Product Name" scope="col">
+                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                    <span class="slds-truncate" title="Product Code">Product Name</span>
+                </div>
+            </th>
+            <th aria-label="Product Code" scope="col">
+                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                    <span class="slds-truncate" title="Product Code">Product Code</span>
+                </div>
+            </th>
+            <th aria-label="List Price" scope="col">
+                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                    <span class="slds-truncate" title="Product Code">List Price</span>
+                </div>
+            </th>
+            <th aria-label="Product Summary" scope="col">
+                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                    <span class="slds-truncate" title="Product Code">Product Summary</span>
+                </div>
+            </th>
+            <th aria-label="Manufacturer" scope="col">
+                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                    <span class="slds-truncate" title="Product Code">Manufacturer</span>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    
+</table>
+  </div>     
+
+                                                    
+</apex:outputPanel>
+</apex:form>
+</apex:page>

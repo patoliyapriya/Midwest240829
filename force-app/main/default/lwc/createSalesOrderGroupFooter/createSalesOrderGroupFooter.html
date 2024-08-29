@@ -1,0 +1,16 @@
+<template>
+    <div class="slds-border_top slds-p-around_small footerbg slds-text-heading_small" data-footer={groupId}>
+        <div class="slds-grid footerfont">
+            <div class="slds-col slds-size_8-of-12 slds-text-align_left" if:false={isMarrs}>
+                {groupWrapper.groupName}
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-text-align_left">
+                {label.SalePriceTotal} :&nbsp; 
+                <lightning-formatted-number value={groupWrapper.groupTotal} 
+                                        format-style="currency"
+                                        currency-code="USD">
+                </lightning-formatted-number>
+            </div>
+        </div>
+    </div>
+</template>

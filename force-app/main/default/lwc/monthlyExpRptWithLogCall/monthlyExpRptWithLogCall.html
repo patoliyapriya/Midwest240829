@@ -1,0 +1,74 @@
+<template>
+    <div if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+    <lightning-card>
+
+        <div style="padding-left: 13px; font-weight: bold; font-size: medium;">
+            <p>Salesman:- {currentUserName}</p>
+        </div>
+        <lightning-layout>
+            <lightning-layout-item>
+                <lightning-combobox 
+                            label="MONTH" 
+                            value={monthValue} 
+                            placeholder="Select Month" 
+                            options={monthOptions}
+                            onchange={handleMonthChange} 
+                            style="width:150px; padding-left: 13px;">
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <lightning-layout-item>
+                <lightning-combobox 
+                            label="YEAR" 
+                            value={yearValue} 
+                            placeholder="Select Year" 
+                            options={yearOptions}
+                            onchange={handleYearChange} 
+                            style="width:150px; padding-left: 10px;">
+                </lightning-combobox>
+            </lightning-layout-item>
+
+            <!-- <lightning-layout-item> button not applied css -->
+            <lightning-button label="Submit" 
+                              onclick={handelSubmit} 
+                              variant="Brand" 
+                              type="Submit" 
+                              disabled={disableBtn} 
+                              style="padding-left: 10px; padding-top: 21px;">
+            </lightning-button>
+        </lightning-layout>
+    </lightning-card>
+
+    <lightning-card>
+        <template if:true={expenseRptWithLogCall}>
+            <lightning-datatable 
+                        key-field="id" 
+                        columns={columns} 
+                        data={expenseRptWithLogCall}
+                        onrowselection ={handleRowSelection}
+                        selected-rows={selectedRows}
+                        aria-multiselectable="true">
+            </lightning-datatable>
+
+            <!-- dir="ltr" class="myUniqueTable" -->
+         <!-- <div style="background-color: #0070D2;padding: 0;">  -->
+             <!-- <div style="margin: 0 2% 0 0%;padding: 0;"> -->
+                    <lightning-datatable 
+                        key-field="id" 
+                        columns={totalBlueColumns} 
+                        data={total}
+                        onrowselection ={handleRowSelection}
+                        hide-table-header="true"
+                        hide-checkbox-column="true"
+                        class="noRowHover">
+                 </lightning-datatable>
+             <!-- </div> -->
+        <!-- </div>  -->
+        </template>
+        <template if:false={expenseRptWithLogCall}>
+            <lightning-card style="font-weight: bold;"><div style="margin-left: 1%;">{errorMessage}</div></lightning-card>
+        </template>
+    </lightning-card>
+</template>

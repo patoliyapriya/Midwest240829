@@ -1,0 +1,53 @@
+<apex:page standardController="Account" extensions="SendEmailToContacts" id="pageId">
+    
+    <script>
+        
+        function buildEmailList(){
+            
+            var pbTable = 'pageId:formId:pb:pbTable:'
+            var strEmailBCC = '';
+            
+            for(var i=0;i>-1;i++){
+            
+                var isSelect = document.getElementById(pbTable + i + ':checkIsSelect');
+                var email = document.getElementById(pbTable + i + ':txtEmail');
+                
+                if(email == null){
+                    break;
+                }
+                
+                if(isSelect.checked && email.innerText != '' && email.innerText != null){
+                    if(strEmailBCC == ''){
+                        strEmailBCC = email.innerText;
+                    }
+                    else{
+                        strEmailBCC = strEmailBCC  + ';' + email.innerText;
+                    }
+                }
+                
+            }
+            
+            window.location = 'mailto:?bcc=' + strEmailBCC;
+            
+            return false;
+            
+        }
+        
+    </script>
+    <apex:form id="formId">
+        <apex:pageBlock title="Select Contact to Send an Email" id="pb">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Send Email" onclick="return buildEmailList();"/>
+                <apex:commandButton value="Cancel" action="{!redirectBackToAccount}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!lstContacts}" var="con" id="pbTable">
+                <apex:column width="5%">
+                    <apex:inputCheckbox value="{!con.isSelect}" id="checkIsSelect"/>
+                </apex:column>
+                <apex:column value="{!con.contact.Name}" width="55%" id="txtName"/>
+                <apex:column value="{!con.contact.Email}" width="45%" id="txtEmail"/>
+            </apex:pageBlockTable>            
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

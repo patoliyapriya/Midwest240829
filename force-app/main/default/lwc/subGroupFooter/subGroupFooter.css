@@ -1,0 +1,13 @@
+.addcolor{
+    background-color: var(--slds-g-color-error-base-40,#b94a48);
+    color: #ffffff;
+}
+
+.footerbg {
+    background: #386DD5;
+    color: White;
+}
+
+.alignmentTable2 {
+    text-align: center;
+}

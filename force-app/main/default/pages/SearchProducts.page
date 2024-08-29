@@ -1,0 +1,190 @@
+<apex:page controller="SearchProductsController" sidebar="false" applyBodyTag="false">
+  <apex:slds />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <style>
+        .errorMessage {
+            color: #fff;
+            background-color: #1797c0;
+            border-color: #bce8f1;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            width: fit-content;
+            margin-top: 1%;
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+    </style>
+
+    <apex:form id="theform">
+
+        <apex:pageBlock title="Search Products">
+         
+          <div class="slds-form-element">
+            <label class="slds-form-element__label" for="text-input-id-1">Enter Serial Number</label>
+              <div class="slds-form-element__control">
+              <apex:inputText id="text-input-id-1" value="{!SerialNumber}" style="width: 27%;"
+                            Styleclass="slds-input" alt="Enter Serial Number"/>
+              
+              </div>
+              <div>
+                <apex:commandButton id="submit" value="Search" action="{!searchProducts}" status="loading"
+                Styleclass="slds-button slds-button_neutral" reRender="theform" style="MARGIN-TOP: 1%;margin-bottom: 1%;" />
+
+                                                                       
+                <apex:actionStatus id="loading">
+                    <apex:facet name="start" > 
+                      <i class="fa fa-spinner fa-spin" style="color:#0B7EC7;margin-left: 6px;"></i>                  
+                    </apex:facet>
+                </apex:actionStatus> 
+              </div>  
+            </div>                
+
+
+          
+          <apex:outputText rendered="{! AND(quoteLineItems.size==0,SerialNumber!='')}">
+             <div class="errorMessage">
+              No products found with {!SerialNumber} serial number!
+              </div>
+          </apex:outputText>
+
+          <div>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" 
+                    width="100%" cellspacing="0" cellpadding="3">
+              <thead>
+                <tr class="slds-line-height_reset" >
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 11rem;" >
+                    <div class="slds-truncate" style="color:white;" >Project Name</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 11rem;" >
+                    <div class="slds-truncate" style="color:white;" >Product Group Name</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Tag</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Hide Line On Email</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Product Code</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Serial Number</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Schedule Startup</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Completed Startup</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Warranty</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Warranty Type</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Parts Covered</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Warranty Start</div>
+                  </th>
+                  <th class="" scope="col" style="background-color:#0B7EC7;width: 8rem;" >
+                    <div class="slds-truncate" style="color:white;">Warranty End</div>
+                  </th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                <apex:repeat value="{!quoteLineItems}" var="ql">
+                <tr class="slds-hint-parent">
+                  <td  style="font-weight:bold;font-size:14px;">
+                    <div class="slds-truncate">
+                      <apex:outputPanel >
+                      <a href="{!$Site.BaseUrl}/{!quoteLineToProduct[ql.id].Id}" 
+                            target="_blank" >
+                          {!quoteLineToProduct[ql.id].Name}
+                        </a>
+                      </apex:outputPanel>
+                    </div>
+                  </td>
+                  <td  style="font-weight:bold;font-size:14px;">
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Product_Group__r.Name}</div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Tag__c}</div>
+                   
+                  </td>
+                  <td>
+                  <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <span class="slds-checkbox">
+                            <apex:inputCheckbox html-name="options" id="divsup"  value="{!ql.Hide_Line_On_Email__c}"
+                            disabled="true"></apex:inputCheckbox>
+                            <apex:outputLabel for="divsup" styleClass="slds-checkbox__label">
+                                <span class="slds-checkbox--faux"></span>
+                                <span class="slds-form-element__label"></span>
+                            </apex:outputLabel> 
+                        </span>
+                    </div>
+                </div>
+ 
+                  </td>
+                  <td>
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Product_Code__c}</div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Serial_Number__c}</div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate slds-text-body_small" title="{!ql.Product_Group__r.Name}">
+                      <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                          <apex:param value="{!ql.Schedule_Startup_Date__c}" /> 
+                      </apex:outputText>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate slds-text-body_small" title="{!ql.Product_Group__r.Name}">
+                      <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                          <apex:param value="{!ql.Completed_Startup_Date__c}" /> 
+                      </apex:outputText>
+                    </div>
+                    
+                  </td>
+                  <td>
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Warranty_Term__c}</div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Warranty_Type__c}</div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate" title="{!ql.Product_Group__r.Name}">{!ql.Warranty_Parts_Covered__c}</div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate slds-text-body_small" title="{!ql.Product_Group__r.Name}">
+                      <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                          <apex:param value="{!ql.Warranty_Start_Date__c}" /> 
+                      </apex:outputText>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="slds-truncate slds-text-body_small" title="{!ql.Product_Group__r.Name}">
+                          <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                              <apex:param value="{!ql.Warranty_End_Date__c}" /> 
+                          </apex:outputText>
+                  </div>
+                  </td>
+                </tr>
+              </apex:repeat>
+              </tbody>
+            </table>      
+          </div>
+
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

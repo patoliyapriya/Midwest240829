@@ -1,0 +1,41 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-24-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right slds-m-around_medium" style="border-radius: 10px !important;">
+        <c-sub-group-header sub-group-wrapper={subGroupHeader}
+                            quote-details={quoteDetails}
+                            group-wrapper={groupWrapper}
+                            onaccordion={handleAccordianChange}
+                            onsubgrouptoggle={handleSubGroupToggle}
+                            onmultiplierchange={handleMultiplierChange}
+                          onmarginchange={handleMarginChange}
+                          onsubgroupnamechange={handleSubGroupNameChange}
+                          is-marrs={isMarrs}
+                          ondetailchange={handleDetailChange}>
+        </c-sub-group-header>
+        <template if:false={isMarrs}>
+            <c-quote-line-items line-item-wrapper={subGroupHeader.lineItemDetails}
+                                quote-details={quoteDetails}
+                                lwc:if={subGroupHeader.isOpen}
+                                onlineitemtoggle={handleLineItemToggle}
+                                onlineitemchange={handleLineItemChange}>
+            </c-quote-line-items>
+        </template>
+        <template if:true={isMarrs}>
+            <c-marrs-quote-line-items line-item-wrapper={subGroupHeader.lineItemDetails}
+                                quote-details={quoteDetails}
+                                lwc:if={subGroupHeader.isOpen}
+                                onmarrslineitemchange={handleMarrsLineItemChange}>
+            </c-marrs-quote-line-items>
+        </template>
+        <c-sub-group-footer sub-group-wrapper={subGroupHeader}
+                            is-marrs={isMarrs}>
+        </c-sub-group-footer>
+    </div>
+<!-- </div> -->
+</template>

@@ -1,0 +1,18 @@
+.blackRow {
+	background-color: #0a1a3e;
+	color: white;
+}
+
+.blueRow {
+	background-color: #0070d2;
+	color: white;
+}
+
+.noRowHover {
+	pointer-events: none;
+
+}
+
+.slds-card {
+	border-radius: unset !important;
+}

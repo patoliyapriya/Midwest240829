@@ -1,0 +1,124 @@
+.error {
+	border:3px solid red !important;
+}
+
+.tblProducts tr:nth-child(odd) {
+	background-color: #FFFFFF !important;
+}
+
+.tblProducts tr:nth-child(even) {
+	background-color: #F2F2F2 !important;
+}
+
+table.tblAddDeductLineItem td {
+	padding: 5px !important;
+	text-align: center;
+}
+
+table.tblSubGroupHeader td {
+	padding-left: 10px !important;
+}
+
+table.tblSubGroupHeader {
+	margin: 10px !important;
+}
+
+table.tblLineItem td {
+	padding: 5px;
+}
+
+table.tblLineItem th {
+	padding-left: 5px;
+}
+
+.tblLineItem tr:nth-child(odd) {
+	background-color: #FFFFFF;
+}
+
+.tblLineItem tr:nth-child(even) {
+	background-color: #F2F2F2;
+}
+
+.tblAddDeductLineItem tr:nth-child(odd) {
+	background-color: #FFFFFF;
+}
+
+.tblAddDeductLineItem tr:nth-child(even) {
+	background-color: #F2F2F2;
+}
+
+.tblMain {
+	border-collapse: inherit !important;
+}
+
+.tblLineItemsFooter td {
+	color: white !important;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.tblTotalFooter td {
+	padding: 1px;
+	color: white;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+.tblGroupFooter td{
+	padding: 5px;
+	color: white;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.sort-disabled {
+	height: 5px;
+}
+
+.slds-accordion__summary {
+	margin-bottom: 0px !important;
+}
+
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+
+.fixed-header,
+.fixed-footer {
+	width: 100%;
+	position: fixed;
+	padding: 10px;
+	z-index: 150;
+	background-color: white;
+}
+
+.fixed-header {
+	top: 0;
+}
+
+.fixed-footer {
+	bottom: 0;
+}
+
+.container {
+	top: 0;
+}
+
+.selected {
+	border: 2px solid green;
+	background-color: #F1F1F1;
+}
+
+input[type="text"] {
+	width: 90%;
+}
+
+table.tblNegotiation {
+	padding: 20px;
+	width: 95% !important;
+}
+
+table.tblNegotiation td {
+	padding: 5px;
+}

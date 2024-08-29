@@ -1,0 +1,94 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-26-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="header slds-p-left_x-small slds-p-top_small slds-p-bottom_small">
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-4">
+                <div class="slds-float_left slds-text-color_default slds-text-heading_small">{subGroupDetails.subGroupName}</div>
+            </div>
+            <div class="slds-col slds-size_3-of-4">
+                <div class="slds-float_right slds-align_absolute-center">
+                    <lightning-layout>
+                        <lightning-layout-item flexibility="auto">
+                            <div class="slds-text-align_center slds-p-right_medium">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label">Show Quantity</span>
+                                    <lightning-input type="toggle" 
+                                        data-name="hideQuantity" 
+                                        message-toggle-inactive="" 
+                                        message-toggle-active=""
+                                        checked={subGroupDetails.hideQuantity}
+                                        onchange={handleToogle}>
+                                    </lightning-input>
+                                </label>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto">
+                            <div class="slds-text-align_center slds-p-right_medium">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label">Show Product Code</span>
+                                    <lightning-input type="toggle" 
+                                        data-name="hideCode" 
+                                        message-toggle-inactive="" 
+                                        message-toggle-active=""
+                                        checked={subGroupDetails.hideCode}
+                                        onchange={handleToogle}>
+                                    </lightning-input>
+                                </label>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto">
+                            <div class="slds-text-align_center slds-p-right_medium">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label">Show Amount</span>
+                                    <lightning-input type="toggle" 
+                                        data-name="hideAmount" 
+                                        message-toggle-inactive="" 
+                                        message-toggle-active=""
+                                        checked={subGroupDetails.hideAmount}
+                                        onchange={handleToogle}>
+                                    </lightning-input>
+                                </label>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto">
+                            <div class="slds-text-align_center slds-p-right_medium">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label">Show Line Items</span>
+                                    <lightning-input type="toggle" 
+                                        data-name="hideLine" 
+                                        message-toggle-inactive="" 
+                                        message-toggle-active=""
+                                        checked={subGroupDetails.hideLine}
+                                        onchange={handleToogle}>
+                                    </lightning-input>
+                                </label>
+                            </div>              
+                        </lightning-layout-item> 
+                        <lightning-layout-item flexibility="auto" >
+                                    <div class="slds-text-align_center slds-p-left_x-medium slds-p-right_large">
+                                        <lightning-button-icon icon-name="utility:chevrondown"
+                                                            size="large" 
+                                                            variant="bare" 
+                                                            onclick={handleSubGroupAccordion}
+                                                            if:true={subGroupDetails.isOpen}>
+                                        </lightning-button-icon>
+                                        <lightning-button-icon icon-name="utility:chevronright" 
+                                                            size="large"
+                                                            variant="bare" 
+                                                            onclick={handleSubGroupAccordion} 
+                                                            if:false={subGroupDetails.isOpen}>
+                                        </lightning-button-icon>
+                                    </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

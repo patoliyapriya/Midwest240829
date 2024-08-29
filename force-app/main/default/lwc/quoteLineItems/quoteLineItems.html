@@ -1,0 +1,299 @@
+<!-- sldsValidatorIgnore -->
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-26-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <template if:true={lineItemDetails}>
+        <template if:true={showDeleteModal}>
+            <c-delete-modal record-id={rowId} is-from="Line Item" onhidedeletemodal={handleHideDeleteModal}>
+            </c-delete-modal>
+        </template>
+        <div>
+        <div class="smooth-transition" lwc:dom="manual"></div>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered"
+            aria-labelledby="element-with-table-label other-element-with-table-label">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col" style="width:3%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">Sale Type</div>
+                    </th>
+                    <th scope="col" style="width:3%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">Tag</div>
+                    </th>
+                    <th scope="col" style="width:10%;">
+                        <div class="slds-truncate wrapText">Product Name</div>
+                    </th>
+                    <th scope="col" lwc:if={quoteDetails.isActiveProjectFinancials} style="width:9%;">
+                        <div class="slds-align_absolute-center">
+                            <lightning-combobox
+                                label="Release"
+                                placeholder="None"
+                                options={releasePickListValues}
+                                onchange={handleHeaderReleaseChange}
+                                ></lightning-combobox>
+                        </div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText">Product Code</div>
+                    </th>
+                    <th scope="col" style="width:7%;"> 
+                        <div class="slds-truncate wrapText">Description</div>
+                    </th>
+                    <th scope="col"  style="width:5%;">
+                        <div class="slds-truncate wrapText">QTY</div>
+                    </th>
+                    <th scope="col" style="width:10%;">
+                        <div class="slds-truncate wrapText">List Price</div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">Multiplier</div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">LBS</div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">T-LBS</div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">Margin Percentage</div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText">Unit Price</div>
+                    </th>
+                    <th scope="col" style="width:5%;">
+                        <div class="slds-truncate wrapText">Extended Cost</div>
+                    </th>
+                    <th scope="col" style="width:10%;">
+                        <div class="slds-truncate wrapText">Sale Price</div>
+                    </th>
+                    <th scope="col" style="width:3%;">
+                        <div class="slds-truncate wrapText slds-align_absolute-center">C/R</div>
+                    </th>
+                    <th scope="col" style="width:2%;">
+                        <div class="slds-truncate wrapText">Alternate</div>
+                    </th>
+                    <th scope="col" style="width:3%;">
+                        <div class="slds-truncate wrapText"></div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={lineItemDetails} for:item="lineItem" for:index="index">
+                    <tr key={lineItem.lineItemId} data-tr={lineItem.lineItemId} draggable="true" data-id={lineItem.lineItemId} ondragstart={handleDragStart} ondragover={handleDragOver} ondrop={handleDrop} class="dragClass">
+                        <td role="gridcell">
+                            <lightning-combobox name="saleType"
+                                            label="Status"
+                                            value={lineItem.saleType}
+                                            data-id={lineItem.lineItemId}
+                                            options={saleTypePickListValues}
+                                            variant="label-hidden"
+                                            data-name="saleType"
+                                            class="color_black"
+                                            onchange={handleSaleTypeChange}>
+                            </lightning-combobox>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="text" 
+                                            variant="label-hidden"
+                                            class="tableWidth color_black"
+                                            data-name="tag"
+                                            data-id={lineItem.lineItemId}
+                                            value={lineItem.tag}
+                                            onfocusout={handleChange}>
+                            </lightning-input>
+                        </td>
+                        <td data-label="Product" class="thWidth wrapText">
+                            {lineItem.productName}
+                        </td>
+                        <td role="gridcell" lwc:if={quoteDetails.isActiveProjectFinancials}>
+                            <lightning-combobox
+                                name="releasepick"
+                                label="Release"
+                                data-id={lineItem.lineItemId}
+                                data-name="releasepick"
+                                placeholder="None"
+                                value={lineItem.releasepick}
+                                variant="label-hidden"
+                                options={releasePickListValues}
+                                onchange={handleChange}
+                                ></lightning-combobox>
+                        </td>
+                        <td data-label="Code" class="wrapText">
+                            {lineItem.code}
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode wrapText thWidth" role="gridcell">
+                            <lightning-formatted-rich-text value={lineItem.description}
+                                                        class="decriptionRow" 
+                                                        data-id={lineItem.lineItemId} 
+                                                        ondblclick={showRichTextModal}>
+                            </lightning-formatted-rich-text>
+                        </td>
+                        <td role="gridcell">
+                            <lightning-input type="number"
+                                            variant="label-hidden"
+                                            value={lineItem.quantity}
+                                            data-name="quantity"
+                                            data-id={lineItem.lineItemId}
+                                            class="tableWidth color_black"
+                                            onfocusout={handleChange}>
+                            </lightning-input>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="number"
+                                        step="any" 
+                                        variant="label-hidden" 
+                                        value={lineItem.listPrice}
+                                        data-id={lineItem.lineItemId}
+                                        data-name="listPrice"
+                                        class="color_black"
+                                        onfocusout={handleChange}
+                                        onchange={handleInputChange}>
+                            </lightning-input>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="number" 
+                                        step="any"
+                                        variant="label-hidden"
+                                        value={lineItem.multiplier}
+                                        data-id={lineItem.lineItemId}
+                                        data-name="multiplier"
+                                        class="color_black"
+                                        onfocusout={handleChange}
+                                        onchange={handleInputChange}>
+                            </lightning-input>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="number" 
+                                        variant="label-hidden"
+                                        value={lineItem.lbs}
+                                        data-id={lineItem.lineItemId}
+                                        data-name="lbs"
+                                        class="color_black"
+                                        onfocusout={handleChange}>
+                            </lightning-input>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <div class="slds-truncate">
+                                <lightning-formatted-number value={lineItem.tLbs} 
+                                            format-style="currency" 
+                                            data-name="tLbs"
+                                            data-id={lineItem.lineItemId}
+                                            currency-code="USD"
+                                            class="wrapText">
+                                </lightning-formatted-number>
+                            </div>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="number"
+                                        step="any" 
+                                        variant="label-hidden" 
+                                        value={lineItem.marginPercentage}
+                                        data-id={lineItem.lineItemId}
+                                        data-name="marginPercentage"
+                                        onfocusout={handleChange}
+                                        class="color_black"
+                                        onchange={handleInputChange}>
+                            </lightning-input>
+                        </td>
+                        <td data-label="Unit Cost">
+                            <div class="slds-truncate">
+                                <lightning-formatted-number value={lineItem.unitCost} 
+                                            format-style="currency" 
+                                            data-name="unitCost"
+                                            data-id={lineItem.lineItemId}
+                                            currency-code="USD"
+                                            class="wrapText">
+                                </lightning-formatted-number>
+                            </div>
+                        </td>
+                        
+                        <td data-label="Extended Cost">
+                            <div class="slds-truncate">
+                                <lightning-formatted-number value={lineItem.extendedCost} 
+                                                    format-style="currency" 
+                                                    currency-code="USD"
+                                                    data-name="extendedCost"
+                                                    data-id={lineItem.lineItemId}
+                                                    class="thWidth wrapText"> 
+                                </lightning-formatted-number>
+                            </div>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode" role="gridcell">
+                            <lightning-input type="number"
+                                        step="any"
+                                        variant="label-hidden"
+                                        value={lineItem.salePrice}
+                                        data-id={lineItem.lineItemId}
+                                        data-name="salePrice"
+                                        class="color_black"
+                                        onfocusout={handleChange}
+                                        onchange={handleInputChange}>
+                            </lightning-input>
+                            <lightning-formatted-number value={lineItem.salePrice} 
+                                                    format-style="currency" 
+                                                    currency-code="USD"
+                                                    class="slds-float_right"
+                                                    data-id={lineItem.lineItemId}
+                                                    data-name="salePriceLock">
+                            </lightning-formatted-number>
+                        </td>
+                        <td class="slds-cell-edit slds-cell_action-mode wrapText" role="gridcell">
+                            <lightning-input type="number"
+                                        step="any"
+                                        variant="label-hidden" 
+                                        data-id={lineItem.lineItemId}
+                                        value={lineItem.cr}
+                                        data-name="cr"
+                                        class="color_black"
+                                        onfocusout={handleChange}
+                                        onchange={handleInputChange}>
+                            </lightning-input>
+                        </td>
+                        <td data-label="Alternate">
+                            <label class="slds-checkbox_toggle slds-grid">
+                                <lightning-input type="toggle" 
+                                                name="input1" 
+                                                message-toggle-inactive="" 
+                                                message-toggle-active="" 
+                                                data-id={lineItem.lineItemId}
+                                                data-name="alternate"
+                                                checked = {lineItem.alternate}  
+                                                onchange={handleAlternateChange}>
+                                </lightning-input>
+                            </label>
+                        </td>
+                        <td role="gridcell">
+                            <lightning-button-menu alternative-text="Show menu" 
+                                        variant="border-filled"  
+                                        menu-alignment="right" 
+                                        icon-name="utility:down" 
+                                        class="slds-m-right_xx-small slds-float_right">
+                                <lightning-menu-item label="Clone" 
+                                        data-id={lineItem.lineItemId}
+                                        data-subgroupid={lineItem.subGroupId}
+                                        onclick={handleCloneLineItem}>
+                                </lightning-menu-item>
+                                <lightning-menu-item label="Delete"
+                                        data-id={lineItem.lineItemId} 
+                                        onclick={handleShowDeleteModal}>
+                                </lightning-menu-item>
+                            </lightning-button-menu>
+                        </td>
+                    </tr>
+                <!-- </div> -->
+                </template>
+            </tbody>
+        </table>
+        </div>
+    </template>
+<template if:true={editDescription}>
+        <c-rich-text-modal onhidedeletemodal={hideRichTextModal}
+                        value={description}
+                        onsavedescription={handleDescriptionChange}>
+        </c-rich-text-modal>
+    </template>
+</template>

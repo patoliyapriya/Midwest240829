@@ -1,0 +1,245 @@
+<!-- Jonathan Hersh - jhersh@salesforce.com - 9/2/2010 -->
+<apex:page tabstyle="Chatter_Invites__tab" controller="chatterInvites">
+    <apex:includescript value="{!URLFOR( $Resource.chatterInvites, 'jquery-1.4.2.min.js' )}" />
+    <apex:includescript value="{!URLFOR( $Resource.chatterInvites, 'jquery-ui-1.8.4.custom.min.js' )}" />
+    <apex:includescript value="{!URLFOR( $Resource.chatterInvites, 'invites.js' )}" />
+	<apex:stylesheet value="{!URLFOR( $Resource.chatterInvites, 'invites.css' )}" />
+    <apex:sectionheader title="Chatter Invites" />
+    
+    <script type="text/javascript">
+    	function setFocusOnLoad() {}
+    	
+    	jQuery(function() {
+    		jQuery('#aboutbutton').button();
+    	});
+    </script>
+    
+    <div id="welcome" title="About Chatter Invites" style="display:none">Chatter Invites lets you quickly build collections of people, Chatter-enabled records, and (public) Chatter Groups, then invite people to follow or join them.<br/><br/>
+    	<strong>Setup:</strong><br/>
+    		<ol><li>Deploy the Chatter Invite object, and grant read/create/delete access to your user profiles.</li>
+    		<li>Add the Chatter Invites sidebar app to your sidebar so you can receive invitations.</li>
+    		</ol><br/>    		
+    	I &hearts; feedback! Post on the <a target="_new" href="http://community.salesforce.com/t5/Force-com-Labs-Development-and/bd-p/labs">Force.com Labs boards</a> or 
+    	<a href="mailto:jhersh@salesforce.com">email me directly</a>.
+    </div>
+    
+    <apex:form id="theform">
+    
+    <apex:outputpanel id="messages">
+        <div style="width: 60%">
+        <apex:outputpanel rendered="{!alertMsg != ''}">
+        <div class="ui-widget">
+            <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+                <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+                <strong>Success!</strong> {!HTMLENCODE(alertMsg)}</p>
+            </div>
+        </div>
+        </apex:outputpanel>
+        <apex:outputpanel rendered="{!errMsg != ''}">
+        <div class="ui-widget">
+            <div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"> 
+                <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span> 
+                <strong>Alert:</strong> {!HTMLENCODE(errMsg)}</p>
+            </div>
+        </div>
+        </apex:outputpanel>
+        </div>
+        <br/>
+    </apex:outputpanel>
+    
+    <apex:actionfunction name="searchRecordsAF" action="{!searchRecords}" rerender="searchBlock,messages" />
+    <apex:actionfunction name="addUserAF" action="{!addUser}" rerender="inviteBlock,userBlock" />
+    <apex:actionfunction name="removeUserAF" action="{!removeUser}" rerender="userBlock">
+        <apex:param name="userID" assignto="{!userID}" value="" />
+    </apex:actionfunction>
+    <apex:actionfunction name="addRecordAF" action="{!addRecord}" rerender="searchBlock,recordBlock,userBlock" oncomplete="setupAccordion();" >
+        <apex:param name="recID" assignto="{!recID}" value="" />
+        <apex:param name="recName" assignto="{!recName}" value="" />
+    </apex:actionfunction>
+    <apex:actionfunction name="removeRecordAF" action="{!removeRecord}" rerender="searchBlock,recordBlock,userBlock" oncomplete="setupAccordion();" >
+        <apex:param name="recID" assignto="{!recID}" value="" />
+    </apex:actionfunction>
+    
+    <div style="float:left; width: 450px; margin-right: 10px;">
+        <apex:pageblock title="1. Find Records to Suggest" id="searchBlock">
+            <apex:pageblockbuttons location="top">
+                
+                <apex:commandbutton value="Clear" action="{!resetSearch}" rerender="searchBlock,messages" rendered="{!obName != null}" />
+            </apex:pageblockbuttons>
+            <apex:pageblocksection showheader="false" columns="1">
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel for="obtype" value="Object Type" />
+                    <apex:selectList id="obtype" value="{!obType}" size="1" multiselect="false">
+                        <apex:selectOptions value="{!chatterObjects}" />
+                        <apex:actionSupport event="onchange" action="{!resetSearch}" rerender="searchBlock" />
+                    </apex:selectList>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="2" >
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel for="searchterm" value="Search Term" />
+                    <apex:inputtext id="searchterm" value="{!obName}" onkeypress="return noenter(event,'search');" />
+                </apex:pageblocksectionitem>
+                <apex:commandbutton value="Search" action="{!searchRecords}" rerender="searchBlock,messages" />
+            </apex:pageblocksection>
+            <apex:pageblocksection title="Search Results" columns="1" rendered="{!obName != null}">
+                <apex:outputtext value="No results." rendered="{!results.size = 0}" />
+                <apex:pageblocktable value="{!results}" var="r" rendered="{!results.size > 0}">
+                	<apex:column style="width: 35px" rendered="{!obType = 'User'}">
+                		<c:ciuserphoto uid="{!r.recID}" height="32" width="32" linked="true" />
+                	</apex:column>
+                    <apex:column headervalue="Name">
+                        <apex:outputlink value="/{!r.recID}" target="_new">{!r.recName}</apex:outputlink>
+                    </apex:column>
+                    <apex:column >
+                        <input type="button" value="Add" onclick="addRecord('{!JSINHTMLENCODE(r.recID)}', '{!JSINHTMLENCODE(r.recName)}', '{!JSINHTMLENCODE(obType)}');" />
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </div>
+    
+    <div style="float:left; width: 450px;">
+        <apex:pageblock title="Selected Records {!if( recordSize > 0, '(' & TEXT(recordSize) & ')', '')}" id="recordBlock">
+            <apex:pageblockbuttons location="top">
+                <apex:commandbutton value="Clear Records" action="{!resetRecords}" rerender="recordBlock,messages,userBlock" rendered="{!toFollow.size > 0}" />
+            </apex:pageblockbuttons>
+            
+            <apex:outputtext value="No records." rendered="{!toFollow.size = 0}" />
+            <apex:outputpanel layout="none" rendered="{!toFollow.size > 0}" >
+                <div id="acc">
+                    <apex:repeat value="{!toFollow}" var="t">
+                        <div>
+                            <p><a id="acc{!t.obType}" href="#">{!t.obType} ({!t.records.size})</a></p>
+                            <div>
+                                <apex:repeat value="{!t.records}" var="r">
+                                    <div style="margin: 5px 0; height: 25px; width: 45%; display: block; float: left" id="record{!r.recID}">
+                                        <a id="{!r.recID}" class="ui-icon ui-icon-closethick recordClose" href="#" style="float: left; margin-right: 5px" onclick="closeRecord('{!JSINHTMLENCODE(r.recID)}');"></a>
+                                        <apex:outputlink target="_new" styleclass="name" value="/{!r.recID}" style="margin-left: 5px">{!r.recName}</apex:outputlink>
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                        </div>                  
+                    </apex:repeat>
+                </div>
+            </apex:outputpanel>
+        </apex:pageblock>   
+    </div>
+    
+    <div style="clear:both"></div>
+    
+    <div style="float:left; width: 450px; margin-right: 10px;">
+        <apex:pageblock title="2. Find People to Invite" id="inviteBlock">
+            <apex:pageblocksection showheader="false" title="Invite a User" columns="2">
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel for="inviteuser" value="Invite a User" />
+                    <apex:inputfield id="inviteuser" value="{!invitee.ownerid}" required="false" onkeypress="return noenter(event,'addUser');" />
+                </apex:pageblocksectionitem>                
+                <apex:commandbutton value="Add User" action="{!addUser}" style="float:right" rerender="inviteBlock,userBlock" />
+            </apex:pageblocksection>
+            <apex:pageblocksection showheader="false" title="Invite a Group" columns="2" >
+                <apex:pageblocksectionitem >
+                    <!-- <apex:outputlabel for="mygroups" value="My Groups" />-->
+                    <apex:selectList id="mygroups" value="{!groupID}" size="1" multiselect="false">
+                        <apex:selectOptions value="{!myGroups}" />
+                    </apex:selectList>
+                </apex:pageblocksectionitem>
+                <apex:commandbutton value="Add Group" action="{!addGroup}" style="float:right" rerender="userBlock" />
+            </apex:pageblocksection>
+            <apex:pageblocksection showheader="false" title="Invite a Role" columns="2" rendered="{!roles.size > 0}">
+                <apex:pageblocksectionitem >
+                    <!-- <apex:outputlabel for="roles" value="Roles" />-->
+                    <apex:selectList id="roles" value="{!roleID}" size="1" multiselect="false">
+                        <apex:selectOptions value="{!Roles}" />
+                    </apex:selectList>
+                </apex:pageblocksectionitem>
+                <apex:commandbutton value="Add Role" action="{!addRole}" style="float:right" rerender="userBlock" />
+            </apex:pageblocksection>
+            <apex:pageblocksection showheader="false" title="Invite a Profile" columns="2" rendered="{!profiles.size > 0}">
+                <apex:pageblocksectionitem >
+                    <!-- <apex:outputlabel for="profiles" value="Profiles" />-->
+                    <apex:selectList id="profiles" value="{!profileID}" size="1" multiselect="false">
+                        <apex:selectOptions value="{!Profiles}" />
+                    </apex:selectList>
+                </apex:pageblocksectionitem>
+                <apex:commandbutton value="Add Profile" action="{!addProfile}" style="float:right" rerender="userBlock" />
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </div>
+    
+    <div style="float:left; width: 450px;">
+        <apex:pageblock title="Selected People {!if( invitees.size > 0, '(' & TEXT(invitees.size) & ')', '')}" id="userBlock">
+            <apex:pageblockbuttons location="top">
+                <apex:commandbutton value="3. Send Invites" action="{!sendInvites}" rerender="messages,userBlock" rendered="{!AND( invitees.size > 0, toFollow.size > 0)}" />
+            </apex:pageblockbuttons>
+            <div id="invitees" style="width: 100%; min-height: {!20 + (45 * (invitees.size / 2))}px; display:block;">
+            <apex:outputtext value="No recipients." rendered="{!invitees.size = 0}" />
+            <apex:repeat value="{!invitees}" var="i" rendered="{!invitees.size > 0}">
+                <div style="margin: 5px; height: 35px; width: 200px; display: block; float: left;" id="user{!i.id}">
+                    <a id="{!i.id}" class="ui-icon ui-icon-closethick userClose" href="#" style="float: left; margin-right: 5px" onclick="closeUser('{!i.id}');"></a>
+                    <div style="float:left"><c:ciuserphoto uid="{!i.id}" photostr="{!i.smallphotourl}" linked="true" height="20" width="20" /></div>
+                    <apex:outputlink target="_new" styleclass="name" value="/{!i.id}" style="float: left; margin-left: 5px;">{!i.name}</apex:outputlink>
+                </div>
+            </apex:repeat>
+            </div>
+        </apex:pageblock>   
+    </div>
+    
+    <div style="clear:both"></div>
+    
+    <a href="#" id="aboutbutton" onclick="jQuery('#welcome').dialog({ resizable: false });">About/Setup</a>
+    
+    </apex:form>
+    
+    <style type="text/css">
+        .bPageBlock .pbTitle { width: 50%; }
+        
+        /* Interaction states
+		----------------------------------*/
+		.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #77d5f7; background: #0078ae url({!URLFOR( $Resource.chatterInvites, 'ui-bg_glass_45_0078ae_1x400.png' )}) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
+		.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #ffffff; text-decoration: none; }
+		.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #448dae; background: #79c9ec url({!URLFOR( $Resource.chatterInvites, 'ui-bg_glass_75_79c9ec_1x400.png' )}) 50% 50% repeat-x; font-weight: normal; color: #026890; }
+		.ui-state-hover a, .ui-state-hover a:hover { color: #026890; text-decoration: none; }
+		.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #acdd4a; background: #6eac2c url({!URLFOR( $Resource.chatterInvites, 'ui-bg_gloss-wave_50_6eac2c_500x100.png' )}) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
+		.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #ffffff; text-decoration: none; }
+		.ui-widget :active { outline: none; }
+		
+		/* Interaction Cues
+		----------------------------------*/
+		.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {border: 1px solid #fcd113; background: #f8da4e url({!URLFOR( $Resource.chatterInvites, 'ui-bg_glass_55_f8da4e_1x400.png' )}) 50% 50% repeat-x; color: #915608; }
+		.ui-state-highlight a, .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #915608; }
+		.ui-state-error, .ui-widget-content .ui-state-error, .ui-widget-header .ui-state-error {border: 1px solid #cd0a0a; background: #e14f1c url({!URLFOR( $Resource.chatterInvites, 'ui-bg_gloss-wave_45_e14f1c_500x100.png' )}) 50% top repeat-x; color: #ffffff; }
+		.ui-state-error a, .ui-widget-content .ui-state-error a, .ui-widget-header .ui-state-error a { color: #ffffff; }
+		.ui-state-error-text, .ui-widget-content .ui-state-error-text, .ui-widget-header .ui-state-error-text { color: #ffffff; }
+		.ui-priority-primary, .ui-widget-content .ui-priority-primary, .ui-widget-header .ui-priority-primary { font-weight: bold; }
+		.ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
+		.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
+		
+		/* Icons
+		----------------------------------*/
+		
+		/* states and images */
+		.ui-icon { width: 16px; height: 16px; background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_0078ae_256x240.png' )}); }
+		.ui-widget-content .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_0078ae_256x240.png' )}); }
+		.ui-widget-header .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_d8e7f3_256x240.png' )}); }
+		.ui-state-default .ui-icon { background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_e0fdff_256x240.png' )}); }
+		.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_056b93_256x240.png' )}); }
+		.ui-state-active .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_f5e175_256x240.png' )}); }
+		.ui-state-highlight .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_f7a50d_256x240.png' )}); }
+		.ui-state-error .ui-icon, .ui-state-error-text .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_fcd113_256x240.png' )}); }
+		
+		/* Overlays */
+		.ui-widget-overlay { background: #aaaaaa url({!URLFOR( $Resource.chatterInvites, 'ui-bg_flat_75_aaaaaa_40x100.png')}) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
+		.ui-widget-shadow { margin: 5px 0 0 5px; padding: 0px; background: #999999 url({!URLFOR( $Resource.chatterInvites, 'ui-bg_flat_55_999999_40x100.png')}) 50% 50% repeat-x; opacity: .45;filter:Alpha(Opacity=45); -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }/*
+
+		/* Component containers
+		----------------------------------*/
+		.ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
+		.ui-widget .ui-widget { font-size: 1em; }
+		.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
+		.ui-widget-content { border: 1px solid #a6c9e2; background: #fcfdfd url({!URLFOR( $Resource.chatterInvites, 'ui-bg_inset-hard_100_fcfdfd_1x100.png' )}) 50% bottom repeat-x; color: #222222; }
+		.ui-widget-content a { color: #222222; }
+		.ui-widget-header { border: 1px solid #4297d7; background: #2191c0 url({!URLFOR( $Resource.chatterInvites, 'ui-bg_gloss-wave_75_2191c0_500x100.png' )}) 50% 50% repeat-x; color: #eaf5f7; font-weight: bold; }
+		.ui-widget-header a { color: #eaf5f7; }
+    </style>
+</apex:page>

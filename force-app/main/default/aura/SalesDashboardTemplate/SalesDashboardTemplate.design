@@ -1,0 +1,9 @@
+<design:component label="Sales Dashboard Template">
+    <flexipage:template>
+        <flexipage:region name="activityGoal" label="left Region" defaultWidth="SMALL" />
+        <flexipage:region name="marginGoal" label="left1 Region" defaultWidth="SMALL" />
+        <flexipage:region name="revenueGoal" label="Right1 Region" defaultWidth="SMALL" />
+        <flexipage:region name="activityRanking" label="Right Region" defaultWidth="SMALL"  />
+        <flexipage:region name="container" label="Main Region" defaultWidth="SMALL" />
+    </flexipage:template>
+</design:component>

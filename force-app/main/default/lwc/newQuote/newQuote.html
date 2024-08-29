@@ -1,0 +1,239 @@
+<template>
+    <article class="slds-card bgcolor">
+        <div class="slds-m-bottom_small slds-m-top_small slds-m-left_medium textColor">
+            <b>
+                <p class="slds-text-heading_large">Quote</p>
+            </b>
+            <p>New Quote</p>
+        </div>
+    </article>
+
+    <div class="slds-m-bottom_medium"></div>
+
+    <lightning-card>
+        <template if:true={shouldRender}>
+            <div class="slds-clearfix slds-m-bottom_x-small">
+                <div class="slds-float_left slds-m-left_medium textColor">
+                    <b>
+                        <p class="slds-text-heading_small">Quote Edit</p>
+                    </b>
+                </div>
+                <div class="slds-float_right">
+                    <lightning-button variant="brand" label="Save" class="slds-m-right_x-small"
+                        onclick={handleContinue}>
+                    </lightning-button>
+                    <lightning-button variant="brand-outline" label="Cancel" class="slds-m-right_medium"
+                        onclick={handleCancel}>
+                    </lightning-button>
+                </div>
+            </div>
+
+            <div class="slds-m-left_medium slds-m-right_medium">
+                <div class="slds-clearfix slds-p-bottom_x-small slds-p-top_x-small bgcolor">
+                    <div class="slds-float_left slds-m-left_medium textColor">
+                        <p class="slds-text-heading_small">Quote Information</p>
+                    </div>
+                    <div class="slds-float_right">
+                        <p class="slds-m-right_medium"><abbr class="slds-required" title="required"><b>*</b></abbr> Required Information</p>
+                    </div>
+                </div>
+            </div>
+            <template if:true={hasOpportunity}>
+                <div class="slds-grid margin">
+                    <div class="slds-col slds-order_2 slds-large-order_1 ">
+                        <div class="slds-col slds-size_small slds-align_absolute-left ">
+                            <div class="slds-form-element__control slds-input-has-fixed-addon">
+                                <lightning-input type="date" 
+                                                label="Quote Date" 
+                                                data-name="quoteDate"
+                                                onchange={handlechange} 
+                                                data-id="quoteDate">
+                                </lightning-input>
+                                <span class="slds-form-element__addon slds-p-top_medium">[5/27/2024]</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-size_small slds-align_absolute-left ">
+                            <lightning-record-edit-form object-api-name="Quote">
+                                <lightning-input-field field-name="Bidding_To__c" 
+                                                    onchange={handlechange}
+                                                    data-id="quoteBiddingToC">
+                                </lightning-input-field>
+                            </lightning-record-edit-form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-grid margin">
+                    <div class="slds-col slds-order_2 slds-large-order_1 ">
+                        <div class="slds-col slds-size_small slds-align_absolute-left ">
+                            <lightning-record-edit-form object-api-name="Quote">
+                                <lightning-input-field data-name="SubmittedBy" 
+                                                    field-name="Submitted_By__c"
+                                                    onchange={handlechange} 
+                                                    data-id="quoteSubmittedByC">
+                                </lightning-input-field>
+                            </lightning-record-edit-form>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-size_small slds-align_absolute-left ">
+                            <div class="slds-col slds-size_small slds-align_absolute-left slds-p-top_large ">
+                                Opportunity Name: {opp.opportunityName}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-grid margin">
+                    <div class="slds-col slds-order_2 slds-large-order_1 ">
+                        <div class="slds-col slds-size_small slds-align_absolute-left ">
+                            <lightning-record-edit-form object-api-name="Quote">
+                                <lightning-input-field data-name="PreparedByUser" 
+                                                    field-name="prepared_by_user__c"
+                                                    onchange={handlechange} 
+                                                    data-id="quotePreparedByUser">
+                                </lightning-input-field>
+                            </lightning-record-edit-form>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-size_small slds-align_absolute-left ">
+                            <div class="slds-col slds-size_small slds-align_absolute-left slds-p-top_large ">
+                                Opportunity Number : {opp.opportunityNumber}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-grid margin">
+                    <div class="slds-col slds-size_small slds-align_absolute-left  ">
+                        Bid Date : {opp.opportunityBidDate}
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-text-color_error">
+                    <p>Error: {error.body.message}</p>
+                </div>
+            </template>
+            <template if:true={isContinue}>
+                <section role="dialog" 
+                        tabindex="-1" 
+                        aria-labelledby="modal-heading-01" 
+                        aria-modal="true"
+                        aria-describedby="modal-content-id-1" 
+                        class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate textColor">
+                                <b>Update Quote Name</b>
+                            </h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-bottom_small slds-p-top_small" id="modal-content-id-1">
+                            <div class="slds-clearfix">
+                                <div class="slds-align_absolute-center">
+                                    <label for="quoteNameInput" class="slds-form-element__label">
+                                        <abbr class="slds-required" title="required">*</abbr><b>Quote Name</b></label>
+                                    <input type="text" onchange={handlechange} data-id="updateQuoteName"
+                                        value={displayQuoteName} required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <lightning-button variant="brand" 
+                                            data-name="Save" 
+                                            label="Save" 
+                                            title="Save"
+                                            onclick={handleSave} 
+                                            class="slds-m-left_x-small">
+                            </lightning-button>
+                            <lightning-button label="Cancel" 
+                                            data-name="Cancle" 
+                                            title="Cancle" 
+                                            onclick={hideModalBox}
+                                            class="slds-m-left_x-small">
+                            </lightning-button>
+                        </footer>
+
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <footer class="slds-card__footer">
+                <lightning-button variant="brand" 
+                                data-name="continue" 
+                                label="Save" 
+                                title="continue"
+                                onclick={handleContinue} 
+                                class="slds-m-left_x-small">
+                </lightning-button>
+                <lightning-button label="Cancel" 
+                                data-name="Cancel" 
+                                title="Cancle" 
+                                onclick={handleCancel}
+                                class="slds-m-left_x-small">
+                </lightning-button>
+            </footer>
+        </template>
+        <template if:true={shouldNotRenderMarrs}>
+            <template if:true={shouldNotRender}>
+                <div class="slds-clearfix">
+                    <lightning-button label="Go to Opportunity" 
+                                    data-name="Cancle" 
+                                    title="Cancle" 
+                                    onclick={handleCancel}
+                                    class="slds-m-right_medium slds-float_right">
+                    </lightning-button>
+                </div>
+                <div class="slds-p-left_medium slds-p-right_medium slds-p-top_medium">
+                    <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                        <span class="slds-assistive-text">warning</span>
+                        <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small"
+                            title="Description of icon when needed">
+                            <lightning-icon icon-name="utility:warning" 
+                                            size="x-small" 
+                                            alternative-text="Warning">
+                            </lightning-icon>
+                        </span>
+                        <h2>You must add a Sales Engineer Split in the
+                            Opportunity prior to creating a quote. If you don’t
+                            know the exact split, use your best guess for now.
+                            You can update the splits at any time.
+                        </h2>
+                    </div>
+                </div>
+                <div class="slds-p-around_medium">
+                    <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                        <span class="slds-assistive-text">warning</span>
+                        <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small"
+                            title="Description of icon when needed">
+                            <lightning-icon icon-name="utility:warning" 
+                                            size="x-small" 
+                                            alternative-text="Warning">
+                            </lightning-icon>
+                        </span>
+                        <h2>You must add Application Engineer in the Opportunity
+                            prior to creating a quote.
+                        </h2>
+                    </div>
+                </div>
+                <div class="slds-clearfix">
+                    <lightning-button label="Go to Opportunity" 
+                                    data-name="Cancle" 
+                                    title="Cancle" 
+                                    onclick={handleCancel}
+                                    class=" slds-align_absolute-center">
+                    </lightning-button>
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+
+</template>

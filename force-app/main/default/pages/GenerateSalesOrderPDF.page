@@ -1,0 +1,2 @@
+<apex:page extensions="SalesOrderPdfCtrl" standardController="AcctSeedERP__Sales_Order__c" action="{!generateAttachment}">
+</apex:page>

@@ -1,0 +1,372 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 11-27-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-card>
+        <template if:true={logACall}>
+            <div style="margin: 10px;">
+                
+                <lightning-record-edit-form object-api-name="LogACall__c"  onsubmit={handleSubmit}>
+                    <div style="margin-top: 10px; margin-bottom: 10px; text-align: right;">
+                        <!-- <lightning-button-group>
+                               <lightning-button label="Add Expense" variant="neutral" onclick={handleAddExpense}></lightning-button>
+                               <lightning-button label="Save"  type="Submit" variant="brand" onclick={handleSave}></lightning-button>
+                        </lightning-button-group> -->
+                        <lightning-button label="Save"  type="submit" variant="brand" onclick={handleSave}></lightning-button>
+                    </div>
+ 
+                    <div class="slds-grid">        
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input-field field-name="Type_of_Call__c" onchange={handleTypeOfCall} variant="label-stacked"></lightning-input-field>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input-field field-name="Event_Date__c" variant="label-stacked" value={logACall.eventDate} onchange={handleEventDate}></lightning-input-field>
+                        </div>
+                    </div>
+                    
+                    <lightning-accordion allow-multiple-sections-open active-section-name="B">
+                        <template if:false={logACall.isExpenseOnly}>
+                            <lightning-accordion-section name="A" label="Call Log">
+                                <div class="slds-grid">        
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <c-Multi-Select-Look-Up
+                                                            record-id={recordId}
+                                                            object-api-name= "Contact"
+                                                            label-name="Contact(s)"
+                                                            object-label= "Search Contact.."
+                                                            field-api-names="Id,Name,Email,Account.Name"
+                                                            filter-field-api-name="Name"
+                                                            icon-name="standard:contact"
+                                                            onretrieve={selectItemEventHandler} 
+                                                            onremove={deleteItemEventHandler}
+                                                            pre-selected-values={currentContactId}>
+                                        </c-Multi-Select-Look-Up>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <c-Multi-Select-Look-Up 
+                                                            record-id={recordId}
+                                                            object-api-name= "Account"
+                                                            label-name="Account(s)"
+                                                            object-label= "Search Account.."
+                                                            field-api-names="Id,Name"
+                                                            filter-field-api-name="Name"
+                                                            icon-name="standard:account"
+                                                            onretrieve={selectAccountEventHandler} 
+                                                            onremove={deleteAccountEventHandler}
+                                                            pre-selected-values={currentAccountId}>
+                                        </c-Multi-Select-Look-Up>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" style="margin-top: 10px;">
+                                    <div class="slds-col slds-size_1-of-2" >
+                                        <lightning-input-field field-name="Relationship__c" onchange={handleRelationship} variant="label-stacked"></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="Opportunity__c" onchange={handleOpportunityId} value={logACall.opportunityId} variant="label-stacked"></lightning-input-field>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;;">
+                                    <lightning-input-field field-name="Comments__c" onchange={handleComments} variant="label-stacked"></lightning-input-field>
+                                </div>
+                                <div style="margin-top: 15px;margin-left: 5px;">
+                                    <lightning-input type="Checkbox" label="Post Update to Chatter" disabled={disableCheckbox} onchange ={handlePostMsgChatter} ></lightning-input>
+                                </div>
+                            </lightning-accordion-section>
+                        </template>
+                        <template if:false={logACall.isExpenseOnly}>
+                            <template for:each={lstTasks} for:item="task" for:index="taskCount">
+                                <template if:false={task.isDeleted}>
+                                    <lightning-accordion-section name="CallLog" label="Followup Task" key={task.Id}>
+                                        <lightning-record-edit-form object-api-name="Task__c" >
+                                            <lightning-input-field field-name="Subject__c" title={taskCount} onchange={handleSubject} variant="label-stacked"></lightning-input-field>
+                                            <!-- //div class="slds-grid" style="margin-top: 10px;" -->
+                                            <div  style="margin-top: 10px;"> 
+                                                <lightning-input-field field-name="Due_Date__c" title={taskCount} onchange={handleDueDate} variant="label-stacked"></lightning-input-field>
+                                            </div>
+                                                <!-- <div class="slds-col slds-size_1-of-2" >
+                                                    <lightning-input-field field-name="Due_Date__c" title={taskCount} onchange={handleDueDate} variant="label-stacked"></lightning-input-field>
+                                                </div> -->
+
+                                               <!-- <div class="slds-col slds-size_1-of-2">-->
+                                                   <!-- The below line was already commented  -->
+                                                    <!-- <lightning-input-field field-name="Assigned_To__c" title={taskCount} onchange={handleAssignedTo} value={task.assignedTo} variant="label-stacked"></lightning-input-field> -->
+                                                   <!-- <c-Multi-Select-Look-Up object-api-name= "User"
+                                                                                    label-name="Assigned To"
+                                                                                    object-label= "Search Users.."
+                                                                                    field-api-names="Id,Name"
+                                                                                    filter-field-api-name="Name"
+                                                                                    icon-name="standard:user"
+                                                                                    onretrieve={selectAssignedToEventHandler} 
+                                                                                    onremove={deleteAssignedToEventHandler}
+                                                                                    index={taskCount}>
+                                                    </c-Multi-Select-Look-Up>
+                                                </div> -->
+                                           
+                                            <div class="slds-grid" style="margin-top: 10px;">
+                                                <div class="slds-col slds-size_1-of-2" >
+                                                    <lightning-input-field field-name="Contact__c" title={taskCount} onchange={handleContact} value={task.contact} variant="label-stacked"></lightning-input-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-input-field field-name="Related_To__c" title={taskCount} onchange={handleRelatedTo} value={task.relatedTo} variant="label-stacked"></lightning-input-field>
+                                                </div>
+                                            </div>
+                                            <div style="text-align: right; margin-right: 10px; margin-bottom: 10px;">
+                                                <lightning-button-group>    
+                                                    <div style=" padding-right: 10px;">
+                                                    <lightning-button label="Add Task"  onclick={handleAddTask}></lightning-button> </div>
+
+                                                    <template if:false = {isLastTask}>
+                                                        <div>
+                                                        <lightning-button label="Delete" variant="destructive" onclick={handleDeleteTask} value={taskCount}></lightning-button></div>
+                                                    </template>
+                                            </lightning-button-group>
+                                            </div>
+                                        </lightning-record-edit-form>
+
+                                        <!-- <template if:false = {isLastTask}>
+                                            <div style="text-align: right; margin-right: 10px; margin-bottom: 10px;">
+                                                <lightning-button class="slds-button" 
+                                                                label="Delete"
+                                                                onclick={handleDeleteTask} 
+                                                                value={taskCount}
+                                                                variant="destructive" >
+                                                </lightning-button>
+                                            </div>
+                                        </template> -->
+                                    </lightning-accordion-section>
+                                </template>
+                            </template>
+                        </template>
+                        <lightning-accordion-section name="C" label="Vehicle Travel">
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <lightning-input-field field-name="Mileage_Type__c" onchange={handleMileageType} variant="label-stacked"></lightning-input-field>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input-field field-name="Mileage_Traveled__c" onchange={handleMileageTraveled} variant="label-stacked"></lightning-input-field>        
+                                </div>
+                            </div>
+                        </lightning-accordion-section>
+                        <template for:each={lstExpenses} for:item="expense" for:index="expenseCount">
+                            <template if:false={expense.isDeleted}>
+                                <lightning-accordion-section name="expenseDetail" label="Expense" key={expense.Id}>
+                                    <lightning-record-edit-form object-api-name="Expense__c" onsubmit={handleSubmit}>
+                                        <div class="slds-grid">
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="Vendor_Or_Venue__c" title={expenseCount} onchange={handleVendorOrVenue} variant="label-stacked"></lightning-input-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="Expense_Type__c" title={expenseCount} onchange={handleExpenseType} variant="label-stacked"></lightning-input-field>        
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid">
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="Expense_Amount__c" title={expenseCount} onchange={handleExpenseAmount} variant="label-stacked"></lightning-input-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="Payment_Type__c" title={expenseCount} value={expense.paymentType} onchange={handlePaymentType} variant="label-stacked"></lightning-input-field>        
+                                            </div>
+                                        </div>
+                                        <template if:true={expense.isPersonalExpense}>
+                                            <lightning-input-field field-name="Reason_For_Personal_Expense__c" title={expenseCount} onchange={handleReason} variant="label-stacked"></lightning-input-field>
+                                        </template>
+                                        
+                                        <lightning-input-field field-name="Description_Or_Notes_Related_To_Expense__c" title={expenseCount} onchange={handleDescription} variant="label-stacked"></lightning-input-field>
+
+                                        <lightning-input-field field-name="Expense_Date__c" title={expenseCount}  onchange={handleExpenseDate} value={logACall.eventDate} variant="label-stacked"></lightning-input-field>
+                                        
+                                        <lightning-input-field field-name="Project__c" title={expenseCount}  onchange={handleProjectId}  variant="label-stacked"></lightning-input-field>
+                                        <lightning-input-field field-name="Split_Expense_Across_Offices__c" value={expense.splitExpenses}  title={expenseCount} onchange={handleSplitExpense} variant="label-stacked"></lightning-input-field>
+                                        
+                                        <!-- Your code -->
+                                        <div style="margin-top: 10px; margin-bottom: 10px; text-align: right;">
+                                            <lightning-button-group>
+                                                <div style=" padding-right: 10px;">
+                                                <lightning-button label="Add Expense" variant="neutral" onclick={handleAddExpense}></lightning-button></div>
+                                                <template if:false = {isLastExpense}>
+                                                    <div><lightning-button label="Delete" variant="destructive" onclick={handleDeleteExpense} value={expenseCount}></lightning-button></div>
+                                                    
+                                                </template>
+                                            </lightning-button-group>
+                                        </div>
+                                  
+                                    </lightning-record-edit-form>  
+                                    <!-- Delete button shifted above -->
+                                    <!-- <template if:false = {isLastExpense}>
+                                        <div style="text-align: right; margin-right: 10px; margin-bottom: 10px;">
+                                            <lightning-button class="slds-button" 
+                                                            label="Delete"
+                                                            onclick={handleDeleteExpense} 
+                                                            value={expenseCount}
+                                                            variant="destructive">
+                                            </lightning-button>
+                                        </div>
+                                    </template>  -->
+                                    
+                                </lightning-accordion-section>
+                            </template>
+                        </template>
+                    </lightning-accordion>
+                    <div style="text-align: right; margin-right: 10px; margin-bottom: 10px;">
+                        <lightning-button label="Save" type="submit" variant="brand" onclick={handleSave}></lightning-button>
+                    </div>
+                </lightning-record-edit-form>
+            </div>
+        </template>
+        <!--
+        <lightning-record-edit-form object-api-name="LogACall__c" onsubmit={handleSubmit} >
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning-input-field field-name="Type_of_Call__c" variant="label-stacked"></lightning-input-field>
+                </div>
+                <div class="slds-col">
+                    <lightning-input-field field-name="Event_Date__c" variant="label-stacked"></lightning-input-field>
+                </div>
+            </div>
+            <lightning-accordion allow-multiple-sections-open>
+                <lightning-accordion-section name="A" label="Call Log">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <c-Multi-Select-Look-Up object-api-name= "Contact"
+                                                label-name="Contact(s)"
+                                                object-label= "Search Contact.."
+                                                field-api-names="Id,Name"
+                                                filter-field-api-name="Name"
+                                                icon-name="standard:contact"
+                                                onretrieve={selectItemEventHandler} 
+                                                onremove={deleteItemEventHandler}>
+                            </c-Multi-Select-Look-Up>
+                        </div>
+                        <div class="slds-col">
+                            <c-Multi-Select-Look-Up object-api-name= "Account"
+                                                            label-name="Account(s)"
+                                                            object-label= "Search Account.."
+                                                            field-api-names="Id,Name"
+                                                            filter-field-api-name="Name"
+                                                            icon-name="standard:account"
+                                                            onretrieve={selectAccountEventHandler} 
+                                                            onremove={deleteAccountEventHandler}>
+                            </c-Multi-Select-Look-Up>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters" style="margin-top: 10px;">
+                        <div class="slds-col">
+                            <lightning-input-field field-name="Relationship__c" variant="label-stacked"></lightning-input-field>
+                        </div>
+                        <div class="slds-col">
+                            <lightning-input-field field-name="Opportunity__c" variant="label-stacked"></lightning-input-field>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;;">
+                        <lightning-input-field field-name="Comments__c" variant="label-stacked"></lightning-input-field>
+                    </div>
+                    
+                </lightning-accordion-section>
+                <lightning-accordion-section name="B" label="Follow Up Task">
+                    <lightning-record-edit-form object-api-name="Task__c">
+                        <lightning-input-field field-name="Name" variant="label-stacked"></lightning-input-field>
+                        <div class="slds-grid slds-gutters" style="margin-top: 10px;">
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Due_Date__c" variant="label-stacked"></lightning-input-field>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Assigned_To__c" variant="label-stacked"></lightning-input-field>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters" style="margin-top: 10px;">
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Contact__c" variant="label-stacked"></lightning-input-field>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Related_To__c" variant="label-stacked"></lightning-input-field>
+                            </div>
+                        </div>
+                    </lightning-record-edit-form>
+                    <div style="text-align: right;">
+                        <lightning-button label="Add Task" variant="neutral"></lightning-button>
+                    </div>
+                </lightning-accordion-section>
+                <lightning-accordion-section name="C" label="Vehicle Travel">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <lightning-input-field field-name="Mileage_Type__c" variant="label-stacked"></lightning-input-field>
+                        </div>
+                        <div class="slds-col">
+                            <lightning-input-field field-name="Mileage_Traveled__c" variant="label-stacked"></lightning-input-field>        
+                        </div>
+                    </div>
+                </lightning-accordion-section>
+                <lightning-accordion-section name="D" label="Expense" >
+                    <lightning-record-edit-form object-api-name="Expense__c"  >
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Vendor_Or_Venue__c" variant="label-stacked"></lightning-input-field>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Expense_Type__c" variant="label-stacked"></lightning-input-field>        
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Expense_Amount__c" variant="label-stacked"></lightning-input-field>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-input-field field-name="Payment_Type__c" variant="label-stacked"></lightning-input-field>        
+                            </div>
+                        </div>
+                        <lightning-input-field field-name="Reason_For_Personal_Expense__c" variant="label-stacked"></lightning-input-field>
+                        <lightning-input-field field-name="Description_Or_Notes_Related_To_Expense__c" variant="label-stacked"></lightning-input-field>
+                        <lightning-input-field field-name="Split_Expense_Across_Offices__c" variant="label-stacked"></lightning-input-field>
+                    </lightning-record-edit-form>   
+                </lightning-accordion-section>
+            </lightning-accordion>
+            <div style="text-align: right;">
+                <lightning-button label="Add Expense" variant="neutral" ></lightning-button>
+                <lightning-button label="Save" variant="brand" class="slds-m-left_x-small"></lightning-button>
+            </div>
+        </lightning-record-edit-form>
+    -->
+        <!--
+    <c-Multi-Select-Look-Up object-api-name= "Contact"
+                                              label-name="Contact(s)"
+                                              object-label= "Search Contact.."
+                                              field-api-names="Id,Name"
+                                              filter-field-api-name="Name"
+                                              icon-name="standard:contact"
+                                              onretrieve={selectItemEventHandler} 
+                                              onremove={deleteItemEventHandler}>
+    </c-Multi-Select-Look-Up>
+    <c-Multi-Select-Look-Up object-api-name= "Account"
+                                              label-name="Account(s)"
+                                              object-label= "Search Account.."
+                                              field-api-names="Id,Name"
+                                              filter-field-api-name="Name"
+                                              icon-name="standard:account"
+                                              onretrieve={selectAccountEventHandler} 
+                                              onremove={deleteAccountEventHandler}>
+    </c-Multi-Select-Look-Up>
+
+    <lightning-record-edit-form object-api-name="LogACall__c" onsubmit={handleSubmit}>
+        <lightning-input-field field-name="Type_of_Call__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Relationship__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Follow_up_Date__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Comments__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Mileage__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Company_Expense__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Personal_Expense__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Venue__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Type_of_Expense__c" variant="label-stacked"></lightning-input-field>
+        <lightning-input-field field-name="Opportunity_Order__c" variant="label-stacked"></lightning-input-field>
+        <lightning-button type="submit"
+                          name="submit"
+                          label="Submit" variant="brand">
+        </lightning-button>
+    </lightning-record-edit-form>
+    
+    -->
+    </lightning-card>
+</template>

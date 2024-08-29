@@ -1,0 +1,47 @@
+<template>
+    <lightning-card>
+      <div>
+        <div style="padding-left: 8px;">
+          <span title="Submitter Comments" class="slds-card__header-title slds-truncate">Submitter Comments</span>
+        </div>
+    
+        
+        <div style="display: flex; 
+              margin: 10px; padding-left:8px;" if:true={submitterComment}>
+          <div>
+            <lightning-avatar variant="circle" src={submitterAvtar} fallback-icon-name="standard:avatar"
+              alternative-text="username" class="slds-m-right_small"></lightning-avatar>
+          </div>
+          <div class="slds-media__body">
+            <div><lightning-formatted-url value={submitterUrl} label={submitterName} target="_blank" ></lightning-formatted-url></lightning-button></div>
+            <div style="padding-top: 2%;"><lightning-formatted-text value={submitterComment}></lightning-formatted-text></div>
+            <div style="color: gray;"><lightning-formatted-date-time value={submittedDate} year="numeric" month="short" day="2-digit" hour="2-digit"
+              minute="2-digit" second="2-digit"></lightning-formatted-date-time></div>
+          </div>
+        </div>
+  
+      </div>
+  
+  
+      <div if:true={approverComment}>
+        <div style="padding-left: 8px; margin-top: 6px;">
+          <span title="Approver Comments" class="slds-card__header-title slds-truncate">Previous Approver Comments</span>
+        </div>
+     
+        <div style="display: flex; 
+              margin: 10px; padding-left: 8px;">
+          <div>
+            <lightning-avatar variant="circle" src={approverAvtar} initials="" fallback-icon-name="standard:avatar"
+              alternative-text="username" class="slds-m-right_small"></lightning-avatar>
+          </div>
+          <div class="slds-media__body">
+            <div><lightning-formatted-url value={approverUrl} label={approverName} target="_blank" ></lightning-formatted-url></lightning-button></div>
+            <div style="padding-top: 2%;"><lightning-formatted-text value={approverComment}></lightning-formatted-text></div>
+            <div style="color: gray;"><lightning-formatted-date-time value={approvedDate} year="numeric" month="short" day="2-digit" hour="2-digit"
+              minute="2-digit" second="2-digit"></lightning-formatted-date-time></div>
+          </div>
+        </div>
+      </div>
+    </lightning-card>
+      
+  </template>

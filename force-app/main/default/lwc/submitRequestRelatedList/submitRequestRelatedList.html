@@ -1,0 +1,41 @@
+<template >
+    
+    <div if:true={isLoading} class="exampleHolder">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+              <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <lightning-card if:false={isLoading} title="Expenses">
+        
+    <template if:true={Expense}>
+            <lightning-datatable 
+                key-field="id"
+                data={Expense}
+                columns={columns}
+                hide-checkbox-column="true">
+            </lightning-datatable>
+    </template>
+    <template if:true={Expense}>
+      <lightning-datatable 
+          key-field="id"
+          data={total}
+          columns={columns}
+          hide-table-header="true"
+          hide-checkbox-column="true"
+          class="noRowHover">
+      </lightning-datatable>
+</template>
+
+    <template if:false={Expense}>
+        <lightning-card style="font-weight: bold ;"><div style="margin-left: 2%;">No data to display</div></lightning-card>
+    </template>
+
+    </lightning-card>    
+</template>

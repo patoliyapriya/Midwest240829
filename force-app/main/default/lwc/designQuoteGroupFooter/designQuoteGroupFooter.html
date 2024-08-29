@@ -1,0 +1,28 @@
+<template>
+    <div class="slds-grid slds-wrap footerbg">
+        <div class="slds-col slds-size_9-of-12 slds-p-left_x-small slds-p-top_small slds-p-bottom_small">
+            <div class="slds-float_left slds-text-color_inverse slds-text-heading_small">
+                {groupDetails.groupName}
+            </div>
+            <div class="slds-float_right slds-text-heading_small slds-text-color_inverse slds-p-right_small">
+                {label.groupPriceTotal} : {groupDetails.groupTotal}
+            </div>
+        </div>
+        <div class="slds-col slds-size_3-of-12 borders slds-p-top_small slds-p-bottom_small">
+            <div class="slds-form-element slds-float_right slds-p-right_small">
+                <label class="slds-checkbox_toggle slds-grid">
+                    <span class="slds-form-element__label slds-m-bottom_none labelcolor">
+                        {label.showGroupPrice}
+                    </span>
+                    <lightning-input type="toggle" 
+                                    name="input1" 
+                                    message-toggle-inactive="" 
+                                    message-toggle-active=""
+                                    checked={groupDetails.hidePricing}
+                                    onchange={handleChange}>
+                    </lightning-input>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>

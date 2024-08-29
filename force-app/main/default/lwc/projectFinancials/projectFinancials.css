@@ -1,0 +1,16 @@
+.centerHeading {
+    width: 25%;
+    font-weight: bold;
+}
+
+.bgcolorOfTotal {
+    background-color: #EBEBEB ;
+}
+
+.tableAlign{
+    width: 50%;vertical-align: top;
+}
+
+.my-table tbody tr:hover {
+    background-color: #f2f2f2;
+}

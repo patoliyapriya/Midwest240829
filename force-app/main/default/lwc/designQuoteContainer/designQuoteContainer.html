@@ -1,0 +1,28 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-10-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <lightning-spinner alternative-text="Loading" 
+                        size="large" 
+                        variant="brand" 
+                        if:true={isLoading}> 
+    </lightning-spinner>
+    
+    <template if:true={cartWrapper}>
+        <c-design-quote-header cart-wrapper={cartWrapper} quoteid={quoteid}></c-design-quote-header>
+        <lightning-card>
+            <template for:each={cartWrapper.groupDetails} for:item="groupItem">
+                <div class="quoteContent" key={groupItem.groupId}>
+                    <c-design-quote-group group-wrapper={groupItem} onquotegrouptoggle={handleQuoteGroupToggle}></c-design-quote-group>
+                </div>
+            </template>
+        </lightning-card>
+        <lightning-card>
+            <c-design-quote-footer quote-wrapper={cartWrapper.quoteDetails} onquotefootertoggle={handleQuoteFooterToggle}></c-design-quote-footer>
+        </lightning-card>
+    </template>
+</template>

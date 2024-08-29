@@ -1,0 +1,81 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 11-09-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <lightning-card >
+     
+    <template for:each={newEmailWrapper} for:item="email">
+      <div key={email.toAddress} class="slds-align_absolute-center">
+       
+          <div class="slds-container--medium slds-align_absolute-center">
+             <div class="slds-form--stacked">
+              <div class="slds-form-element" style="text-align: center;">    
+                <!--<lightning-button label="Send Email"
+                variant="slds-button_neutral"
+                                 onclick={SendEmailJS}></lightning-button>-->
+              </div>
+                <div class="slds-form-element">
+                  <lightning-combobox name="From"
+                                      label="From"
+                                      value={email.orgWideFromAddressId}
+                                      placeholder="Select From Address"
+                                      options={options}
+                                      onchange={handleChange} >
+                  </lightning-combobox>
+                  
+                  <c-Multi-Select-Look-Up object-api-name= "Contact"
+                                          label-name="To"
+                                          object-label= "Search Contact.."
+                                          field-api-names="Id,Name,Email,Account.Name"
+                                          filter-field-api-name="Name"
+                                          icon-name="standard:contact"
+                                          onretrieve={selectItemEventHandler} 
+                                          onremove={deleteItemEventHandler}>
+              </c-Multi-Select-Look-Up>
+
+
+                </div>
+                <div class="slds-form-element">
+                  <lightning-input type="email" label="CC" name="ccAddress" multiple="true"
+                                  onchange={handleChange} value={email.ccAddress}></lightning-input>
+                </div>
+                <div class="slds-form-element">
+                  <lightning-input type="email" label="BCC" multiple="true"
+                                  onchange={handleChange} name="BccAddress" 
+                                  value={ccEmailAddress}></lightning-input>
+                </div>
+                <div class="slds-form-element">
+                  
+                  <lightning-input type="text" label="Subject" 
+                                      value={email.Subject}
+                                      onchange={handleChange} 
+                                      name="Subject" 
+                                      required=true></lightning-input>
+                </div>
+                <div class="slds-form-element__control">
+                  
+                 
+                  <iframe frameborder="0" height="300" 
+                          name="contentFrame" scrolling="yes" 
+                          src={email.emailPreviewUrl}
+                          title="Email" width="900" 
+                          style="height: 1213px; width: 947px;">
+                  </iframe>
+                </div>
+  
+             </div>
+          </div>
+       
+      </div>
+      
+
+    </template>
+
+  
+</lightning-card>
+     
+</template>

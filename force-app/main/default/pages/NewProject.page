@@ -1,0 +1,164 @@
+<apex:page controller="NewProjectController" >
+    <style>
+        .parentDisable{
+            position:fixed;
+            top:0;
+            left:0;
+            background:#000;
+            opacity:0.5; 
+            height:100%;
+            width:100%; 
+            z-index:80;
+        }
+        .button { 
+            background: url('{!$Resource.LoadingButton}') no-repeat left top; 
+            width:335px; 
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 45%;
+            left: 45%;
+            z-index:100;
+            
+        }
+        
+        .descPopup{
+            width:500px;
+            position:fixed;
+            border: 0px;
+            top: 35%;
+            left: 45%;
+        }
+        
+        .descProductPopup{
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 10%;
+            left: 15%;
+        }
+        
+        .circle {
+            
+            width:22px;
+            height:22px;
+            float:left;
+            margin-bottom:18px;
+            margin-top:18px;
+            margin-left: 55px;
+            z-index:100;
+        }
+                
+        .txt {
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+            font-size:13px;
+            color:#000000;
+            line-height:20px;
+            margin-left:15px;
+            margin-bottom:18px;
+            margin-top:18px;
+            width: 200px;
+            font-weight: bold;
+            float: left;
+            z-index:100;
+        }   
+        
+        .error {
+          border:3px solid red;
+        }
+        
+    </style>
+    
+    <script>
+        function startSplash() {                        
+            var divObj = document.getElementById('divLoading');            
+            divObj.style.display='block';                                                   
+        }
+          
+        function endSplash() {              
+            document.getElementById('divLoading').style.display='none';                      
+        }
+    </script>
+    
+    <apex:sectionHeader subtitle="New Project" title="Project"/>
+    <apex:form id="formId">
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+        <apex:actionfunction name="reRenderPONumber" reRender="pbsPONumber" action="{!poNumber}" status="splashStatus" />
+        <div id="divLoading" style="display:none;">
+            <div class="parentDisable"></div>
+            <div class="button" id="splashDiv">
+                <div class="circle"><apex:image value="{!$Resource.LoadingImage}"></apex:image></div>
+                <div class="txt">Please Wait. Loading...</div>
+            </div>
+        </div>  
+        <apex:outputPanel rendered="{!errorMessage != '' && errorMessage != null}">
+            <apex:pageBlock >
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!backToOpportunity}" value="Back to Opportunity"/>
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection >
+                    <apex:pageMessage severity="Error" strength="1" summary="{!errorMessage}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:outputPanel>
+
+        <apex:outputPanel rendered="{!errorMessage == null || errorMessage == ''}">
+            <apex:pageBlock rendered="{! !isQuoteSync}" mode="edit">
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Continue" action="{!continueConvertToProject}" reRender="formId" status="splashStatus"/>
+                    <apex:commandButton value="Cancel" action="{!backToOpportunity}" immediate="true" />
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection title="Select Quote">
+                    <apex:inputField value="{!opportunityToUpdate.Sync_Quote__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            
+            <apex:pageBlock title="Project Details" rendered="{!redirectProject != null}" mode="edit">
+                <apex:pageMessage detail="This Opportunity already has an associated project. You cannot convert to a project again. Please click the project below for review." severity="info" title="Covert to Prject" strength="3"></apex:pageMessage>
+                <apex:pageBlockSection title="Project Details" collapsible="false">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Project Name</apex:outputLabel>
+                        <apex:outputLink value="/{!redirectProject.Id}">{!redirectProject.Name}</apex:outputLink>    
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+            </apex:pageBlock>
+            
+            <apex:pageBlock title="Project Edit" mode="edit" id="pb" rendered="{!redirectProject == null && isQuoteSync}">
+                <apex:pagemessages />
+                <apex:pageblockButtons >
+                    <apex:commandButton value="Save" action="{!saveProject}" rerender="formId" status="splashStatus"/>
+                    <apex:commandButton value="Cancel" action="{!returnToOpportunity}" immediate="true"/>
+                </apex:pageblockButtons>
+                <apex:pageBlockSection title="PO Number" id="pbsPONumber">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputText >Do you have PO Number?</apex:outputText>
+                        <apex:actionRegion >
+                            <apex:inputField value="{!newProject.Do_you_have_PO_Number__c}" required="true">
+                                <apex:actionSupport event="onchange" reRender="pb" action="{!poNumber}" status="splashStatus"/>
+                            </apex:inputField>
+                        </apex:actionRegion>
+                    </apex:pageBlockSectionItem>
+                    <apex:inputField value="{!newProject.PO_Number__c}" rendered="{!newProject.Do_you_have_PO_Number__c == 'Yes'}" required="true"/>
+                    <apex:inputField value="{!newProject.PO_Number_Reason__c}" rendered="{!newProject.Do_you_have_PO_Number__c == 'No'}" required="true"/>
+                    <apex:outputText value="Projects will not be worked without PO on unless approved by a manager." style="font-weight:bold;color:red;" rendered="{!newProject.Do_you_have_PO_Number__c == 'No'}"/>
+                </apex:pageBlockSection>
+                <apex:pageblockSection title="Quote Information">
+                    <apex:inputField value="{!newProject.Name}" required="true"/>
+                    <apex:inputField value="{!newProject.Receipt_of_Order_Date__c}" />
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >Project Bid Date</apex:outputLabel>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}">
+                            <apex:param value="{!projectBidDate}"/>
+                        </apex:outputText>
+                    </apex:pageBlockSectionItem>
+                    <apex:inputField value="{!newProject.ProjectShipDate__c}" required="true"/>
+                </apex:pageblockSection>
+                
+                
+            </apex:pageBlock>
+        </apex:outputPanel>
+        
+        
+    </apex:form>
+</apex:page>

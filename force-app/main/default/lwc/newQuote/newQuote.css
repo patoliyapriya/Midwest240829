@@ -1,0 +1,17 @@
+.textColor {
+    color: #032D60;
+}
+
+.bgcolor {
+    background-color: #f2f2f2;
+}
+
+.slds-p-horizontal_medium {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.margin {
+    margin-left: 100px;
+    margin-top: 10px;;
+}

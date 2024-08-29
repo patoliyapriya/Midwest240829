@@ -1,0 +1,20 @@
+.footerbgblack {
+    background: black;
+}
+
+.borders {
+    border-left: 2px solid white;
+}
+
+.labelcolor {
+    color: white;
+}
+
+.footerbggreen {
+    background-color: #33cc80;
+}
+
+.footer {
+   background: white;
+   height: 140px;
+}

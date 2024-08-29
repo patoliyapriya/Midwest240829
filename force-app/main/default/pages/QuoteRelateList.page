@@ -1,0 +1,127 @@
+<apex:page extensions="QuoteRelatedListController" standardController="Opportunity" id="pageId">
+    <style>
+        .alignRight{
+            text-align:right;
+        }
+        
+        .alignCenter{
+            text-align:center;
+        }
+        
+        .parentDisable{
+                position:fixed;
+                top:0;
+                left:0;
+                background:#000;
+                opacity:0.5; 
+                height:100%;
+                width:100%; 
+                }
+        .button { 
+            background: url('{!$Resource.LoadingButton}') no-repeat left top; 
+            width:335px; 
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 45%;
+            left: 45%;
+            
+        }
+        
+        .circle {
+            
+            width:22px;
+            height:22px;
+            float:left;
+            margin-bottom:18px;
+            margin-top:18px;
+            margin-left: 55px;
+        }
+                
+        .txt {
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+            font-size:13px;
+            color:#000000;
+            line-height:20px;
+            margin-left:15px;
+            margin-bottom:18px;
+            margin-top:18px;
+            width: 200px;
+            font-weight: bold;
+            float: left;
+        }   
+        
+    </style>
+    <script>
+        
+        function makeQuotePrimary(quoteId, ele){
+            if(ele.checked){
+                var hidQuoteId = document.getElementById('pageId:formId:pbId:hidQuoteId');
+                hidQuoteId.value = quoteId;
+                makeQuotePrimaryAndSync();
+                return true;
+                //ele.style.disable = 'disabled';
+                //makeQuotePrimaryAndSync(quoteId);
+            }
+        }
+        
+        function startSplash() {                        
+            var divObj = document.getElementById('divLoading');            
+            divObj.style.display='block';                                                   
+        }
+          
+        function endSplash() {              
+            document.getElementById('divLoading').style.display='none';                      
+        }
+        
+        function refreshPage(opportunityId){
+            window.top.location.href = '/' + opportunityId;
+        }
+        
+        function redirectToQuote(opportunityId){
+            window.top.location.href = '/apex/NewQuote?retURL='+ opportunityId + '&cancelURL=' + opportunityId + '&oppId=' + opportunityId;
+        }
+    </script>
+    <apex:form id="formId">
+        <apex:pageMessages ></apex:pageMessages>
+        <div id="divLoading" style="display:none;">
+            <div class="parentDisable"></div>
+            <div class="button" id="splashDiv">
+                <div class="circle"><apex:image value="{!$Resource.LoadingImage}"></apex:image></div>
+                <div class="txt">Please Wait. Loading...</div>
+            </div>
+        </div>  
+        
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+        <apex:actionFunction action="{!syncBackToOpportunity}" name="makeQuotePrimaryAndSync" reRender="pbId" status="splashStatus" oncomplete="refreshPage('{!Opportunity.Id}');">
+        </apex:actionFunction>
+        <apex:pageBlock title="Quotes" Id="pbId">
+            <apex:inputHidden value="{!syncQuoteId}" id="hidQuoteId"/>
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="New Quote" action="{!newQuote}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!lstQuote}" var="quote">
+                <apex:column headerValue="Action">
+                    <apex:outputLink value="/{!quote.Id}/e?retURL=/{!quote.Id}&cancelURL=/{!Opportunity.Id}" target="_parent">Edit</apex:outputLink>&nbsp; | &nbsp;
+                    <apex:commandLink value="Del" action="{!deleteQuote}" reRender="pbId" status="splashStatus" oncomplete="refreshPage('{!Opportunity.Id}');">
+                        <apex:param value="{!quote.Id}" name="quoteId" assignTo="{!deleteQuoteId}"/>
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column headerValue="Quote Number">
+                    <apex:outputLink value="/{!quote.Id}" target="_parent">{!quote.QuoteNumber}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Name">
+                    <apex:outputLink value="/{!quote.Id}" target="_parent">{!quote.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Is Primary?" style="text-align:center;" headerClass="alignCenter">
+                    <apex:inputCheckbox disabled="true" rendered="{!quote.Id == Opportunity.Sync_Quote__c}" value="{!quote.Id == Opportunity.Sync_Quote__c}"></apex:inputCheckbox>
+                    <apex:inputCheckbox onclick="makeQuotePrimary('{!quote.Id}', this);" rendered="{!quote.Id != Opportunity.Sync_Quote__c}" ></apex:inputCheckbox>
+                </apex:column>
+                <apex:column value="{!quote.Is_Locked__c}" style="text-align:center;" headerClass="alignCenter"/>
+                <apex:column value="{!quote.Total_Base_Bid_Total__c}" headerValue="Total Base Bid" style="text-align:right;" headerClass="alignRight"/>
+                <apex:column value="{!quote.Total_Project_Margin__c}" style="text-align:right;" headerClass="alignRight"/>
+                <apex:column value="{!quote.Total_Project_Margin_Percentage__c}" style="text-align:right;" headerClass="alignRight"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

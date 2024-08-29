@@ -1,0 +1,169 @@
+<apex:page docType="html-5.0" sidebar="false" showHeader="false" controller="GoalChartController" lightningStylesheets="true" action="{!loadActivityGoalChart}">
+	<apex:form id="theForm">
+	<apex:includeLightning />
+
+	<script>
+		// Load the MessageChannel token in a variable
+	   var lmsDemoChannel = "{!$MessageChannel.SelectedUser__c}";
+	   var subscriptionToMC = null;
+	   function subscribeMC() {
+		   console.log('on subcriptoin vf');
+		   if (!subscriptionToMC) {
+			   subscriptionToMC = sforce.one.subscribe(lmsDemoChannel, onNewUserSelected);
+		   }
+	   }
+
+	   function onNewUserSelected(message) {
+		   var publishedData = message;
+		   var newSelectedUserId = publishedData.newUserId;
+		   var newSelectedUserName = publishedData.newUserName;
+		   if (newSelectedUserId) {
+			   console.log('found new user Id in vf page rev='+newSelectedUserId);
+			   // refresh data with new userId
+			   refreshActvChartNumber(newSelectedUserId, newSelectedUserName);
+		   }
+
+	   } 
+
+	   	window.onload=function() {        
+			subscribeMC();
+    	};
+   </script>
+
+	<style>
+		/* For Styling of Apex Page message */
+		.msgIcon {
+			display: none!important
+		}
+		.customMessage * {
+			color: #fff!important;
+			
+			font-weight: 400;
+		}
+		.customMessage {
+			margin: 5px 0!important;
+			max-width: 1280px;
+			opacity: 1!important;
+			width: 100%;
+			font-size: 20px;
+			border: 0px;
+			padding-left: 10px;
+		}
+		.message {
+			opacity:1;
+			font-size: 20px;
+			font-weight: 400;
+		}
+		.column {
+			float: left;
+			width: 50%;
+			/* Should be removed. Only for demonstration */
+		}
+
+		/* Clear floats after the columns */
+		.row:after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+
+		table {
+			margin: auto !important;
+		}
+	</style>
+	<html>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	
+
+	<script>
+		$(document).ready(function(){
+				overridePageMessages();
+			});
+
+		function overridePageMessages(){
+			var textureEffect = '';
+			//Uncomment below line for texture effect on page messages
+			//textureEffect = 'slds-theme--alert-texture';
+
+			$('.warningM3').addClass('slds-notify slds-notify--toast slds-theme--warning customMessage '+textureEffect);
+			$('.errorM3').addClass('slds-notify slds-notify--alert slds-theme--error customMessage '+textureEffect);
+
+			$('.errorM3').removeClass('errorM3');
+			$('.warningM3').removeClass('warningM3');
+		}
+
+		function numFormatter(num) {
+			if(num > 999 && num < 1000000){
+				return (num/1000).toFixed(0) + 'K'; // convert to K for number from > 1000 < 1 million 
+			}else if(num > 1000000){
+				return (num/1000000).toFixed(1) + 'M'; // convert to M for number from > 1 million 
+			}else if(num < 900){
+				return num.toString(); // if value < 1000, nothing to do
+			} else if (num = 1000000) {
+			return '1.0M';
+			} 
+		}
+
+		function drawChart() {
+			// activity goal chart
+			var data = google.visualization.arrayToDataTable([
+				['Label', 'Value'],
+				['', {!activityChart.chartActualInInteger}]
+			]);
+
+			var actvityMajorActivityEachValue = ({!activityChart.chartTotalInteger} / 5).toFixed(0);
+
+			var options = {
+				width: 200, height: 200,
+				yellowColor:'#FFB03B',
+				redColor:'#E16032',
+				greenColor:'#54A77B',
+				redFrom: 0, redTo: {!activityChart.chartTotalInteger}/3,
+				yellowFrom:{!activityChart.chartTotalInteger}/3, yellowTo:({!activityChart.chartTotalInteger}/3) + ({!activityChart.chartTotalInteger}/3),
+				greenFrom:({!activityChart.chartTotalInteger}/3) + ({!activityChart.chartTotalInteger}/3), greenTo:{!activityChart.chartTotalInteger},
+				minorTicks: 0,
+				majorTicks: ['0',
+								actvityMajorActivityEachValue,
+								(actvityMajorActivityEachValue*2),
+								(actvityMajorActivityEachValue*3),
+								(actvityMajorActivityEachValue*4),
+								({!activityChart.chartTotalInteger}) ],
+				max: {!activityChart.chartTotalInteger},
+				forceIFrame:false,
+				animation:{
+					duration: 1000,
+					easing: 'in',
+					startup: true
+				},
+			};
+
+			var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+			chart.draw(data, options);
+		}
+
+	</script>
+
+		<body>
+			<script>
+				google.charts.load('current', {'packages':['gauge']});
+				google.charts.setOnLoadCallback(drawChart);
+			</script>
+				
+					<apex:actionFunction action="{!loadActivityGoalChart}" name="refreshActvChartNumber" reRender="theForm,chart" oncomplete="drawChart();">
+						<apex:param name="selectedUserId" value="" assignTo="{!selectedUserId}"/>
+						<apex:param name="selectedUserName" value="" assignTo="{!selectedUserName}"/>
+					</apex:actionFunction> 
+					<apex:outputPanel id="chart" rendered="{!!isError}">
+						<div class="row" >
+							<div class="column" ></div>
+							<div id="myChart" class="column" style="text-align: -webkit-center;width: 100%;">
+								<div id="preview-textfield" style="font-size: large;"></div>
+								<div id="chart_div" ></div>
+							</div>
+						</div>
+					</apex:outputPanel>
+					<apex:pagemessages />
+		</body>
+	</html>
+ </apex:form>	
+</apex:page>

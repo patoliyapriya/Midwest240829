@@ -1,0 +1,29 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-19-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-border_top slds-p-around_small footerbg slds-text-heading_small" style="border-bottom-left-radius: 10px !important; border-bottom-right-radius: 10px !important;" data-footer={subGroupId}>
+      <table>    
+        <tr>
+            <td style="width:62%;"></td>
+            <td if:false={isMarrs} class="alignmentTable2">{label.totalExtendedCost} :&nbsp;
+                <lightning-formatted-number value={subGroupWrapper.subGroupExtendedCost}
+                                        format-style="currency" 
+                                        currency-code="USD">
+                </lightning-formatted-number>
+            </td>
+            <td>{label.total} : &nbsp; 
+                <lightning-formatted-number value={subGroupWrapper.subGroupTotal}
+                                        format-style="currency"
+                                        currency-code="USD">
+                </lightning-formatted-number>
+            </td>
+            <td style="width:8%;"></td>
+        </tr>          
+        </table>
+    </div>
+</template>

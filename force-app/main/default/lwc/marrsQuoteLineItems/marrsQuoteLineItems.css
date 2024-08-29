@@ -1,0 +1,41 @@
+.edit-icon {
+    display: none;
+}
+
+.slds-cell-edit:hover .edit-icon {
+    display: inline-block;
+}
+
+.tableWidth {
+    width:60px;
+}
+
+td {
+    padding-left: 6px !important;
+    padding-right: 3px !important;
+}
+
+.wrapText {
+    text-wrap: balance;
+}
+
+th {
+    padding-left: 5px !important;
+}
+
+.decriptionRow{
+    min-height: 1.8rem;
+    display: block;
+}
+
+.displayBlock {
+    display: block;
+}
+
+.displayNone {
+    display: none;
+}
+
+.slds-table tbody tr[draggable="true"] {
+    cursor: move;
+}

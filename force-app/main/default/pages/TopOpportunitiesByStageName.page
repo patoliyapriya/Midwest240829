@@ -1,0 +1,270 @@
+<apex:page controller="ShowAllOpportunity" lightningStylesheets="true" sidebar="false" docType="html-5.0">
+    <script>  
+        function startSplash() {
+            var divObj = document.getElementById('divLoading');
+            divObj.style.display = 'block';
+        }
+
+        function endSplash() {
+            document.getElementById('divLoading').style.display = 'none';
+        }
+
+    </script>
+    <apex:slds />
+    <apex:form id="formId">
+        <!-- Loading records when click on button spinner -->
+        <div id="divLoading" style="display: none;">
+            <div class="demo-only" style="height:100%">
+                <div class="slds-spinner_container" style="position: fixed;">
+                    <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); " />
+
+        <!-- standard icon and title-->
+        <div class="slds-media slds-no-space slds-grow" style="padding-left:2px">
+            <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-opportunity">
+                    <svg aria-hidden="true" class="slds-icon slds-icon--medium">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#opportunity">
+                        </use>
+                    </svg>
+                </span>
+            </div>
+            <div class="slds-media__body">
+                <p class="slds-text-title_caps slds-line-height_reset">Opportunity</p>
+                <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate">
+                    All {!stageName} Opportunities</h1>
+            </div>
+
+            <div align="right">
+                <apex:commandButton styleClass="slds-button slds-button_brand" value="First" action="{!first}" 
+                    status="splashStatus" reRender="formId"/>
+                <apex:commandButton styleClass="slds-button slds-button_brand" value="Previous" action="{!previous}" 
+                    status="splashStatus" disabled="{! !hasPrevious}" reRender="formId"/>
+                <apex:commandButton styleClass="slds-button slds-button_brand" value="Next" action="{!next}" status="splashStatus" 
+                    disabled="{! !hasNext}" reRender="formId"/>
+                <apex:commandButton styleClass="slds-button slds-button_brand" value="Last" action="{!last}" status="splashStatus" 
+                  reRender="formId"/>
+            </div>
+        </div>
+
+        <!-- </apex:pageBlock> -->
+        <apex:outputPanel id="pnlAllOpportunity" >
+            <!-- class="slds-table slds-table_header-fixed slds-table_bordered slds-table_edit slds-table_resizable-cols -->
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered"
+                aria-labelledby="element-with-table-label other-element-with-table-label"
+                style="margin-top:10px; table-layout:fixed;">
+                <!--  position:relative;  border: 3px solid #73AD21;  -->
+                <thead>
+                    <tr class="slds-line-height_reset" >
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="OPP NUMBER">OPP NUMBER
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="OPPORTUNITY NAME">OPPORTUNITY NAME
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="OWNER">OWNER
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="SE MARGIN">SE MARGIN
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="SE REVENUE">SE REVENUE
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="SE PRJCT. MARGIN">SE PRJCT. MARGIN
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="SE PRJCT. REVENUE">SE PRJCT. REVENUE
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="EST. CLOSE DATE">EST. CLOSE DATE
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="EST. SHIP DATE">EST. SHIP DATE
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="PROB % ">PROB %
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="BIDDERS ">BIDDERS
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="DESCRIPTION">DESCRIPTION
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="LAST CHATTER ACTION">LAST CHATTER ACTION
+                                <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                </span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <apex:repeat value="{!opportunity}" var="opp">
+                        <tr class="slds-hint-parent">
+                            <th data-label="OPP NUMBER" scope="row">
+                                <div class="slds-truncate" title="{!opp.Opportunity.Opportunity_Number__c}">
+                                    <a href="/{!opp.Opportunity.Id}" target="_blank" tabindex="-1">
+                                        {!opp.Opportunity.Opportunity_Number__c}</a>
+                                </div>
+                            </th>
+
+                            <th data-label="OPPORTUNITY NAME" scope="row">
+                                <div class="slds-truncate" title="{!opp.Opportunity.Name}">
+                                    <apex:outputField value="{!opp.Opportunity.Name}" />
+                                </div>
+                            </th>
+
+                            <th data-label="OWNER" scope="row">
+                                <div class="slds-truncate" title="{!opp.Opportunity.Owner.Name}">
+                                    <apex:outputField value="{!opp.Opportunity.Owner.Name}" />
+                                </div>
+                            </th>
+
+                            <th data-label="SE MARGIN" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputText value="{0,number,currency}">
+                                        <apex:param value="{!opp.margin}" />
+                                    </apex:outputText>
+                                </div>
+                            </th>
+
+                            <th data-label="SE REVENUE" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputText value="{0,number,currency}">
+                                        <apex:param value="{!opp.revenue}" />
+                                    </apex:outputText>
+                                </div>
+                            </th>
+
+                            <th data-label="SE PRJCT. MARGIN" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" />
+                                </div>
+                            </th>
+
+                            <th data-label="SE PRJCT. REVENUE" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" />
+                                </div>
+                            </th>
+
+                            <th data-label="EST. CLOSE DATE" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputText value="{0,date,MM/dd/yy}">
+                                        <apex:param value="{!opp.Opportunity.CloseDate}" />
+                                    </apex:outputText>
+                                </div>
+                            </th>
+
+                            <th data-label="EST. SHIP DATE" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputText value="{0,date,MM/dd/yy}">
+                                        <apex:param value="{!opp.Opportunity.Ship_Date__c}" />
+                                    </apex:outputText>
+                                </div>
+                            </th>
+
+                            <th data-label="PROB %" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputField value="{!opp.Opportunity.Probability}" />
+                                </div>
+                            </th>
+
+                            <th data-label="BIDDERS" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputField value="{!opp.Opportunity.Bidders__c}" />
+                                </div>
+                            </th>
+                            <th data-label="DESCRIPTION" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputField value="{!opp.Opportunity.Description}" />
+                                </div>
+                            </th>
+                            <th data-label="LAST CHATTER ACTION" scope="row">
+                                <div class="slds-truncate">
+                                    <apex:outputText value="{!opp.lastChatterAction}" />
+                                </div>
+                            </th>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,88 @@
+<apex:page standardController="Quote" sidebar="false" extensions="CustomQuoteLineItemCotroller" id="pageId">
+	<script>
+		var lastFocused = null;
+		function setFocusQuantity(){
+			//var ele = document.getElementById('pageId:formId:pbId:pbTable:0:txtQuantity');
+			var ele = document.getElementById(lastFocused.id);
+			if(ele != null){
+				ele.focus();
+				ele.select();
+			}
+			else{
+				ele = document.getElementById('pageId:formId:pbId:pbTable:0:txtQuantity');
+				ele.focus();
+				ele.select();
+			}
+		}
+	</script>
+	<apex:form id="formId">
+		<apex:actionFunction name="CalculateSalesPrice" action="{!CalculateSalesPrice}" reRender="pnl" status="counterStatus" oncomplete="setFocusQuantity();"/>
+		<apex:sectionHeader title="Edit Quote Line Items for" subtitle="{!Quote.Name}"/>
+		<apex:pageBlock id="pbId">
+			<apex:pageBlockButtons >
+				<!-- <apex:commandButton value="Calculate Sales Price" action="{!CalculateSalesPrice}" reRender="pnl" />  -->
+				<apex:commandButton value="Save" action="{!UpdateLineItems}" onkeydown="if(event.keyCode==13){this.blur();actionFunction();}"/>
+				<apex:commandButton value="Cancel" action="{!Cancel}" onkeydown="if(event.keyCode==13){this.blur();actionFunction();}"/>
+			</apex:pageBlockButtons>
+			<apex:outputPanel id="pnl">
+				<apex:pageBlockTable value="{!Quote.QuoteLineItems}" var="lineItem" id="pbTable">
+					<apex:column headerValue="Product">
+						<apex:outputText value="{!lineItem.Product2.Name}" />
+					</apex:column>
+					<apex:column headerValue="Product Code">
+						<apex:outputText value="{!lineItem.Product2.ProductCode}" />
+					</apex:column>
+					<apex:column headerValue="Quantity">
+						<apex:inputText value="{!lineItem.Quantity}" id="txtQuantity" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();}" />
+					</apex:column>
+					<apex:column headerValue="List Price">
+						<apex:outputText value="{!lineItem.ListPrice}" />
+					</apex:column>
+					<apex:column headerValue="Multiplier">
+						<apex:inputText value="{!lineItem.Multiplier__c}" id="txtMultiplier" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();actionFunction();}"/>
+					</apex:column>
+					<apex:column headerValue="Freight">
+						<apex:inputText value="{!lineItem.Freight__c}" id="txtFreight" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();actionFunction();}"/>
+					</apex:column>
+					<apex:column headerValue="Margin Percentage">
+						<apex:inputText value="{!lineItem.Margin_Percentage__c}" id="txtPercentage" onkeydown="if(event.keyCode==13){lastFocused=this;CalculateSalesPrice();this.blur();actionFunction();}"/>
+					</apex:column>
+					<apex:column headerValue="Sales Price">
+						<apex:outputField value="{!lineItem.UnitPrice}" />
+					</apex:column>
+					<apex:column headerValue="Total Price">
+						<apex:outputField value="{!lineItem.Total_Price__c}" />
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:outputPanel>
+			<!-- <apex:outputPanel id="pnl">
+				<table style="width: 100%;" cellspacing="15">
+					<tr>
+						<td>Product</td>
+						<td>Product Code</td>
+						<td>Quantity  </td>
+						<td>List Price</td>
+						<td>Multiplier</td>
+						<td>Freight</td> 
+						<td>Margin Percentage</td>
+						<td>Sales Price</td>
+						<td>Total Price</td> 
+					</tr>
+					<apex:repeat value="{!Quote.QuoteLineItems}" var="lineItem" >
+						<tr>
+							<td style="font-weight: bold;"><apex:outputText value="{!lineItem.Product2.Name}" /></td>
+							<td style="font-weight: bold;"><apex:outputText value="{!lineItem.Product2.ProductCode}" /></td>
+							<td><apex:inputText value="{!lineItem.Quantity}" onblur="CalculateSalesPrice()"/></td>
+							<td style="font-weight: bold;"><apex:outputText value="{!lineItem.ListPrice}" /></td>
+							<td><apex:inputText value="{!lineItem.Multiplier__c}" onblur="CalculateSalesPrice()"/></td>
+							<td><apex:inputText value="{!lineItem.Freight__c}" onblur="CalculateSalesPrice()"/></td>
+							<td><apex:inputText value="{!lineItem.Margin_Percentage__c}" onblur="CalculateSalesPrice()"/></td>
+							<td><apex:outputField value="{!lineItem.UnitPrice}" /></td>
+							<td><apex:outputField value="{!lineItem.Total_Price__c}" /></td>
+						</tr>
+					</apex:repeat>
+				</table>
+			</apex:outputPanel> -->
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

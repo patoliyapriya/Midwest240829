@@ -1,0 +1,161 @@
+<apex:page >
+    <head>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/themes/smoothness/jquery-ui.css" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+            $(function () {
+                $("#tblLocations").sortable({
+                    items: 'tr:not(tr:first-child)',
+                    cursor: 'pointer',
+                    axis: 'y',
+                    dropOnEmpty: false,
+                    start: function (e, ui) {
+                        ui.item.addClass("selected");
+                    },
+                    stop: function (e, ui) {
+                        ui.item.removeClass("selected");
+                        $(this).find("tr").each(function (index) {
+                            if (index > 0) {
+                                $(this).find("td").eq(2).html(index);
+                            }
+                        });
+                    }
+                });
+            });
+
+            $( function() {
+                $( ".column" ).sortable({
+                connectWith: ".column",
+                handle: ".portlet-header",
+                cancel: ".portlet-toggle",
+                placeholder: "portlet-placeholder ui-corner-all"
+                });
+            
+                $( ".portlet" )
+                .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
+                .find( ".portlet-header" )
+                    .addClass( "ui-widget-header ui-corner-all" )
+                    .prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+            
+                $( ".portlet-toggle" ).on( "click", function() {
+                var icon = $( this );
+                icon.toggleClass( "ui-icon-minusthick ui-icon-plusthick" );
+                icon.closest( ".portlet" ).find( ".portlet-content" ).toggle();
+                });
+            } );
+        </script>
+        <style type="text/css">
+            table th, table td
+            {
+                width: 100px;
+                padding: 5px;
+                border: 1px solid #ccc;
+            }
+            .selected
+            {
+                background-color: #666;
+                color: #fff;
+            }
+            .column {
+                width: 170px;
+                float: left;
+                padding-bottom: 100px;
+            }
+            .portlet {
+                margin: 0 1em 1em 0;
+                padding: 0.3em;
+            }
+            .portlet-header {
+                padding: 0.2em 0.3em;
+                margin-bottom: 0.5em;
+                position: relative;
+            }
+            .portlet-toggle {
+                position: absolute;
+                top: 50%;
+                right: 0;
+                margin-top: -8px;
+            }
+            .portlet-content {
+                padding: 0.4em;
+            }
+            .portlet-placeholder {
+                border: 1px dotted black;
+                margin: 0 1em 1em 0;
+                height: 50px;
+            }
+        </style>
+    </head>
+    <body>
+        
+ 
+        <div class="column">
+ 
+            <div class="portlet">
+              <div class="portlet-header">Feeds</div>
+              <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+            </div>
+           
+            <div class="portlet">
+              <div class="portlet-header">News</div>
+              <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+            </div>
+           
+        </div>
+           
+            
+        <table id="tblLocations" cellpadding="0" cellspacing="0" border="1">
+            <tr>
+                <th>ID </th>
+                <th>Location</th>
+                <th>Preference</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td> Goa</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Mahabaleshwar</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Kerala</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Kashmir</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Ooty</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Simla</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Manali</td>
+                <td>7</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Darjeeling</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Nanital</td>
+                <td>9</td>
+            </tr>
+        </table>
+    </body>
+</apex:page>

@@ -1,0 +1,2 @@
+<apex:page standardController="Quote" extensions="SyncQuoteBackToOpportunityController" action="{!syncBackToOpportunity}">
+</apex:page>

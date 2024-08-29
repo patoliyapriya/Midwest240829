@@ -1,0 +1,179 @@
+<apex:page standardController="AcctSeedERP__Shipment__c" extensions="PackingPdfController" applyHtmlTag="false" showHeader="false" applyBodyTag="false" renderAs="pdf">
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                margin: 1cm;
+                margin-bottom: 2.5cm;
+
+                @bottom-center {
+                    content: element(footer);
+                }
+            }
+
+            div.footer {
+                display: block;
+                position: running(footer);
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+        </style>
+    </head>
+    <body style="font-family:Arial,sans-serif;font-size:14px;">
+        <table>
+            <tr>
+                <td style="width: 55%;">
+                    Midwest Machinery <br/>
+                    17814 Edison Avenue <br/>
+                    Chesterfield, MO 63005 <br/>
+                    US
+                </td>
+                <td style="width: 45%;text-align: right">
+                    <apex:outputField value="{!AcctSeedERP__Shipment__c.AcctSeedERP__Packing_Slip_Format__r.AcctSeed__Image__c}" 
+                                    rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Packing_Slip_Format__r.AcctSeed__Image__c)}" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%; font-weight: bold;">Bill To:</td>
+                            <td style="width: 50%; font-weight: bold;">Ship To:</td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: top;">
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_Street__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_Street__c}<br/>
+                                </apex:outputText> 
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_City__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_City__c}<br/>
+                                </apex:outputText>                                
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_State__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_State__c}<br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_PostalCode__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Billing_PostalCode__c}<br/>
+                                </apex:outputText>
+                            </td>
+                            <td style="vertical-align: top;">
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Customer__r.Name)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Customer__r.Name} <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_Street__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_Street__c} <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_City__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_City__c} <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_State__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_State__c} <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_PostalCode__c)}">
+                                    {!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.AcctSeedERP__Shipping_PostalCode__c} <br/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table cellspacing="5">
+                        <tr>
+                            <td style="width: 50%;">Shipment Number</td>
+                            <td style="text-align: right;">{!AcctSeedERP__Shipment__c.Name}</td>
+                        </tr>
+                        <tr>
+                            <td>Shipment Date</td>
+                            <td style="text-align: right;">
+                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                    <apex:param value="{!AcctSeedERP__Shipment__c.AcctSeedERP__Shipment_Date__c}" />
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Shipment Carrier</td>
+                            <td style="text-align: right;">{!AcctSeedERP__Shipment__c.AcctSeedERP__Carrier__r.Name}</td>
+                        </tr>
+                        <tr>
+                            <td>Shipment Reference</td>
+                            <td style="text-align: right;">{!AcctSeedERP__Shipment__c.AcctSeedERP__Shipping_Reference__c}</td>
+                        </tr>
+                        <tr>
+                            <td>Customer PO#</td>
+                            <td style="text-align: right;">{!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.Customer_PO_Number__c}</td>
+                        </tr>
+                        <tr>
+                            <td>Sales Order#</td>
+                            <td style="text-align: right;">
+                                {!IF(AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.Sales_Order_Number__c == '', AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.Name, AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.Sales_Order_Number__c)}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Freight Terms</td>
+                            <td style="text-align: right;">{!AcctSeedERP__Shipment__c.AcctSeedERP__Sales_Order__r.Freight_Terms__c}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table style="width: 100%; margin-top: 20px;" cellspacing="0" cellpadding="5">
+                        <tr style="background-color:#e4e2e2;">
+                            <td style="width: 25%;">Product</td>
+                            <td style="width: 25%;">Description</td>
+                            <td style="width: 20%;">Comment</td>
+                            <td style="width: 15%;">Ordered</td>
+                            <td style="width: 15%;">Shipped</td>
+                        </tr>
+                        <apex:repeat value="{!lstShipmentLineItems}" var="lineItem">
+                            <tr>
+                                <td>{!lineItem.AcctSeedERP__Product__c}</td>
+                                <td>
+                                    <apex:outputText value="{!lineItem.AcctSeedERP__Sales_Order_Line__r.Quote_Line_Item__r.Descriptions__c}" escape="false"/>
+                                </td>
+                                <td>{!lineItem.AcctSeedERP__Sales_Order_Line__r.AcctSeedERP__Comment__c}</td>
+                                <td>
+                                    <apex:outputText value="{0, number, ###,###,###,###,##0.00}">
+                                        <apex:param value="{!lineItem.AcctSeedERP__Sales_Order_Line__r.AcctSeedERP__Quantity_Ordered__c}"/>
+                                    </apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0, number, ###,###,###,###,##0.00}">
+                                        <apex:param value="{!lineItem.AcctSeedERP__Quantity_Shipped__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    <div class="footer">
+        <div style="font-family:Arial,sans-serif;font-size:10px;text-align:right;">
+            <table style="width: 100%; text-align: right;" cellspacing="5">
+                <tr>
+                    <td style="width: 75%;">
+                        Customer Signature
+                    </td>
+                    <td style="border-bottom: 1px solid black"></td>
+                </tr>
+                <tr>
+                    <td>
+                        Date of Pick up
+                    </td>
+                    <td style="border-bottom: 1px solid black">
+                    </td>
+                </tr>
+            </table>
+            <div style="margin-top: 10px;">
+                Page <span class="pagenumber" /> of
+                <span class="pagecount" />
+            </div>
+        </div>
+    </div>
+</apex:page>

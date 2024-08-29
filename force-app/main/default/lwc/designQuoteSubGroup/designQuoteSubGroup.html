@@ -1,0 +1,21 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-19-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right slds-m-around_medium">
+        <c-design-quote-sub-group-header sub-group-wrapper={subGroupHeader}
+                                        ontogglechange={handleToggleChange}
+                                        onaccordion={handleAccordianChange}>
+        </c-design-quote-sub-group-header>
+        <c-design-quote-line-items line-item-wrapper={subGroupHeader.lineItemDetails} 
+                                  lwc:if={subGroupHeader.isOpen}
+                                  ontogglechange={handleLineItemToggle}>
+        </c-design-quote-line-items>
+        <c-design-quote-sub-group-footer sub-group-wrapper={subGroupHeader}
+                                         onfootertogglechange={handleFooterToggle}></c-design-quote-sub-group-footer>
+    </div>
+</template>

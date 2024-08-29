@@ -1,0 +1,48 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-26-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="headerbg slds-p-left_x-small slds-p-top_small slds-p-bottom_x-large">
+        <div class="slds-float_left slds-text-color_inverse slds-text-heading_small">
+            {groupDetails.groupName}
+        </div>
+        <div class="slds-float_right slds-p-center_small">
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto">
+                    <label class="slds-checkbox_toggle slds-grid">
+                        <span class="slds-form-element__label labelcolor">
+                            {label.pageBreakAfterGroup}
+                        </span>
+                <lightning-input type="toggle" 
+                                name="pageBreak" 
+                                message-toggle-inactive="" 
+                                message-toggle-active=""
+                                checked={groupDetails.pageBreak}
+                                onchange={handleChange}>
+                        </lightning-input>
+                    </label>
+                </lightning-layout-item>
+                <lightning-layout-item flexibility="auto">
+                    <div class="slds-text-align_center slds-p-left_x-large slds-p-right_large">
+                        <lightning-button-icon icon-name="utility:chevrondown" 
+                                            size="large"
+                                            variant="bare" 
+                                            onclick={handleAccordion} 
+                                            if:true={groupDetails.isOpen}>
+                        </lightning-button-icon>
+                        <lightning-button-icon icon-name="utility:chevronright" 
+                                            size="large"
+                                            variant="bare" 
+                                            onclick={handleAccordion} 
+                                            if:false={groupDetails.isOpen}>
+                        </lightning-button-icon>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,36 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-16-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="slds-border_top slds-p-around_small footerbg slds-text-heading_small" data-footer={groupId}>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_4-of-12" if:false={isMarrs}>
+                {label.totalHours} :&nbsp;{groupWrapper.totalHours}
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-text-align_center" if:false={isMarrs}>
+                {label.totalExtendedCost} :&nbsp; 
+                <lightning-formatted-number value={groupWrapper.groupExtendedCost}
+                                        format-style="currency" 
+                                        currency-code="USD">
+                </lightning-formatted-number>
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-text-align_left" 
+                if:true={isMarrs}>
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-text-align_center" 
+                if:true={isMarrs}>
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                {label.total} :&nbsp; 
+                <lightning-formatted-number value={groupWrapper.groupTotal} 
+                                        format-style="currency"
+                                        currency-code="USD">
+                </lightning-formatted-number>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,1160 @@
+<apex:page standardController="Quote" extensions="AddQuoteLineItemsController" sidebar="false" id="pageId">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style>
+        
+        .deleteButton{
+            background-color: red !important;
+            color:white !important;
+        }
+        
+        /* Define the hover highlight color for the table row */
+        .hoverTable tr:hover {
+            //background-color: #F2F2F2;
+            //cursor:pointer;
+        }
+
+        .parentDisable{
+                position:fixed;
+                top:0;
+                left:0;
+                background:#000;
+                opacity:0.5; 
+                height:100%;
+                width:100%; 
+                }
+        .button { 
+            background: url('{!$Resource.LoadingButton}') no-repeat left top; 
+            width:335px; 
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 45%;
+            left: 45%;
+            
+        }
+        
+        .descPopup{
+            width:500px;
+            position:fixed;
+            border: 0px;
+            top: 35%;
+            left: 45%;
+        }
+        
+        .descProductPopup{
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 10%;
+            left: 15%;
+        }
+        
+        .circle {
+            
+            width:22px;
+            height:22px;
+            float:left;
+            margin-bottom:18px;
+            margin-top:18px;
+            margin-left: 55px;
+        }
+                
+        .txt {
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+            font-size:13px;
+            color:#000000;
+            line-height:20px;
+            margin-left:15px;
+            margin-bottom:18px;
+            margin-top:18px;
+            width: 200px;
+            font-weight: bold;
+            float: left;
+        }   
+        
+        .error {
+          border:3px solid red;
+        }
+
+        .selected {
+            background-color: brown;
+            color: #FFF;
+        }
+        
+    </style>
+    
+    <script>
+        
+        function groupAlternate(groupIndex, ele) {
+            markGroupAlternate(groupIndex, ele.checked);
+            calculateTotals();
+            calculateGrandTotalsExtendedCostAndBaseBid();
+        }
+
+        function subGroupAlternate(groupIndex, subGroupIndex, ele) {
+            markSubGroupAlternate(groupIndex, subGroupIndex, ele.checked);
+
+            let hasAllSubGroupAlternateChecked = isAllSubGroupAlternateChecked(groupIndex);
+
+            applyAlternateStyleSheetToGroup(groupIndex, hasAllSubGroupAlternateChecked);
+
+            calculateTotals();
+            calculateGrandTotalsExtendedCostAndBaseBid();
+        }
+
+        function lineItemAlternate(groupIndex, subGroupIndex, rowIndex, ele) {
+
+            markLineItemAlternate(groupIndex, subGroupIndex, (rowIndex - 1), ele.checked);
+
+            let hasAllLineItemAlternateChecked = isAllLineItemAlternateChecked(groupIndex, subGroupIndex);
+            
+            applyAlternateStyleSheetToSubGroup(groupIndex, subGroupIndex, hasAllLineItemAlternateChecked);
+
+            let hasAllSubGroupAlternateChecked = isAllSubGroupAlternateChecked(groupIndex);
+
+            applyAlternateStyleSheetToGroup(groupIndex, hasAllSubGroupAlternateChecked);
+
+            calculateTotals();
+            calculateGrandTotalsExtendedCostAndBaseBid();
+
+        }
+
+        function markGroupAlternate(groupIndex, isAlternate) {
+            
+            for(var i=0, iLen=-1; i>iLen; i++) {
+
+                var checkAlternateSubGroupId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':rptProductSubGroup:' + i +':subGroupAlternate';
+                var checkAlternateSubGroup = document.getElementById(checkAlternateSubGroupId);
+
+                if(checkAlternateSubGroup == null) {
+                    break;
+                }
+
+                markSubGroupAlternate(groupIndex, i, isAlternate);
+
+            }
+
+        }
+
+        function markSubGroupAlternate(groupIndex, subGroupIndex, isAlternate) {
+            
+            applyAlternateStyleSheetToSubGroup(groupIndex, subGroupIndex, isAlternate);
+
+            for(var i=0, iLen=-1; i>iLen; i++) {
+
+                var checkAlternateLineItemId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':rptProductSubGroup:' + subGroupIndex + ':rptProductSelected:' + i + ':checkAlternateQL';
+                var checkAlternateLineItem = document.getElementById(checkAlternateLineItemId);
+
+                if(checkAlternateLineItem == null) {
+                    break;
+                }
+                
+                markLineItemAlternate(groupIndex, subGroupIndex, i, isAlternate);
+            }
+
+        }
+
+        function markLineItemAlternate(groupIndex, subGroupIndex, rowIndex, isAlternate) {
+            
+            var checkAlternateLineItemId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':rptProductSubGroup:' + subGroupIndex + ':rptProductSelected:' + rowIndex + ':checkAlternateQL';
+            var checkAlternateLineItem = document.getElementById(checkAlternateLineItemId);
+
+            if(isAlternate) {
+                checkAlternateLineItem.checked = true;
+                document.getElementById('quoteLineItemRow' + groupIndex + subGroupIndex + rowIndex).style.backgroundColor = 'red';
+            } else {
+                checkAlternateLineItem.checked = false;
+                document.getElementById('quoteLineItemRow' + groupIndex + subGroupIndex + rowIndex).style.backgroundColor = '#fff';
+            }
+            CalculatePrice(groupIndex, subGroupIndex, (rowIndex+1));
+        }
+
+        function isAllSubGroupAlternateChecked(groupIndex) {
+
+            var isAllChecked = true;
+
+            for(var i=0, iLen=-1; i>iLen; i++) {
+
+                var checkAlternateSubGroupId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':rptProductSubGroup:' + i + ':subGroupAlternate';
+                var checkAlternateSubGroup = document.getElementById(checkAlternateSubGroupId);
+
+                if(checkAlternateSubGroup == null) {
+                    break;
+                }
+                if(!checkAlternateSubGroup.checked) {
+                    isAllChecked = false;
+                    break;
+                } 
+            }
+
+            return isAllChecked;
+        }
+
+        function isAllLineItemAlternateChecked(groupIndex, subGroupIndex) {   
+            
+            var isAllChecked = true;
+
+            for(var i=0, iLen=-1; i>iLen; i++) {
+                
+                var checkAlternateLineItemId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':rptProductSubGroup:' + subGroupIndex + ':rptProductSelected:' + i + ':checkAlternateQL';
+                var checkAlternateLineItem = document.getElementById(checkAlternateLineItemId);
+
+                if(checkAlternateLineItem == null) {
+                    break;
+                }
+                if(!checkAlternateLineItem.checked) {
+                    isAllChecked = false;
+                    break;
+                } 
+            }
+
+            return isAllChecked;
+        }
+
+        function applyAlternateStyleSheetToGroup(groupIndex, isAlternate) {
+            var checkGroupAlternateId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':parentGroupCheckBox'; 
+            var checkGroupAlternate = document.getElementById(checkGroupAlternateId);
+            checkGroupAlternate.checked = isAlternate;
+        }
+        
+        function applyAlternateStyleSheetToSubGroup(groupIndex, subGroupIndex, isAlternate) {
+
+            var checkAlternateSubGroupId = 'pageId:formId:pbSelectedProducts:rptSelectedProductsGroup:' + groupIndex + ':rptProductSubGroup:' + subGroupIndex +':subGroupAlternate';
+                
+            var checkAlternateSubGroup = document.getElementById(checkAlternateSubGroupId);
+
+            if(isAlternate) {
+                checkAlternateSubGroup.checked = true;
+                document.getElementById('subGroupRow' + groupIndex + subGroupIndex).style.backgroundColor = 'red';
+                document.getElementById('subGroupTotalRow' + groupIndex + subGroupIndex).style.backgroundColor = "red";
+
+            } else {
+                checkAlternateSubGroup.checked = false;
+                document.getElementById('subGroupRow' + groupIndex + subGroupIndex).style.backgroundColor = "#F2F2F2";
+                document.getElementById('subGroupTotalRow' + groupIndex + subGroupIndex).style.backgroundColor = "#F2F2F2";
+            }
+        }
+        
+    </script>
+    
+    <apex:form id="formId">
+        <apex:includeScript value="{!$Resource.Quote_Calculations}" />
+        <apex:actionFunction name="quickSaveMoveLineItemActionFunction" action="{!quickSave}" status="splashStatus" reRender="pbsSelectedProducts,pnlHidden,pnlMoveLineItems" oncomplete="return OpenMoveLineItemPopup();"/>
+        <apex:actionFunction name="quickSaveActionFunction" action="{!quickSave}" status="splashStatus" reRender="pbsSelectedProducts" />
+        <apex:actionFunction name="previewActionFunction" action="{!quickSave}" status="splashStatus" reRender="pbsSelectedProducts" oncomplete="return previewDocument('{!Quote.Id}');" />
+        <apex:actionFunction name="saveActionFunction" action="{!Save}" status="splashStatus" reRender="pbsSelectedProducts" />
+        <apex:sectionHeader title="{!Quote.Name}" subtitle="{!Quote.QuoteNumber}"/>
+        <apex:outputPanel id="pnl">
+            <apex:pageMessages />
+            
+            <apex:pageblock title="Selected Products" rendered="{!isSelectedProductShow}" id="pbSelectedProducts">
+                
+                <apex:pageblockButtons >
+                    <apex:commandButton value="Save and Exit" action="{!Save}" onclick="return validateGroupAndSubGroupName('Save');"/>
+                    <apex:commandButton value="Quick Save" onclick="return validateGroupAndSubGroupName('quickSave');" reRender="pbsSelectedProducts"/>
+                    <apex:commandButton value="Back To Quote" action="{!backToQuote}" immediate="true"/>
+                    <apex:commandButton value="Preview" onclick="return validateGroupAndSubGroupName('preview');" reRender="pbsSelectedProducts"/>
+                    <apex:commandButton value="Go to Project" action="{!backToProject}" rendered="{!project != null}" immediate="true"/>
+                    <apex:commandButton value="Verify Calculations" onclick="return VerifyCalculation()"/>
+                </apex:pageblockButtons>
+                
+                <apex:outputPanel id="pbsSelectedProducts">
+                    <apex:variable value="{!-1}" var="groupIndex"/>
+                    <apex:pageMessages />
+                    <div style="margin:5px;" align="right">
+                        <apex:inputCheckbox value="{!quote.Hide_All_Product_Code__c}"/>
+                        <apex:outputText value="Hide All Product Code" />
+                        <apex:inputCheckbox value="{!quote.Hide_All_Tags__c}"/>
+                        <apex:outputText value="Hide All Tags" />
+                        <apex:inputCheckbox value="{!quote.Hide_Price_Per__c}"/>
+                        <apex:outputText value="Show Price Per" />
+                    </div>
+                    <apex:repeat value="{!lstProductGroupWrapperClass}" var="grp" id="rptSelectedProductsGroup">
+                        <apex:variable value="{!groupIndex + 1}" var="groupIndex" />
+                        <apex:variable value="{!-1}" var="subGroupIndex"/>
+                        <table width="100%" cellpadding="5" cellspacing="0" id="tblGroup" border="1">
+                             
+                                <tr style="background-color: {!IF(grp.productGroup.Alternate__c = true, 'red', 'black')};" id="productDetailRow{!groupIndex}">
+                                
+                               
+                                    <td style="color: white;font-family:Arial;font-size: 16px;font-weight:bold;" width="50%" colspan="4">
+                                        <apex:inputText value="{!grp.productGroup.Name}" html-placeholder="Please Enter Group Name" onkeyup="setBaseBidGroupName(this,'{!groupIndex}');" onkeydown="if(event.keyCode==13){return false;}" id="txtGroupName"/>
+                                    </td>
+                                    <td align="right" width="30%" >
+                                        <apex:inputcheckbox value="{!grp.productGroup.Alternate__c}" 
+                                                            onclick="return groupAlternate('{!groupIndex}', this);"
+                                                            id="parentGroupCheckBox"/>
+                                                            
+                                        <apex:outputText value="Alternate" style="color:white;" /> &nbsp;&nbsp;
+                                        <apex:inputcheckbox value="{!grp.productGroup.Page_Break__c}" />
+                                        <apex:outputText value="Page Break" style="color:white;"/> &nbsp;&nbsp;
+                                        <apex:commandButton value="New Group" action="{!newGroup}" status="splashStatus" rerender="pnl"/>
+                                        <apex:commandButton value="Clone Group" onclick="return cloneGroup('{!groupIndex}');"/>
+                                        <apex:commandButton value="Delete Group" onclick="return dltGroup('{!groupIndex}');"/>
+                                        
+                                    </td>     
+                                </tr> 
+                             
+                            <tr>
+                                <td colspan="5">
+                                    <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp" id="rptProductSubGroup">
+                                        <apex:variable value="{!subGroupIndex + 1}" var="subGroupIndex"/>
+                                        <br/>
+                                        <table width="100%" cellpadding="5" cellspacing="0" border="1" id="tblSubGroup">
+                                            <tr style="background-color: {!IF(subGrp.productGroup.Alternate__c=true,'red','#F2F2F2')};" id="subGroupRow{!groupIndex}{!subGroupIndex}">
+                                                <td colspan="6" style="font-family:Arial; font-size:14px;font-weight:bold;">
+                                                    <apex:inputText value="{!subGrp.productGroup.Name}" html-placeholder="Please Enter Sub Group Name" onkeydown="if(event.keyCode==13){return false;}" onkeyup="setSubGroupName(this, '{!groupIndex}', '{!subGroupIndex}');" id="txtSubGroupName"/>
+                                                </td>
+                                                <td align="right" colspan="{!IF(isActiveFinancialQuote == true, 19, 18)}" style="vertical-align:middle;">
+                                                    
+                                                    <apex:inputcheckbox value="{!subGrp.productGroup.Alternate__c}" 
+                                                                    onclick="subGroupAlternate('{!groupIndex}', '{!subGroupIndex}', this);"
+                                                                    id="subGroupAlternate" />
+                                                    <apex:outputText value="Alternate" style="color:Black;"/> &nbsp;&nbsp;
+                                                    
+                                                    <apex:inputcheckbox value="{!subGrp.productGroup.Page_Break__c}" />
+                                                    <apex:outputText value="Page Break" /> &nbsp; &nbsp;
+                                                    <apex:commandButton value="Add Product" onclick="return addProducts('{!groupIndex}','{!subGroupIndex}');"/>
+                                                    <!-- <apex:commandButton value="Add Custom Product" onclick="return addCustomProduct('{!groupIndex}','{!subGroupIndex}');"/> -->
+                                                    <apex:commandButton value="New Sub Group" onclick="return newSubGroup('{!groupIndex}');"/>
+                                                    <apex:commandButton value="Clone Sub Group" onclick="return cloneSubGroup('{!groupIndex}','{!subGroupIndex}');" />
+                                                    <apex:commandButton value="Delete Sub Group" onclick="return dltSubGroup('{!groupIndex}','{!subGroupIndex}');"/>
+                                                    <apex:commandButton value="Negotiation Calculator" onclick="return openReverseMarginPopup('SubGroup','{!groupIndex}','{!subGroupIndex}');"/>
+                                                </td>
+                                                <td align="center">
+                                                    <apex:image value="{!$Resource.Up_Button}" width="30" height="30"  style="cursor: pointer;" onclick="upDownSubGroup('{!groupIndex}','{!subGroupIndex}','up');" rendered="{!subGroupIndex != 0}"/> 
+                                                    <apex:image value="{!$Resource.Down_Button}" width="30" height="30" style="cursor: pointer;" onclick="upDownSubGroup('{!groupIndex}','{!subGroupIndex}','down');" rendered="{!grp.lstProductSubGroup.size != subGroupIndex + 1}"/>
+                                                </td>
+                                            </tr>
+                                            <tr style="background-color:#767171;">
+                                                <td width="1%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">#</td>
+                                                <td width="2%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Delete</td>
+                                                <td width="{!IF(isActiveFinancialQuote == true, 7, 5)}%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Sale Type</td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Tag</td>
+                                                <td width="{!IF(isActiveFinancialQuote == true, 12, 9)}%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Product Name</td>
+                                                <td width="5%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;display: {!IF(isActiveFinancialQuote == true, 'table-cell', 'none')};">
+                                                    Release
+                                                    <apex:inputField value="{!subGrp.productGroup.Release_Number__c}" onchange="return changeMultiplier('{!groupIndex}','{!subGroupIndex}','Release');" id="txtHeaderRelease" />
+                                                </td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Product Code</td>
+                                                <td width="3%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;" align="middle">
+                                                    Hide Code
+                                                    <apex:inputCheckbox value="{!subGrp.productGroup.Hide_Code__c}" onchange="return checkAllCheckBox('{!groupIndex}','{!subGroupIndex}','Hide Code');" id="checkHideCodeHeader" />
+                                                </td>
+                                                <td width="3%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;" align="middle">
+                                                    Alternate
+                                                   
+                                                </td>                                                
+                                                <td width="10%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Description</td>
+                                                <td width="3%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">QTY</td>
+                                                <td width="3%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;" align="middle">
+                                                    Hide Quantity
+                                                    <apex:inputCheckbox value="{!subGrp.productGroup.Hide_Quantity__c}" onchange="return checkAllCheckBox('{!groupIndex}','{!subGroupIndex}','Quantity');" id="checkHideQuantityHeader" />
+                                                </td>
+                                                <td width="5%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">List Price</td>
+                                                <td width="5%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">
+                                                    Multiplier
+                                                    <apex:inputText onchange="return changeMultiplier('{!groupIndex}','{!subGroupIndex}','Multiplier');" style="width:90%" id="txtHeaderMultiplier" onkeydown="if(event.keyCode==13){return false;}"/>
+                                                </td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">
+                                                    LBS &nbsp;&nbsp;<apex:image value="/img/func_icons/util/help16.png" style="vertical-align:middle" title="it's for calculation purposes only."/>
+                                                </td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">T-LBS</td>
+                                                <td width="6%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Unit Cost</td>
+                                                <!-- <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Freight</td> -->
+                                                <td width="6%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Extended Cost</td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">
+                                                    Margin Percentage
+                                                    <apex:inputText onchange="return changeMultiplier('{!groupIndex}','{!subGroupIndex}','Margin Percentage');" style="width:90%" id="txtHeaderMarginPercentage" onkeydown="if(event.keyCode==13){return false;}"/>
+                                                </td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Sale Price</td>
+                                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">C/R $</td>
+                                                <td width="2%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;" align="middle">
+                                                    Hide Amount
+                                                    <apex:inputCheckbox value="{!subGrp.productGroup.Hide_Amount__c}" onchange="return checkAllCheckBox('{!groupIndex}','{!subGroupIndex}','Hide Amount');" id="checkHideAmountHeader" />
+                                                </td>
+                                                <td width="2%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;" align="middle">
+                                                    Hide Line <br />
+                                                    <apex:inputCheckbox value="{!subGrp.productGroup.Hide_Line__c}" onchange="return checkAllCheckBox('{!groupIndex}','{!subGroupIndex}','Hide Line');" id="checkHideLineHeader"/>
+                                                </td>
+                                                <td width="2%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Page Break</td>
+                                                <td width="3%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Up/Down</td>
+                                            </tr>
+                                            <apex:variable value="{!0}" var="delProductIndex"/>
+                                            <apex:repeat value="{!subGrp.lstProductSelected}" var="prod" id="rptProductSelected">
+                                                <tr  style="background-color: {!IF(prod.productDetails.Alternate__c = true, 'red', '#fff')};"
+                                                     id="quoteLineItemRow{!groupIndex}{!subGroupIndex}{!delProductIndex}">
+                                                    <td>
+                                                        <apex:outputText >
+                                                            <apex:variable value="{!delProductIndex + 1}" var="delProductIndex" />
+                                                            {!delProductIndex}.
+                                                        </apex:outputText>                                                    
+                                                    </td>
+                                                    <td>
+                                                        <center><apex:commandButton value=" X " onClick="return DeleteSelectedProductRow('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}','delete');" /></center>
+                                                        <center><apex:commandButton value="Cln" onClick="return DeleteSelectedProductRow('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}','clone');" /></center>
+                                                        <center><apex:commandButton value="Move" onclick="return MoveLineItemToSubGroup('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');"  /></center>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField value="{!prod.productDetails.Sale_Type__c}" style="width:90%" id="txtSaleType" onchange="return EnableDisableColumns('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}', this);"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.Tag__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{!prod.productDetails.Product_Name__c}" style="width:90%" />
+                                                    </td>
+                                                    <td style="display: {!IF(isActiveFinancialQuote == true, 'table-cell', 'none')};">
+                                                        <apex:inputField value="{!prod.productDetails.Release_pick__c}" style="width:90%;" id="txtRelease"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{!prod.productDetails.Product_Code__c}" style="width:90%" />
+                                                    </td>
+                                                    <td align="middle">
+                                                        <apex:inputCheckbox value="{!prod.productDetails.Hide_Code__c}" id="checkHideCode" />
+                                                    </td>
+                                                    <td align="middle">
+                                                        <apex:inputCheckbox value="{!prod.productDetails.Alternate__c}" id="checkAlternateQL" 
+                                                        onclick="lineItemAlternate('{!groupIndex}', '{!subGroupIndex}', '{!delProductIndex}', this);"/>
+                                                        
+                                                    </td>                                                    
+                                                    <td ondblclick="openDescriptionPopup('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" >
+                                                        <apex:outputText value="{!LEFT(prod.productDetails.Descriptions__c,200)}..." style="width:90%" id="txtDescription" escape="false"/>
+                                                        <apex:inputhidden value="{!prod.productDetails.Descriptions__c}" id="hidDescription" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.Quantity__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}" onchange="CalculatePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" id="txtQuantity" />
+                                                    </td>
+                                                    <td align="middle">
+                                                        <apex:inputCheckbox value="{!prod.productDetails.Hide_Quantity__c}" id="checkHideQuantity" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.List_Price__c}" style="width:90%;display:{!IF(prod.productDetails.Sale_Type__c == 'C/R' , 'none','block')};" onkeydown="if(event.keyCode==13){return false;}" onchange="CalculatePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" id="txtListPrice" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.Multiplier__c}" style="width:90%;display:{!IF(prod.productDetails.Sale_Type__c == 'C/R' , 'none','block')};" onkeydown="if(event.keyCode==13){return false;}" onchange="CalculatePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" id="txtMultiplier" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.LBS__c}" style="width:90%;display:{!IF(prod.productDetails.Sale_Type__c == 'C/R' , 'none','block')};" id="txtLBS" onkeydown="if(event.keyCode==13){return false;}" onchange="CalculatePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{!prod.productDetails.T_LBS__c}" style="width:90%" id="txtTLBS"/>
+                                                        <apex:inputHidden value="{!prod.productDetails.T_LBS__c}" id="hidTLBS"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{0, Number, Currency}" id="txtUnitCost" style="background-color: #F8F8F8;font-family: Arial; font-size: 14px;font-weight: bold;border:0;width: 80%;" >
+                                                            <apex:param value="{!prod.productDetails.Unit_Cost__c}"/>
+                                                        </apex:outputText>
+                                                        <apex:inputHidden value="{!prod.productDetails.Unit_Cost__c}" id="hidUnitCost"/>
+                                                    </td>
+                                                    <!--
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.Freight__c}" style="width:90%;display:{!IF(prod.productDetails.Sale_Type__c == 'C/R' , 'none','block')};" onkeydown="if(event.keyCode==13){return false;}" onchange="calculateFreightOverride('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" id="txtFreight" />
+                                                        <apex:inputHidden value="{!prod.productDetails.Is_Freight_Override__c}" id="hidFreightOverride"/>
+                                                    </td>
+                                                    -->
+                                                    <td>
+                                                        <apex:outputText value="{0, Number, Currency}" id="txtExtendedCost" style="background-color: #F8F8F8;font-family: Arial; font-size: 14px;font-weight: bold;border:0;width: 80%;" >
+                                                            <apex:param value="{!prod.productDetails.Extended_Cost__c}"/>
+                                                        </apex:outputText>
+                                                        <apex:inputHidden value="{!prod.productDetails.Extended_Cost__c}" id="hidExtendedCost"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.Margin_Percentage__c}" onkeydown="if(event.keyCode==13){return false;}" style="width:90%;display:{!IF(prod.productDetails.Sale_Type__c == 'B/R' || prod.productDetails.Sale_Type__c == 'LAB' || prod.productDetails.Sale_Type__c == '' , 'block','none')}" onchange="CalculatePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" id="txtMarginPercentage" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText id="txtSalesPrice" 
+                                                                        value="{0, Number, Currency}" 
+                                                                        style="display:{!IF(prod.productDetails.Sale_Type__c == 'D/S' || prod.productDetails.Sale_Type__c == 'C/R','block','none')};background-color: #F8F8F8;font-family: Arial; font-size: 14px;font-weight: bold;border:0;width: 80%;" >
+                                                            <apex:param value="{!prod.productDetails.Sales_Price__c}"/>
+                                                        </apex:outputText>
+                                                        <apex:inputHidden value="{!prod.productDetails.Sales_Price__c}" id="hidSalesPrice"/>
+                                                        <apex:inputHidden value="{!prod.productDetails.Is_SalePrice_Override__c}" id="hidSalePriceOverride"/>
+                                                        <apex:inputText id="textBoxSalesPrice"
+                                                                        value="{!prod.productDetails.Sales_Price__c}"  
+                                                                        onkeydown="if(event.keyCode==13){return false;}" 
+                                                                        onchange="ChangeSalePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');"
+                                                                        style="display:{!IF(prod.productDetails.Sale_Type__c == 'P/T' || prod.productDetails.Sale_Type__c == 'B/R' || prod.productDetails.Sale_Type__c == 'LAB','block','none')};width:90%;" />
+                                                     </td>
+                                                    <td>
+                                                        <apex:inputText value="{!prod.productDetails.CR__c}" style="width:90%;display:{!IF(prod.productDetails.Sale_Type__c == 'C/R' || prod.productDetails.Sale_Type__c == '', 'block','none')}" onchange="CalculatePrice('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}');" onkeydown="if(event.keyCode==13){return false;}" id="txtCR" />
+                                                    </td>
+                                                    <td>
+                                                        <center><apex:inputCheckbox value="{!prod.productDetails.Hide_Pricing__c}" id="checkHideAmount"/></center>
+                                                    </td>
+                                                    <td>
+                                                        <center><apex:inputCheckbox value="{!prod.productDetails.Hide_Line__c}" id="checkHideLine"/></center>
+                                                    </td>
+                                                    <td>
+                                                        <center><apex:inputCheckbox value="{!prod.productDetails.Page_Break__c}" id="checkPageBreak"/></center>
+                                                    </td>
+                                                    <td align="center">
+                                                        <apex:image value="{!$Resource.Up_Button}" width="30" height="30" rendered="{!delProductIndex != 1}" onclick="return upDownProductLineItem('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}','up');" style="cursor: pointer;"/>
+                                                        <apex:image value="{!$Resource.Down_Button}" width="27" height="27" rendered="{!subGrp.lstProductSelected.size != delProductIndex}" onclick="return upDownProductLineItem('{!groupIndex}','{!subGroupIndex}','{!delProductIndex}','down');" style="cursor: pointer;"/>
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                            <tr id="subGroupTotalRow{!groupIndex}{!subGroupIndex}"
+                                                Style = "background-color: {!IF(subGrp.productGroup.Alternate__c=true,'red','#F2F2F2')};">
+                                                <td colspan="{!IF(isActiveFinancialQuote == true, 9, 8)}" style="text-align:right;">Total Hours</td>
+                                                <td>
+                                                    <apex:outputText id="txtQuantityTotal" value="{!subGrp.productGroup.Quantity_Total__c}"/>
+                                                    <apex:inputHidden id="hidQuantityTotal" value="{!subGrp.productGroup.Quantity_Total__c}"/>
+                                                </td>
+                                                <td colspan="6" style="text-align:right;">
+                                                    <apex:inputcheckbox value="{!subGrp.productGroup.Hide_Pricing__c}" />
+                                                    <apex:outputText value="Hide Pricing @Sub Group Level" />
+                                                </td>
+                                                <!--
+                                                <td>
+                                                    <apex:outputText value="{0, Number, Currency}" id="txtGrandTotalFreight" >
+                                                        <apex:param value="{!subGrp.productGroup.Total_Freight__c}"/>
+                                                    </apex:outputText>
+                                                    <apex:inputHidden value="{!subGrp.productGroup.Total_Freight__c}" id="hidGrandTotalFreight"/>
+                                                </td>
+                                                -->
+                                                <td >
+                                                    <apex:outputText value="{0, Number, Currency}" id="txtGrandTotalExtendedCost" >
+                                                        <apex:param value="{!subGrp.productGroup.Total_Extended_Cost__c}"/>
+                                                    </apex:outputText>
+                                                    <apex:inputHidden value="{!subGrp.productGroup.Total_Extended_Cost__c}" id="hidGrandTotalExtendedCost"/>
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    <apex:outputText value="{!subGrp.productGroup.Name}" id="txtSubGroupNameTotal"/> &nbsp; TOTAL: &nbsp;
+                                                </td>
+                                                <td colspan="7">
+                                                    <apex:outputText value="{0, Number, Currency}" id="txtGrandTotalSubGroup" >
+                                                        <apex:param value="{!subGrp.productGroup.Total_Line_Items__c}"/>
+                                                    </apex:outputText> 
+                                                    <!-- &nbsp; <apex:commandButton onclick="return roundOff('{!groupIndex}','{!subGroupIndex}');" value="Round Off"/> -->
+                                                    <apex:inputHidden value="{!subGrp.productGroup.Total_Line_Items__c}" id="hidGrandTotalSubGroup"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </apex:repeat>            
+                                </td>
+                            </tr>
+                            <tr style="background-color: {!IF(grp.productGroup.Alternate__c=true,'red','#A8D08D')};"
+                                id="productGroupTotalRow{!groupIndex}">
+                                <td style="color: white;font-family:Arial;" align="right">
+                                    <apex:inputcheckbox value="{!grp.productGroup.Hide_Pricing__c}" />
+                                    <apex:outputText value="Hide Pricing @Group Level" />
+                                </td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                    Total Hours: &nbsp;
+                                    <apex:outputText value="{!grp.productGroup.Grand_Quantity_Total__c}" id="txtGrandTotalQuantity"  />
+                                    <apex:inputhidden value="{!grp.productGroup.Grand_Quantity_Total__c}" id="hidGrandTotalQuantity" />
+                                </td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                    Total Extended Cost: &nbsp;
+                                    <apex:outputText value="{0, Number, Currency}" id="txtTotalGroupExtendedCost"  >
+                                        <apex:param value="{!grp.productGroup.Total_Group_Extended_Cost__c}"/>
+                                    </apex:outputText>
+                                    <apex:inputhidden value="{!grp.productGroup.Total_Group_Extended_Cost__c}" id="hidTotalGroupExtendedCost" />
+                                </td>
+                                <!--
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                    
+                                    Total Freight: &nbsp;
+                                    <apex:outputText value="{0, Number, Currency}" id="txtTotalGroupFreight"  >
+                                        <apex:param value="{!grp.productGroup.Total_Group_Freight__c}"/>
+                                    </apex:outputText>
+                                    <apex:inputhidden value="{!grp.productGroup.Total_Group_Freight__c}" id="hidTotalGroupFreight" />
+                                </td>
+                                -->
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;" colspan="2">
+                                    <apex:outputText value="{!grp.productGroup.Name}" id="txtGroupNameBaseBidTotal"/>
+                                    TOTAL: &nbsp;
+                                     <apex:outputText value="{0, Number, Currency}" id="txtGrandTotalGroup"  >
+                                         <apex:param value="{!grp.productGroup.Total_Sub_Groups__c}"/>
+                                     </apex:outputText>
+                                     <apex:inputHidden value="{!grp.productGroup.Total_Sub_Groups__c}" id="hidGrandTotalGroup"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                    </apex:repeat>
+                </apex:outputPanel>
+                <apex:pageblockSection columns="1" id="pbsSummary">
+                    <apex:outputPanel id="pnlSummary">
+                        <table border="1" align="right" cellpadding="3" cellspacing="0" width="35%">
+                            <tr style="background-color:#767171;">
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;"><center>Hide</center></td>
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;"><center>Totals</center></td>
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;"><center>Amounts</center></td>
+                            </tr>
+                            <tr>
+                                <td><apex:inputcheckbox value="{!Quote.Hide_Total_Base_Bid_Total__c}" /></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">Total Sell Price</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtTotalBaseBidTotal"  >
+                                         <apex:param value="{!quote.Total_Base_Bid_Total__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Total_Base_Bid_Total__c}" id="hidTotalBaseBidTotal" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <!-- <apex:inputcheckbox value="{!Quote.Hide_Total_Extended_Cost__c}" /> -->
+                                </td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;width:50%">Total Extended Cost</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;width:50%">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtTotalExtendedCost"  >
+                                         <apex:param value="{!quote.Total_Extended_Cost__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Total_Extended_Cost__c}" id="hidTotalExtendedCost" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;width:50%">Total Direct Sell Price</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;width:50%">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtTotalDirectSellPrice"  >
+                                         <apex:param value="{!quote.Total_Direct_Sell_Price__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Total_Direct_Sell_Price__c}" id="hidTotalDirectSellPrice" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;width:50%">Total Buy Resell Price AND Pass Through Price</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;width:50%">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtTotalBuyResellPrice"  >
+                                         <apex:param value="{!quote.Total_Buy_Resell_Price__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Total_Buy_Resell_Price__c}" id="hidTotalBuyResellPrice" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">Total Buy/Resell AND Pass Through Margin ($)</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtTotalMarginDollar"  >
+                                         <apex:param value="{!quote.Total_Buy_Resell_Margin__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Total_Buy_Resell_Margin__c}" id="hidTotalMarginDollar" />
+                                    <apex:inputhidden value="{!quote.Total_Buy_Resell_Extended_Cost__c}" id="hidTotalBuyResellExtendedCost" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">Total Buy/Resell AND Pass Through Margin (%)</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputField value="{!quote.Total_Buy_Resell_Margin_Percentage__c}" id="txtTotalMarginPercentage"  />
+                                     <apex:inputhidden value="{!quote.Total_Buy_Resell_Margin_Percentage__c}" id="hidTotalMarginPercentage" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                    Commissions and Rebates
+                                </td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtCommissionsAndRebates"  >
+                                         <apex:param value="{!quote.Commissions_and_Rebates__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Commissions_and_Rebates__c}" id="hidCommissionsAndRebates" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">Total Project Margin ($)</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputText value="{0, Number, Currency}" id="txtTotalProjectMarginDollar"  >
+                                         <apex:param value="{!quote.Total_Project_Margin__c}"/>
+                                     </apex:outputText>
+                                    <apex:inputhidden value="{!quote.Total_Project_Margin__c}" id="hidTotalProjectMarginDollar" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">Total Project Margin (%)</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputField value="{!quote.Total_Project_Margin_Percentage__c}" id="txtTotalProjectMarginPercentage"  />
+                                     <apex:inputhidden value="{!quote.Total_Project_Margin_Percentage__c}" id="hidTotalProjectMarginPercentage" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">Total Hours</td>
+                                <td style="font-family: Arial; font-size: 14px;font-weight: bold;text-align:right;">
+                                     <apex:outputField value="{!quote.Quantity_Total__c}" id="txtQuantityTotalQuote"  />
+                                     <apex:inputhidden value="{!quote.Quantity_Total__c}" id="hidQuantityTotalQuote" />
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                </apex:pageblockSection>
+                <table width="100%">
+                    <tr>
+                        <td align="right">
+                            <apex:commandButton value="Negotiation Calculator" onclick="return openReverseMarginPopup('Project','','');"/>
+                        </td>
+                    </tr>
+                </table>
+                <apex:pageBlockSection id="pbsAdditionDeduction" columns="1" >
+                    <apex:outputPanel id="pnlAdditionDuduction">
+                        <table width="60%" border="1" align="right" cellpadding="3" cellspacing="0">
+                            <tr>
+                                <td colspan="4" style="font-family: Arial; font-size: 14px;font-weight: bold;vertical-align:middle;">Adds/Deducts/Alternates</td>
+                                <td align="right">
+                                    <apex:commandButton value="Add Item" action="{!addAdditionDeductionLineItem}" rerender="pbsAdditionDeduction" status="splashStatus"/>
+                                </td>
+                            </tr>
+                            <tr style="background-color:#767171;">
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;width:3%;align:middle;">#</td>
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;width:5%;align:middle;">Delete</td>
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;width:15%;">Type</td>
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;width:62%;">Details</td>
+                                <td style="font-family: Arial;font-size:10px;color:white;font-weight:bold;width:15%;">Amount</td>
+                            </tr>
+                            <apex:variable value="{!0}" var="addDedCount"/>
+                            <apex:repeat value="{!lstAdditionDuduction}" var="ad">
+                                <tr>
+                                    <td align="middle" style="vertical-align:middle;">
+                                        <apex:variable value="{!addDedCount + 1}" var="addDedCount"/>
+                                        {!addDedCount}.
+                                    </td>
+                                    <td align="middle" style="vertical-align:middle;">
+                                        <apex:commandButton value=" X " onclick="return deleteAdditionDeduction('{!addDedCount}');" />
+                                    </td>
+                                    <td style="vertical-align:middle;">
+                                        <apex:inputField value="{!ad.Type__c}" style="width:95%;"/>
+                                    </td>
+                                    <td>
+                                        <apex:inputtextarea value="{!ad.Details__c}" style="width:95%;" rows="4" />
+                                    </td>
+                                    <td style="vertical-align:middle;">
+                                        <apex:inputField value="{!ad.Amount__c}" style="width:90%;" onkeydown="if(event.keyCode==13){return false;}"/>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" id="pbsScratchPad">
+                    <apex:outputPanel id="pnlScratchPad">
+                        <table width="100%" cellpadding="5" cellspacing="0" border="1" id="tblSubGroup">
+                            <tr style="background-color:#F2F2F2;">
+                                <td colspan="9" style="font-family:Arial; font-size:14px;font-weight:bold;">
+                                    Deduction or Additions Scratch Pad
+                                </td>
+                                <td colspan="7" align="right">
+                                    <apex:commandButton value="Add Product" onclick="return scratchAddProduct();"/>
+                                    <apex:commandButton value="Add Custom Product" onclick="return scratchAddCustomProduct();"/>
+                                </td>
+                            </tr>
+                            <tr style="background-color:#767171;">
+                                <td width="1%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">#</td>
+                                <td width="2%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Delete</td>
+                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Tag</td>
+                                <td width="13%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Product Name</td>
+                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Product Code</td>
+                                <td width="13%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Description</td>
+                                <td width="3%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">QTY</td>
+                                <td width="7%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">List Price</td>
+                                <td width="5%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Multiplier</td>
+                                <td width="5%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">
+                                    LBS &nbsp;&nbsp;<apex:image value="/img/func_icons/util/help16.png" style="vertical-align:middle" title="it's for calculation purposes only."/>
+                                </td>
+                                <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">T-LBS</td>
+                                <td width="6%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Unit Cost</td>
+                                <!-- <td width="4%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Freight</td> -->
+                                <td width="9%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Extended Cost</td>
+                                <td width="5%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Margin Percentage</td>
+                                <td width="7%" style="font-family: Arial;font-size:10px;color:white;font-weight:bold;">Sale Price</td>
+                            </tr>
+                            <apex:variable value="{!0}" var="delProductIndex"/>
+                            <apex:repeat value="{!lstScratchPad}" var="prod" id="rptScratchPad">
+                                <tr>
+                                    <td>
+                                        <apex:outputText >
+                                            <apex:variable value="{!delProductIndex + 1}" var="delProductIndex" />
+                                            {!delProductIndex}.
+                                        </apex:outputText>                                                    
+                                    </td>
+                                    <td>
+                                        <center><apex:commandButton value=" X " onClick="return DeleteScratchPadRow('{!delProductIndex}');" /></center>
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Tag__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}"/>
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Product_Name__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}"/>
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Product_Code__c}" style="width:90%" rendered="{!prod.productDetails.Product_Name__c == 'Custom'}" onkeydown="if(event.keyCode==13){return false;}"/>
+                                        <apex:outputText value="{!prod.productDetails.Product_Code__c}" style="width:90%" rendered="{!prod.productDetails.Product_Name__c != 'Custom'}"/>
+                                    </td>
+                                    <td ondblclick="openDescriptionPopup('{!delProductIndex}');" >
+                                        <apex:outputText value="{!LEFT(prod.productDetails.Descriptions__c,200)}..." style="width:90%" id="txtScratchDescription" escape="false"/>
+                                        <apex:inputhidden value="{!prod.productDetails.Descriptions__c}" id="hidScratchDescription" />
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Quantity__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}" onchange="calculateScratchPad('{!delProductIndex}');" id="txtScratchQuantity" />
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.List_Price__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}" onchange="calculateScratchPad('{!delProductIndex}');" id="txtScratchListPrice" />
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Multiplier__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}" onchange="calculateScratchPad('{!delProductIndex}');" id="txtScratchMultiplier" />
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.LBS__c}" style="width:90%" id="txtScratchLBS" onkeydown="if(event.keyCode==13){return false;}" onchange="calculateScratchPad('{!delProductIndex}');" />
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{!prod.productDetails.T_LBS__c}" style="width:90%" id="txtScratchTLBS"/>
+                                        <apex:inputHidden value="{!prod.productDetails.T_LBS__c}" id="hidScratchTLBS"/>
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{0, Number, Currency}" id="txtScratchUnitCost" style="background-color: #F8F8F8;font-family: Arial; font-size: 14px;font-weight: bold;border:0;width: 80%;" >
+                                            <apex:param value="{!prod.productDetails.Unit_Cost__c}"/>
+                                        </apex:outputText>
+                                        <apex:inputHidden value="{!prod.productDetails.Unit_Cost__c}" id="hidScratchUnitCost"/>
+                                    </td>
+                                    <!--
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Freight__c}" style="width:90%" onkeydown="if(event.keyCode==13){return false;}" onchange="calculateScratchFreightOverride('{!delProductIndex}');" id="txtScratchFreight" />
+                                        <apex:inputHidden id="hidScratchFreightOverride"/>
+                                    </td>
+                                    -->
+                                    <td>
+                                        <apex:outputText value="{0, Number, Currency}" id="txtScratchExtendedCost" style="background-color: #F8F8F8;font-family: Arial; font-size: 14px;font-weight: bold;border:0;width: 80%;" >
+                                            <apex:param value="{!prod.productDetails.Extended_Cost__c}"/>
+                                        </apex:outputText>
+                                        <apex:inputHidden value="{!prod.productDetails.Extended_Cost__c}" id="hidScratchExtendedCost"/>
+                                    </td>
+                                    <td>
+                                        <apex:inputText value="{!prod.productDetails.Margin_Percentage__c}" onkeydown="if(event.keyCode==13){return false;}" style="width:90%" onchange="calculateScratchPad('{!delProductIndex}');" id="txtScratchMarginPercentage" />
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{0, Number, Currency}" id="txtScratchSalesPrice" style="background-color: #F8F8F8;font-family: Arial; font-size: 14px;font-weight: bold;border:0;width: 80%;" >
+                                            <apex:param value="{!prod.productDetails.Sales_Price__c}"/>
+                                        </apex:outputText>
+                                        <apex:inputHidden value="{!prod.productDetails.Sales_Price__c}" id="hidScratchSalesPrice"/>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:pageblock>
+            
+            <apex:pageBlock rendered="{! !isSelectedProductShow}" id="pbProductSelect">
+                <apex:pageBlockSection columns="1" id="pbsProducts">
+                    <apex:outputPanel >
+                        <table width="100%">
+                            <tr>
+                                <td width="3%"><apex:outputLabel >Search:</apex:outputLabel></td>
+                                <td width="57%"><apex:inputtext value="{!searchProduct}" style="width: 90%;" onkeyup="setTimeout(searchProducts,2000);" onkeydown="if(event.keyCode==13){return false;}" tabIndex="1"/></td>
+                                <td width="40%"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <apex:commandButton value="Select Products" action="{!selectProducts}" status="splashStatus" reRender="pnl" tabindex="0" />
+                                    <apex:commandButton value="Back to Cart" action="{!backToCart}" status="splashStatus" reRender="pnl" rendered="{!lstProductGroupWrapperClass.size > 0}"/>
+                                    <apex:commandButton value="Back to Quote" action="{!backToQuote}" />
+                                    <apex:commandButton value="New Product" onclick="return openNewProductDiv();" />
+                                </td>
+                                <td align="right">
+                                    <apex:commandButton value="First" action="{!first}" status="splashStatus" reRender="pbsProducts"/>
+                                    <apex:commandButton value="Previos" action="{!previous}" status="splashStatus" disabled="{! !hasPrevious}" reRender="pbsProducts"/> 
+                                    <apex:commandButton value="Next" action="{!next}" status="splashStatus" disabled="{! !hasNext}" reRender="pbsProducts"/>
+                                    <apex:commandButton value="Last" action="{!last}" status="splashStatus" reRender="pbsProducts"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                    <apex:pageBlockTable value="{!Products}" var="prod" id="pbtProducts">
+                        <apex:column width="2%">
+                            <apex:inputCheckbox value="{!prod.isSelect}"/>
+                        </apex:column>
+                        <apex:column value="{!prod.product.Product2.Name}" headerValue="Product Name" width="15%"/>
+                        <apex:column value="{!prod.product.Product2.ProductCode}" headerValue="Product Code" width="7%"/>
+                        <apex:column value="{!prod.product.UnitPrice}" headerValue="List Price" width="7%"/>
+                        <apex:column value="{!prod.product.Product2.Description}" headerValue="Product Summary" width="54"/>
+                       
+                        <apex:column value="{!prod.product.Product2.Manufacturer__c}" headerValue="Manufacturer" width="15%"/>
+                        
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+                
+            </apex:pageBlock>
+        </apex:outputPanel>
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+        
+        <apex:actionFunction action="{!searchProducts}" name="searchProducts" reRender="pbsProducts" status="splashStatus"/>
+        <apex:actionFunction action="{!addCustomProduct}" name="addCustomProductActionFunction" reRender="pbSelectedProducts" status="splashStatus"/>
+        <apex:actionFunction action="{!cloneGroup}" name="cloneGroupActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus" oncomplete="calculateGrandTotalsExtendedCostAndBaseBid()"/>
+        <apex:actionFunction action="{!deleteGroup}" name="deleteGroup" reRender="pbSelectedProducts,pnlHidden" status="splashStatus" oncomplete="calculateGrandTotalsExtendedCostAndBaseBid()"/>
+        <apex:actionFunction action="{!addProduct}" name="addProductsActionFunction" reRender="pnl,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction action="{!newSubGroup}" name="newSubGroupActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction action="{!createSubGroup}" name="createSubGroupActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction action="{!deleteSubGroup}" name="deleteSubGroupActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus" oncomplete="calculateGroupPrice('{!hidGroupIndex}')"/>
+        <apex:actionFunction action="{!cloneSubGroup}" name="cloneSubGroupActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus" oncomplete="calculateGroupPrice('{!hidGroupIndex}')"/>
+        <apex:actionFunction action="{!deleteProductRow}" name="deleteProductRowActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus" oncomplete="calculateSubGroupPrice('{!hidGroupIndex}','{!hidSubGroupIndex}','{!hidProductRowIndex}');calculateGroupPrice('{!hidGroupIndex}');"/>
+        <apex:actionFunction action="{!cloneProductRow}" name="cloneProductRowActionFunction" reRender="pbSelectedProducts,pnlHidden" status="splashStatus" oncomplete="calculateSubGroupPrice('{!hidGroupIndex}','{!hidSubGroupIndex}','{!hidProductRowIndex}');calculateGroupPrice('{!hidGroupIndex}');"/>
+        <apex:actionFunction action="{!deleteAdditionDeduction}" name="deleteAdditionDeductionActionFunction" reRender="pbsAdditionDeduction,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction action="{!insertNewProduct}" name="insertNewProductActionFunction" rerender="pbsProducts" status="splashStatus"/>
+        <apex:actionFunction name="updateDescriptionActionFunction" action="{!saveDescription}" rerender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        
+        <apex:actionFunction name="upProductLineItemActionFunction" action="{!upProductLineItem}" rerender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction name="downProductLineItemActionFunction" action="{!downProductLineItem}" rerender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction name="upSubGroupActionFunction" action="{!upSubGroup}" rerender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction name="downSubGroupActionFunction" action="{!downSubGroup}" rerender="pbSelectedProducts,pnlHidden" status="splashStatus"/>
+        
+        <apex:actionFunction name="scratchAddProductActionFunction" action="{!addProduct}" reRender="pnl,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction name="scratchAddCustomProductActionFunction" action="{!addCustomProduct}" reRender="pbsScratchPad,pnlHidden" status="splashStatus"/>
+        <apex:actionFunction name="scratchDeleteProductRowActionFunction" action="{!deleteScratchPadProductRow}" reRender="pbsScratchPad,pnlHidden" status="splashStatus"/>
+        
+        
+        <div id="divLoading" style="display:none;">
+            <div class="parentDisable"></div>
+            <div class="button" id="splashDiv">
+                <div class="circle"><apex:image value="{!$Resource.LoadingImage}"></apex:image></div>
+                <div class="txt">Please Wait. Loading...</div>
+            </div>
+        </div>  
+        
+        <apex:outputpanel id="pnlHidden">
+            <apex:inputhidden value="{!hidGroupIndex}" id="hidGroupIndex" />
+            <apex:inputhidden value="{!hidSubGroupIndex}" id="hidSubGroupIndex" />
+            <apex:inputhidden value="{!hidProductRowIndex}" id="hidProductRowIndex" />
+            <apex:inputhidden value="{!hidMoveSubGroupId}" id="hidSubGroupId" />
+            <apex:inputhidden value="{!hidGroupIndexMoveLineItem}" id="hidGroupIndexMoveLineItem" />
+            <apex:inputhidden value="{!hidSubGroupIndexMoveLineItem}" id="hidSubGroupIndexMoveLineItem" />
+            <apex:inputHidden value="{!rickTextAreaValue.Descriptions__c}" id="hidRichTextAreaDescriptions"/>
+        </apex:outputpanel>    
+        
+        <apex:outputPanel id="pnlDescription">
+            <div id="divDescriptionPopup" style="display:none;">
+                <div class="parentDisable"></div>
+                <div class="descPopup" >
+                    <table width="100%" cellpadding="0" cellspacing="0" >
+                        <tr style="background-color:#F2F2F2;height:25px;">
+                            <td style="font-weight:bold;">&nbsp;&nbsp; Description</td>
+                        </tr>
+                        <tr>
+                            <td><apex:inputTextarea value="{!rickTextAreaValue.Descriptions__c}" id="txtAreaDescription" richText="true"/></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color:#F2F2F2;height:45px;">
+                                <center>
+                                    <apex:commandButton value="Ok" onclick="return updateDescription();" />
+                                    <apex:commandButton value="Cancel" onclick="return closePopupDescription();"/>
+                                </center>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                </div>
+            </div> 
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="pnlReverseMargin">
+            <div id="divReverseMarginPopup" style="display: none;">
+                <div class="parentDisable"></div>
+                <div class="descPopup" >
+                    <table width="100%" cellpadding="0" cellspacing="0" >
+                        <tr style="background-color:#F2F2F2;height:25px;">
+                            <td style="font-weight:bold;padding-left:5px;">
+                                <apex:outputText value="Reverse Margin Calculations" id="txtReverseMarginHeader" />
+                            </td>
+                        </tr>
+                        <tr style="background-color:white;">
+                            <td align="middle">
+                                <table width="95%" cellspacing="0" cellpadding="5" border="1" style="margin:5px;" >
+                                    <tr>
+                                        <td width="34%" style="font-weight:bold;">Totals</td>
+                                        <td width="33%" style="font-weight:bold;">Negotiations</td>
+                                        <td width="33%" style="font-weight:bold;">Current Amount</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">Total Sell Price</td>
+                                        <td><apex:inputText style="width:90%" id="txtNegotiationsTotal" onblur="calculateNegotiations('Total Sell Price');" onkeydown="if(event.keyCode==13){return false;}"/></td>
+                                        <td>
+                                            <apex:outputText style="width:90%" id="txtOriginalTotal" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">
+                                            Total Project Margin ($)
+                                        </td>
+                                        <td><apex:inputText style="width:90%" id="txtNegotiationsTotalProjectMarginDollar" onblur="calculateNegotiations('BuyResellMarginDollar');" onkeydown="if(event.keyCode==13){return false;}"/></td>
+                                        <td>
+                                            <apex:outputText style="width:90%" id="txtOriginalTotalProjectMarginDollar" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">
+                                            Total Project Margin (%)
+                                            <apex:inputhidden id="hidMarginPercentage"/>
+                                        </td>
+                                        <td><apex:inputText style="width:90%" id="txtNegotiationsTotalProjectMarginPer" onblur="calculateNegotiations('BuyResellMarginDollarPer');" onkeydown="if(event.keyCode==13){return false;}"/></td>
+                                        <td>
+                                            <apex:outputText style="width:90%" id="txtOriginalOriginalMarginPer" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">
+                                            Change Margin (%) to:
+                                            <apex:inputhidden id="hidChangeMarginPer"/>
+                                        </td>
+                                        <td colspan="2">
+                                            <apex:outputText style="width:90%" id="txtOriginalChangeMarginPer" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="background-color:#F2F2F2;height:45px;">
+                                <center>
+                                    <apex:commandButton value="Accept Changes" onclick="return acceptNegotiations()" />
+                                    <apex:commandButton value="Cancel" onclick="return closeReverseMarginPopup();"/>
+                                </center>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                </div>
+            </div> 
+        </apex:outputPanel>
+        
+        <apex:outputPanel >
+            
+            <div id="divNewProductPopup" style="display:none;">
+                <div class="parentDisable"></div>
+                <div class="descProductPopup" style="width:70%;position: absolute;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 0;" >
+                        <tr style="background-color:#F2F2F2;height:25px;">
+                            <td style="font-weight:bold;" >&nbsp;&nbsp; Add New Product</td>
+                        </tr>
+                        <tr style="background-color:white;">
+                            <td>
+                                <apex:pageBlock title="Product Edit" mode="edit" id="pb">     
+                                    <apex:pageBlockSection title="Product Information" id="pbs">
+                                        <apex:pageBlockSectionItem id="pbsiProductName">
+                                            <apex:outputLabel value="New Product" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput">
+                                                    <div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!newProduct.Name}" required="false" id="txtProductName"/>
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem id="pbsiManufacturer">
+                                            <apex:outputLabel value="Manufacturer" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput">
+                                                    <div class="requiredBlock"></div>
+                                                    
+                                                    <apex:inputField value="{!newProduct.Manufacturer__c}" id="txtManufacturer"/>
+                                                   
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!newProduct.ProductCode}" id="txtProductCode"/>
+                                        <apex:pageBlockSectionItem id="pbsiProductType">
+                                            <apex:outputLabel >Product Type</apex:outputLabel>
+                                            <apex:outputPanel id="pnlProductType">
+                                                <div class="requiredInput">
+                                                    <div class="requiredBlock"></div>
+                                                    
+                                                        <apex:inputField value="{!newProduct.Product_Type__c}" id="txtProductType" />
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem id="pbsiProductSummary">
+                                            <apex:outputLabel >Product Summary</apex:outputLabel>
+                                            <apex:outputPanel >
+                                                <div class="requiredInput">
+                                                    <div class="requiredBlock"></div>
+                                                    <apex:inputTextarea value="{!newProduct.Description}" id="txtProductSummary" cols="40" />   
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!newProduct.IsActive}" id="txtIsActive" />
+                                        <apex:inputField value="{!newProduct.Midwest_Group_Office__c}" id="txtOffice" />
+                                        <apex:inputField value="{!newProduct.Weight__c}" onchange="vlidateIntegers(this);" id="txtWeight" />
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection id="pbsDesc" columns="1">
+                                        <apex:pageBlockSectionItem id="pbsiDesc">
+                                            <apex:outputLabel value="Product Description" />
+                                            <apex:outputPanel id="pnlDesc">
+                                                <div class="requiredInput">
+                                                    <div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!newProduct.Product_Description__c}" id="txtDescription"  />
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection title="Add Standard Price" id="pbsStandardPrice">
+                                        <apex:pageblockSectionItem id="pbsi">
+                                            <apex:outputLabel value="Standard Price" />
+                                            <apex:outputpanel >
+                                                <div class="requiredInput">
+                                                <div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!stadardPrice}" styleClass="requiredIndicator" 
+                                                                    id="txtStandardPrice" onchange="vlidateIntegers(this);"/>
+                                                </div>
+                                            </apex:outputpanel>
+                                        </apex:pageblockSectionItem>
+                                    </apex:pageBlockSection>
+                                </apex:pageBlock>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="background-color:#F2F2F2;height:45px;" align="middle">
+                                <apex:commandButton value="Save" onclick="return saveNewProduct();" rerender="pbsProducts" status="splashStatus"/>
+                                <apex:commandButton value="Cancel" onclick="return closeAddNewProductDiv();"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="pnlMoveLineItems">
+            <div id="divMoveLineItem" style="display:none;">
+                <div class="parentDisable"></div>
+                <div class="descProductPopup" style="width:40%;">
+                    <apex:variable value="{!-1}" var="groupIndexMoveLineItem"/>
+                    <table width="90%" cellpadding="0" cellspacing="0" >
+                        <tr style="background-color:#F2F2F2;height:25px;">
+                            <td style="font-weight:bold;" >&nbsp;&nbsp; Move Product</td>
+                        </tr>
+                        <tr style="background-color:white;">
+                            <td>
+                                <table width="80%" style="margin-left:30px;" cellpadding="3" cellspacing="0" class="hoverTable" border="1" id="tblMoveLineItem">
+                                    <apex:repeat value="{!lstProductGroupWrapperClass}" var="grp">
+                                        <apex:variable value="{!groupIndexMoveLineItem + 1}" var="groupIndexMoveLineItem" />
+                                        <apex:variable value="{!-1}" var="subGroupIndexMoveLineItem"/>
+                                        <tr>
+                                            <td style="font-weight:bold;">{!groupIndexMoveLineItem + 1} &nbsp; {!grp.productGroup.Name}</td>
+                                        </tr>
+                                        <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                            <apex:variable value="{!subGroupIndexMoveLineItem + 1}" var="subGroupIndexMoveLineItem"/>
+                                            <tr onclick="return SelectedRowMoveLineItem(this, '{!subGrp.productGroup.Id}', '{!groupIndexMoveLineItem}', '{!subGroupIndexMoveLineItem}');" style="cursor: pointer;">
+                                                <td style="padding-left:25px;">
+                                                   <b>{!groupIndexMoveLineItem + 1}.{!subGroupIndexMoveLineItem + 1}</b> &nbsp; {!subGrp.productGroup.Name}
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </apex:repeat>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr style="background-color:#F2F2F2;height:25px;">
+                            <td style="height:35px;" align="center">
+                                <apex:commandButton value="Move" action="{!moveSelectedLineItemToSubGroup}" reRender="pbsSelectedProducts,pnlHidden,pnlMoveLineItems" status="splashStatus" oncomplete="return CalculateMoveLineItemPricing();"/> &nbsp;
+                                <apex:commandButton value="Cancel" onclick="return CloseMoveLineItemPopup();" immediate="true"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </apex:outputPanel>
+        
+    </apex:form>
+</apex:page>

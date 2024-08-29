@@ -1,0 +1,84 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-24-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <template if:true={showModal}>
+        <c-new-group-modal quoteid={quoteid}
+                        onhidemodal={handleHideModal}>
+        </c-new-group-modal>
+    </template>
+    <div class="header myStickyHeader sticky" id="myHeader">
+        <div class="slds-page-header slds-page-header_record-home">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-account">
+                                <lightning-icon icon-name="standard:quotes" 
+                                                size="medium"
+                                                alternative-text="Quote Icon">
+                                </lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>{cartWrapper.quoteDetails.quoteNumber}</span>
+                                        <span class="slds-page-header__title slds-truncate"
+                                            title="Quote Name">
+                                            {cartWrapper.quoteDetails.quoteName}
+                                        </span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__controls">
+                        <div class="slds-page-header__control">
+                            <ul class="slds-button-group-list">
+                                <li><button class="slds-button slds-button_neutral"
+                                    onclick={handleSaveExit}>
+                                    Save and Exit
+                                    </button>
+                                </li>
+                                <li><button class="slds-button slds-button_neutral"
+                                    onclick={handleQuickSave}>
+                                    Quick Save
+                                    </button>
+                                </li>
+                                <li if:false={isMarrs}><button class="slds-button slds-button_neutral"
+                                    onclick={handleDesignQuote}>
+                                    Design Quote
+                                    </button>
+                                </li>
+                                <li if:true={isMarrs}><button class="slds-button slds-button_neutral"
+                                    onclick={previewDocument}>
+                                    Preview Quote
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="slds-button slds-button_neutral"
+                                            onclick={handleNewGroup}>
+                                            {label.newGroupLabel}
+                                    </button>
+                                </li>
+                                <li><button class="slds-button slds-button_neutral"
+                                            onclick={handleCancel}>
+                                            {label.cancelLabel}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,34 @@
+.divBody {
+    width: 70%; 
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 25px;
+}
+
+.divContainer {
+    background-color: white;
+}
+
+.divApprover {
+    margin-top: 15px; 
+    border: 1px solid rgb(229, 229, 229); 
+    border-radius: 5px; 
+    margin-bottom: 25px
+}
+
+.divLabel {
+    font-weight: bold; 
+    margin-top: auto; 
+    margin-bottom: auto; 
+    width: 15%; 
+    text-align: right;
+}
+
+.divComponent {
+    display: flex; 
+    margin: 10px;
+}
+
+.divLookup {
+    width: 70%;
+}

@@ -1,0 +1,20 @@
+<template>
+	<div if:true={isLoading} >
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+	<template if:true={salesResults}>
+		<div style="margin: 15px;">
+			<lightning-datatable
+					key-field="id"
+					wrap-text-max-lines="2"
+					hide-checkbox-column
+					data={salesResults}
+					columns={columns}
+					class="noRowHover">
+			</lightning-datatable>
+		</div>
+	</template>
+	<template if:false={salesResults}>
+		<lightning-card>No data to display : {errormessage} </lightning-card>
+	</template>
+</template>

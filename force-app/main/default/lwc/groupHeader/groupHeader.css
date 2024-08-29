@@ -1,0 +1,25 @@
+.addcolor{
+    background-color: var(--slds-g-color-error-base-40,#b94a48);
+    color: #ffffff;
+}
+
+.headerbg {
+    background: #1a0000;
+}
+
+.labelcolor {
+    color: white;
+}
+
+.headerfont {
+    font-weight: bold;
+}
+
+.editableTextColor {
+    color: black;
+}
+
+input {
+    border: none;
+    outline: none;
+}

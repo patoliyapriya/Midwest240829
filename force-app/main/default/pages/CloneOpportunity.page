@@ -1,0 +1,82 @@
+<apex:page extensions="CloneOpportunityController" standardController="Opportunity" >
+    
+    <script type="text/javascript">
+        function selectAllCheckboxes(obj,receivedInputID) {
+            var inputCheckBox = document.getElementsByTagName("input");                  
+            for(var i=0; i<inputCheckBox.length; i++){          
+                if(inputCheckBox[i].id.indexOf(receivedInputID)!=-1){                                     
+                    inputCheckBox[i].checked = obj.checked;
+                }
+            }
+        }
+        function doCheckRun(preview){
+             document.getElementById("spinner").style.display = "block";
+             Controller.remoteActionFunction(function(result) {
+                 document.getElementById("spinner").style.display = "none";
+             });
+        }
+
+    </script> 
+    
+    <apex:form id="theform">
+        <apex:sectionHeader subtitle="Clone Opportunity With Quotes" title="Clone Opportunity"/>
+        <apex:pageBlock mode="Edit" title="Clone Opportunity">
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Save" 
+                                    action="{!cloneOpportunityWithChildObjects}"
+                                    rendered="{!showQuote}"
+                                    status="actStatusId"
+                                    onclick="doCheckRun(true);return false;"/> 
+                                    
+                <apex:commandButton value="Cancel" 
+                                    action="{!doCancel}"
+                                    status="actStatusId"/>
+                                     
+                <apex:commandButton value="Previous" 
+                                    action="{!hideQuote}"
+                                    reRender="theform"
+                                    rendered="{!showQuote}"
+                                    status="actStatusId"/>                 
+                                    
+                <apex:commandButton value="Next" 
+                                    action="{!showQuote}"
+                                    reRender="theform"
+                                    rendered="{!Not(showQuote)}"
+                                    status="actStatusId"/>   
+                                                       
+                <apex:actionStatus id="actStatusId">
+                    <apex:facet name="start" > 
+                      <img src="/img/loading.gif" />                    
+                    </apex:facet>
+                </apex:actionStatus>  
+                <div id="spinner" style="margin-top: -2%;margin-left: 18%;display: none">
+                   <img src="/img/loading.gif" />
+                </div>                                  
+            </apex:pageBlockButtons>
+             
+            <apex:pageBlockSection title="{!IF(showQuote, 'Quote ', 'Opportunity ')} Information"
+                                    collapsible="false" columns="1">
+            
+                <apex:inputField value="{!opp.Name}" rendered="{!Not(showQuote)}"
+                                 style="width: 50%;"/>
+                
+                 <apex:pageBlockTable value="{!wrapQuoteList}" var="quoteWrap" id="table" 
+                                         title="All Quote" rendered="{!showQuote}">
+                     <apex:column headerValue="Select">
+                          <apex:facet name="header">
+                             <apex:inputCheckbox selected="true" onclick="selectAllCheckboxes(this,'inputId')"/>
+                          </apex:facet>
+                          <apex:inputCheckbox value="{!quoteWrap.isSelected}" id="inputId"/>
+                     </apex:column>
+                     <apex:column headerValue="Quote Name" value="{!quoteWrap.oldQuote.Name}" style="margin-left: 4%;"/>
+                     <apex:column headerValue="Clone Quote Name" >
+                         new opportunity# - <apex:inputtext value="{!quoteWrap.newQuote.Name}"
+                                                            style="width: 60%;" />
+                     </apex:column>
+             </apex:pageBlockTable> 
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+</apex:page>

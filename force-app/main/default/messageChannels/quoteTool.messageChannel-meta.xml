@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This Lightning Message Channel sends information from LWC to LWC</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>message To Send</description>
+        <fieldName>messageToSend</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>My source?</description>
+        <fieldName>messageSender</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>Record Id To Send</description>
+        <fieldName>messageRowId</fieldName>
+    </lightningMessageFields>
+    <masterLabel>MyMessageChannel</masterLabel>
+</LightningMessageChannel>

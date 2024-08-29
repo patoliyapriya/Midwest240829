@@ -1,0 +1,142 @@
+<apex:page id="thePage" standardController="AcctSeed__Billing__c" 
+            title="{!IF(AcctSeed__Billing__c.Invoice_Number__c == '', AcctSeed__Billing__c.Name, AcctSeed__Billing__c.Invoice_Number__c) & ' | Accounting Seed'}" 
+                contentType="text/html;charset=utf-8"  
+                lightningStylesheets="true"
+                extensions="BillingPDFManagerCustomCtrl">
+
+    <apex:includeScript value="{!URLFOR($Resource.AcctSeed__accounting_resources, 'javascript/jquery.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AcctSeed__accounting_resources, '/javascript/jquery.dataTables.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AcctSeed__accounting_resources, 'javascript/bootstrap-tagsinput.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AcctSeed__accounting_resources, 'javascript/accounting-common.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AcctSeed__accounting_resources, 'javascript/common-pdf-manager.js')}" loadOnReady="true"/>
+    <apex:stylesheet value="{!URLFOR($Resource.AcctSeed__accounting_resources, '/css/bootstrap-tagsinput.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.AcctSeed__accounting_resources, '/css/jquery.dataTables.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.AcctSeed__accounting_resources, '/css/common.css')}" />
+
+    <script type="text/javascript">
+        function setContact (contactId) {
+            var sendEmailBtnEle = document.getElementById('thePage:theForm:theBlock:buttons:emailAttachButton');
+            console.log('contactId==>'+contactId);
+            if(contactId == '' || contactId == null) {
+                console.log('contactId2==>'+contactId);
+                sendEmailBtnEle.disabled = true;  
+            }
+            //sendEmailBtnEle.disabled = true;
+        }
+
+        function openAttachPop(page, billingId) {
+            window.open(page+'?Id='+billingId,'_blank', 'toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400')
+
+            
+        }
+    </script>
+
+    <apex:form id="theForm">
+        <apex:sectionHeader title="Billing" subtitle="Billing PDF" />
+        <apex:pageBlock id="theBlock">
+
+            <apex:outputPanel id="thePageMessages">
+                <apex:pageMessages escape="false"/>
+            </apex:outputPanel>
+            <apex:outputPanel id="emailErrorPanel" style="display:none">
+                <apex:pageMessage summary="" severity="error" strength="3" />
+            </apex:outputPanel>
+
+            <apex:pageBlockButtons id="buttons">
+                <apex:commandButton id="saveAttachButton"
+                                    action="{!saveAttach}"
+                                    value="Save PDF"
+                                    onClick="AcctSeed.ASModule.setCustomStyleOnBtn('Processing...');"
+                                    />
+                <apex:commandButton id="emailAttachButton"
+                                    action="{!saveAndEmail}"
+                                    value="Send Email"
+                                    onClick="return AcctSeed.ASModule.validateEmails();"
+                                    disabled="{!!showSendEmail}"/>
+                <apex:commandButton id="cancelButton" action="{!cancel}" value="Back" immediate="true" />
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection title="Billing Information" columns="2" collapsible="false" >
+                <apex:outputField value="{!AcctSeed__Billing__c.Name}" rendered="{!AcctSeed__Billing__c.Invoice_Number__c == ''}" />
+                <apex:outputField value="{!AcctSeed__Billing__c.Invoice_Number__c }" rendered="{!AcctSeed__Billing__c.Invoice_Number__c != ''}" />
+                <apex:outputField id="billingType" value="{!AcctSeed__Billing__c.AcctSeed__Type__c}" />
+                <apex:outputField id="customerName" value="{!AcctSeed__Billing__c.AcctSeed__Customer__r.Name}" />
+                <apex:outputField id="billingTotal" value="{!AcctSeed__Billing__c.AcctSeed__Total__c}" />
+                <apex:outputField id="postingStatus" value="{!AcctSeed__Billing__c.AcctSeed__Status__c}" />
+                <apex:outputField id="billingBalanceAmount" value="{!AcctSeed__Billing__c.AcctSeed__Balance__c}" />
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Billing Contact" for="billingcontactname" />
+                    <apex:outputText id="billingcontactname"
+                                    value="{!AcctSeed__Billing__c.AcctSeed__Billing_Contact__r.Name} ({!AcctSeed__Billing__c.AcctSeed__Billing_Contact__r.Email})" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Email Sender and Recipient Information" columns="2" collapsible="false">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="From Address" for="fromAddress" />
+                    <apex:outputPanel >
+                        <apex:selectList id="fromAddress" value="{!selectedOrgWideEmailAddress}"
+                                        multiSelect="false" size="1" >
+                            <apex:selectOptions value="{!OrgWideEmailSelectOptions}"/>
+                        </apex:selectList>
+                        <!-- 
+                        <apex:outputText value="{!selectedOrgWideEmailAddress}" rendered="{!!fromAddressPicklistEnabled}"/>
+                        -->
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="CC Me" for="ccUser" />
+                    <apex:inputCheckbox id="ccUser" value="{!sendccUser}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Send to Contact" />
+                    <apex:actionRegion >
+                        <apex:inputField value="{!billingSO.AcctSeed__Billing_Contact__c}">
+                          
+                            <apex:actionSupport event="onchange" 
+                                            action="{!setContact}" 
+                                            reRender="theBlock,errorPanel"
+                                            onComplete="setContact('{!billingSO.AcctSeed__Billing_Contact__c}')"    />
+                        
+                            
+                        </apex:inputField>
+                        <apex:outputPanel id="errorPanel" style="color:red;" 
+                                        layout="block" 
+                                        rendered="{!showSendContactError}">
+                            Error: The contact you have selected does not have an email address defined.
+                        </apex:outputPanel>
+                    </apex:actionRegion>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="CC Addresses" for="ccAddresses"/>
+                    <apex:inputText id="ccAddresses" value="{!ccAddresses}" styleClass="form-control" html-data-role="tagsinput"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="email" title="Email Subject and Body Information" columns="1" collapsible="true">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Subject" />
+                    <apex:inputText id="emailSubject" value="{!emailsubject}" style="width:65%"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Body" />
+                    <apex:inputTextarea id="emailBody" value="{!emailBody}"
+                                        style="width:65%;line-height:1em;height:7em;"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="attachment" title="Email Attachments" columns="1" collapsible="true">
+                <apex:commandButton value="Attach file"
+                                    onClick="openAttachPop('{!$Page.AttachmentSelector}', '{!billingSO.Id}');return false;"/>
+                
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:pageBlock title="Billing PDF Preview" >
+        <div id="loader1" style="font-weight:bold">
+            <img src="/img/loading.gif" style="text-align:center" width="16" height="16" alt="loading gif" />&nbsp;&nbsp;Creating Billing PDF...
+        </div>
+        <apex:iframe id="iframe1" src="{!pdfName}" />
+    </apex:pageBlock>
+</apex:page>

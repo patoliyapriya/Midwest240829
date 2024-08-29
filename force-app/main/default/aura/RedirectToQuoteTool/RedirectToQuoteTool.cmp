@@ -1,0 +1,14 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 03-11-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<aura:component implements="lightning:isUrlAddressable,force:hasRecordId" description="c:AddressableLWC component">
+
+    <aura:attribute name="quoteId" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <c:quoteContainer quoteId="{!v.quoteId}" />
+</aura:component>

@@ -1,0 +1,28 @@
+.expenseReportBGColor {
+    background-color: blue;   
+    color: black;
+    pointer-events: none; 
+}
+/* .THIS .secondTable {
+  text-align: left !important;
+  background-color: blue; 
+   text-align: center;
+}
+.textMoveTowardLeft{
+   text-align: left;
+}
+.THIS .myUniqueTable th {
+  text-align: left !important;
+}
+.THIS .innerclass{
+  margin-left: 2.5%;
+  z-index: 99 !important;
+
+}
+
+.THIS .OuterClass{
+ background-color: blue;
+ padding: 0px;
+ margin: 0px;
+ z-index: 999;
+} */

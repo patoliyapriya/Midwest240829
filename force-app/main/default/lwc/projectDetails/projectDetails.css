@@ -1,0 +1,10 @@
+.modal-container {
+    max-width: 80rem !important;
+    width: 80% !important;
+}
+
+.modal-content {
+    min-height: 400px !important;
+    scroll-behavior: auto;
+    overflow: scroll;
+}

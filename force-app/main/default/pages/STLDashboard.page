@@ -1,0 +1,163 @@
+<apex:page controller="STLDashboard" sidebar="false" showHeader="false">
+    <style>
+        
+        .headerColumn{
+            font-weight:800;
+            color:white;
+            font-size; 16px;
+            
+        }
+        
+        .rowDetail{
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        table.darkTable {
+            background-color: #FFFFFF;
+            width: 100%;
+            height: 200px;
+            text-align: left;
+            border-collapse: collapse;
+            font-family: Source Sans Pro, san-serif !important;
+        
+        }
+        
+        table.darkTable td, table.darkTable th {
+            border: 0px solid #4A4A4A;
+            padding: 4px 3px;
+            font-family: Source Sans Pro, san-serif !important;
+        }
+        
+        table.darkTable tbody td {
+            font-size: 18px;  
+            font-family: Source Sans Pro, san-serif !important;
+        }
+        
+        table.darkTable tr:nth-child(even) {
+            background: #E0DEDE;
+        }
+        
+        table.darkTable thead {
+            background: #3c3c3c;  
+            font-family: Source Sans Pro, san-serif !important;
+        }
+        
+        table.darkTable thead th {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            text-align: center; 
+            font-family: Source Sans Pro, san-serif !important;
+        }
+        
+        table.darkTable thead td {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-align: center; 
+            font-family: Source Sans Pro, san-serif !important;
+        }
+        
+        table.darkTable thead th:first-child {
+            border-left: none;
+        }
+        
+        .top{
+            background-color:#2a2a2a;
+            color:white;
+            text-align:left;
+        }
+        
+        .green{
+            background: linear-gradient(#60ff7a, #4dbe58);
+        }
+        
+        .red{
+            background: linear-gradient(#ff6363, #c21616);
+        }
+        
+        .textgreeen{
+            color:#078528;
+        }
+        
+        .textred{
+            color:#870000;
+        }
+        
+        .textred2{
+            color:#870000;
+        }
+        
+    </style>
+    <apex:form >
+        <apex:actionPoller action="{!refreshDashBoard}" reRender="pnlTopTenOpportunity" interval="60"/>
+        <apex:outputPanel id="pnlTopTenOpportunity">
+            <table class="darkTable" style="line-height:1.0">
+                <thead>
+                    <tr>
+                        <th colspan="7" style="text-align:left; height:40px"> MIDWEST MACHINERY SALES STL DASHBOARD | TOP 10 TARGETED</th>
+                        <th colspan="3" style="text-align:right;">
+                            TOTAL TARGETED PIPELINE: 
+                            <apex:outputText value="{0,number,currency}" >
+                                <apex:param value="{!totalTargeted}" />
+                            </apex:outputText>
+                        </th>
+                    </tr>
+                    <tr class="top" style="height:32px">
+                        <td class="top" style="min-width: 75px">OPP #</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 100px">NAME</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 86px">OWNER</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 100px">TOTAL PROJECT $</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 100px">EST. CLOSE</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 55px">PROB %</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 275px">BIDDERS</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 275px">DESCRIPTION</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A; min-width: 110px">LAST ACTIVITY</td>
+                        <td class="top" style="border-left: 2px solid #4A4A4A">LAST UPDATE</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <apex:repeat value="{!lstOpportunityTargetedWrapper}" var="opp">
+                        <tr style="background-color:{!opp.strColor}">
+                            <td style="height: 80px;">
+                                <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                            </td>
+                            <td>{!opp.Opportunity.Name}</td>
+                            <td>{!opp.Opportunity.Owner.Name}</td>
+                            <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                            <td>
+                                <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                    <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                                </apex:outputText>
+                            </td>
+                            <td>
+                                <font size="5">
+                                    <apex:outputField value="{!opp.Opportunity.Probability}" />
+                                </font>
+                            </td>
+                            <td>
+                                <font size="3">
+                                    <apex:outputText value="{!opp.Opportunity.Bidders__c}" />
+                                </font>
+                            </td>
+                            <td>
+                                {!opp.Opportunity.Description}
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                    <apex:param value="{!opp.Opportunity.LastModifiedDate}" /> 
+                                </apex:outputText>
+                            </td>
+                            <td>
+                                <font size="3">
+                                    <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                                </font>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

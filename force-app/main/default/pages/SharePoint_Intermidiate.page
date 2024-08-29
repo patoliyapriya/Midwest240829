@@ -1,0 +1,6 @@
+<apex:page controller="SharePointIntermidiateController" 
+            action="{!openSharepointFolder}">
+    <script>
+       
+    </script>
+</apex:page>

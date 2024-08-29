@@ -1,0 +1,93 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-30-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div>
+        <template if:true={quoteDetails}>
+            <table class="slds-m-left_small slds-text-heading_small" if:false={isMarrs}>
+                <tr>
+                    <td>{label.extendedCostLabel}</td>
+                    <td>{label.directSellPriceLabel}</td>
+                    <td>{label.buyResellAndPTPrice}</td>
+                    <td>{label.buyResellAndPTMargin}</td>
+                    <td>{label.buyResellAndPTMarginPercent}</td>
+                    <td>{label.commissionAndRebates}</td>
+                    <td>{label.projectMargin}</td>
+                    <td>{label.projectMarginPercent}</td>
+                    <td>{label.sellPrice}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.extendedCost} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.directSellPrice} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.buyResellPrice} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.buyResellMargin} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.buyResellMarginPercent} 
+                                                    format-style="percent-fixed" 
+                                                    maximum-fraction-digits="2">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.commissionAndRebates} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td><lightning-formatted-number value={quoteDetails.projectMargin} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.projectMarginPercent} 
+                                                    format-style="percent-fixed" 
+                                                    maximum-fraction-digits="2">
+                        </lightning-formatted-number>
+                    </td>
+                    <td>
+                        <lightning-formatted-number value={quoteDetails.sellPrice} 
+                                                    format-style="currency" 
+                                                    currency-code="USD">
+                        </lightning-formatted-number>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="slds-grid slds-text-heading_small slds-p-around_x-small" if:true={isMarrs}>
+                <div class="slds-col slds-size_4-of-12 slds-text-align_left"></div>
+                <div class="slds-col slds-size_4-of-12 slds-text-align_center"></div>
+                <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                    {label.sellPrice} :&nbsp; 
+                    <lightning-formatted-number value={quoteDetails.sellPrice} 
+                                            format-style="currency" 
+                                            currency-code="USD">
+                    </lightning-formatted-number>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

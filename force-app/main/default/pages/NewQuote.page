@@ -1,0 +1,102 @@
+<apex:page StandardController="Quote" extensions="NewQuoteController"  contentType="text/html;charset=utf-8"   lightningStylesheets="true">
+
+    <script>
+        
+        function openQuoteUpdatePopup() {
+            //alert('yes');
+            var popup = document.getElementById('divQuoteName');
+            popup.style.display = 'block';
+            return false;
+        }
+         
+        function closeQuoteUpdatePopup() {
+            var popup = document.getElementById('divQuoteName');
+            popup.style.display = 'none';
+            return false;
+        }
+         
+    </script>
+    <style type="text/css">
+        .Popup{       
+            z-index: 9999; 
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            width: 500px;
+            margin-left: -250px;
+            top:100px;
+        }
+        .popupBackground{
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+
+    </style>
+    
+    <apex:form id="formId">
+        <apex:sectionHeader subtitle="New Quote" title="Quote"/>
+        
+        <div id="divQuoteName" style="display:none;">
+            <apex:outputPanel styleClass="popupBackground" layout="block" />
+                <apex:outputPanel styleClass="Popup" layout="block" >
+                    <apex:pageBlock title="Update Quote Name">
+                        <apex:pageBlockSection columns="1">
+                            <apex:inputField label="Quote Name" value="{!quote.Name}" style="width: 100%" id="quoteName"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockButtons location="bottom" style="margin-top: 0%">
+                            <apex:commandButton value="Save" action="{!updateQuote}" />
+                            <apex:commandButton value="Cancel" onClick="return closeQuoteUpdatePopup();" />
+                        </apex:pageBlockButtons>
+                    </apex:pageBlock>
+             </apex:outputPanel>
+        </div>
+        
+        <apex:outputPanel rendered="{! !isMaRRsOpportunity}">
+            <apex:pageBlock rendered="{! (!hasSplitEngineer || !hasApplicationEngineer)}">
+                <apex:pageBlockButtons > 
+                    <apex:commandButton value="Go to Opportunity" action="{!Cancel}"/>
+                </apex:pageBlockButtons>
+                <apex:pageMessage summary="You must add a Sales Engineer Split in the Opportunity prior to creating a quote. If you don’t know the exact split, use your best guess for now. You can update the splits at any time." 
+                        severity="warning" strength="3" rendered="{! !hasSplitEngineer}"/>
+                
+                <apex:pageMessage summary="You must add Application Engineer in the Opportunity prior to creating a quote." 
+                        severity="warning" strength="3"  rendered="{! !hasApplicationEngineer}" />
+            </apex:pageBlock>
+        </apex:outputPanel>
+        
+         
+        <apex:pageBlock title="Quote Edit" mode="Edit" rendered="{!(hasSplitEngineer && hasApplicationEngineer) || isMaRRsOpportunity}" >
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!SaveQuote}" onComplete="return openQuoteUpdatePopup();" reRender="formId"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!Cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Quote Information" collapsible="false">
+                <!-- <apex:inputField value="{!Quote.Name}"/> -->
+                <apex:inputField value="{!Quote.Bid_Date__c}"/>
+                <apex:inputfield value="{!Quote.Bidding_To__c}" />
+                <apex:inputField value="{!Quote.Submitted_By__c}"/>
+                <apex:outputfield value="{!opportunity.Name}" />
+                <apex:inputField value="{!Quote.prepared_by_user__c}" />
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Opportunity Number</apex:outputLabel>
+                    <apex:outputText value="{!opportunityNumber}"></apex:outputText>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Bid Date</apex:outputLabel>
+                    <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                        <apex:param value="{!opportunity.Bid_Date__c}" /> 
+                    </apex:outputText>
+                </apex:pageBlockSectionItem>
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

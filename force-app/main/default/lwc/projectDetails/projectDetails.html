@@ -1,0 +1,757 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 11-01-2023
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <lightning-card>
+        <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+            <lightning-accordion-section label="Project Status Report" name="A" >
+                <div style="margin-bottom: 15px;">
+                    <lightning-button label="Sharepoint Folder" title="It will open sharepoint folder in new tab."
+                        onclick={GoToSharePointFolder}></lightning-button>
+                </div>
+
+                <template for:each={lstGroupWrapper} for:item="parentGroup">
+                    <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}
+                        key={parentGroup.groupId}>
+                        <lightning-accordion-section name="parentGroup" label={parentGroup.groupName}>
+                            <template for:each={parentGroup.subGroupList} for:item="subGroup">
+                                <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}
+                                    key={subGroup.subGroupId}>
+                                    <lightning-accordion-section label={subGroup.subGroupName} name="BB2">
+                                        <div style="margin-top: 15px;">
+                                            <c-my-custom-data-table key-field="id" columns={columns}
+                                                data={subGroup.lstQuoteLineItems} hide-checkbox-column
+                                                wrap-text-max-lines="2" default-sort-direction={defaultSortDirection}
+                                                sorted-direction={sortDirectionProjectStatus}
+                                                sorted-by={sortedByProjectStatus} onsort={onSortProjectStatus}
+                                                show-row-number-column onsave={handleSaveProjectStatus}
+                                                draft-values={draftValuesProjectStatus}
+                                                onvaluechange={handleValueChange} oncellchange={handleCellChange}
+                                                data-record="Id" onedit={handleEdit} oncancel={handleCancel}
+                                                oncustomtblur={handleBlur}>
+                                            </c-my-custom-data-table>
+                                            <div
+                                                style="background-color: #54698d; padding: 5px; color: white; padding-left: 10px; display: flex;">
+                                                <div style="width: 46%;">TOTALS</div>
+                                                <div style="width: 27%;"><b>Invoice Amount Totals:</b>
+                                                    ${subGroup.totalInvoiceAmount}</div>
+                                                <div style="width: 27%;"><b>Amount Paid:</b> ${subGroup.totalAmountPaid}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </lightning-accordion>
+                            </template>
+                        </lightning-accordion-section>
+                    </lightning-accordion>
+                </template>
+            </lightning-accordion-section>
+
+            <lightning-accordion-section label="Accounting" name="B" allow-multiple-sections-open={multiple}>
+
+                <template for:each={lstGroupWrapper} for:item="parentGroup">
+                    <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}
+                        key={parentGroup.groupId}>
+                        <lightning-accordion-section name="parentGroup" label={parentGroup.groupName}>
+                            <template for:each={parentGroup.subGroupList} for:item="subGroup">
+                                <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}
+                                    key={subGroup.subGroupId}>
+                                    <lightning-accordion-section label={subGroup.subGroupName} name="BB2">
+                                        <div style="margin-top: 15px;">
+                                            <c-my-Custom-Data-Table key-field="Id" columns={columnAccountingSeed}
+                                                data={subGroup.lstQuoteLineItems} wrap-text-max-lines="3"
+                                                hide-checkbox-column default-sort-direction={defaultSortDirection}
+                                                sorted-direction={sortDirectionAccounting}
+                                                sorted-by={sortedByAccounting} onsort={onSortAccounting}
+                                                show-row-number-column onsave={handleSave}
+                                                draft-values={draftValuesAccounting}>
+                                            </c-my-Custom-Data-Table>
+                                            <div
+                                                style="background-color: #54698d; padding: 5px; color: white; padding-left: 10px; display: flex;">
+                                                <div style="width: 46%;">TOTALS</div>
+                                                <div style="width: 27%;"><b>Invoice Amount Totals:</b>
+                                                    ${subGroup.totalInvoiceAmount}</div>
+                                                <div style="width: 27%;"><b>Amount Paid:</b> ${subGroup.totalAmountPaid}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </lightning-accordion>
+                            </template>
+                        </lightning-accordion-section>
+                    </lightning-accordion>
+                </template>
+
+            </lightning-accordion-section>
+
+            <lightning-accordion-section label="Startup and Warranty" name="C" >
+                <template for:each={lstGroupWrapper} for:item="parentGroup">
+                    <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}
+                        key={parentGroup.groupId}>
+                        <lightning-accordion-section name="parentGroup" label={parentGroup.groupName}>
+                            <template for:each={parentGroup.subGroupList} for:item="subGroup">
+                                <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}
+                                    key={subGroup.subGroupId}>
+                                    <lightning-accordion-section label={subGroup.subGroupName} name="BB2">
+                                        <div style="margin-top: 15px;">
+
+                                            <c-my-custom-data-table key-field="id" columns={columnsStartup}
+                                                data={subGroup.lstQuoteLineItems} hide-checkbox-column
+                                                wrap-text-max-lines="2" default-sort-direction={defaultSortDirection}
+                                                sorted-direction={sortDirectionStartUp} sorted-by={sortedByStartUp}
+                                                onsort={onSortStartUp} onsave={handleSaveStartup}
+                                                draft-values={draftValuesStartUpWarranty}>
+                                            </c-my-custom-data-table>
+                                            <div
+                                                style="background-color: #54698d; padding: 5px; color: white; padding-left: 10px; display: flex;">
+                                                <div style="width: 46%;">TOTALS</div>
+                                                <div style="width: 27%;"><b>Invoice Amount Totals:</b>
+                                                    ${subGroup.totalInvoiceAmount}</div>
+                                                <div style="width: 27%;"><b>Amount Paid:</b> ${subGroup.totalAmountPaid}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </lightning-accordion>
+                            </template>
+                        </lightning-accordion-section>
+                    </lightning-accordion>
+                </template>
+
+            </lightning-accordion-section>
+
+            <lightning-accordion-section label="PM Email Tool" name="D" >
+                <lightning-record-edit-form record-id={recordId} object-api-name="Project__c" density="compact"
+                    onsuccess={handleSuccessProjectSave}>
+
+                    <lightning-button label="Send Update" variant="slds-button_neutral" class="slds-m-left_x-small"
+                        onclick={openSendEmailPopup}></lightning-button>
+                    <lightning-button label="Schedule Update" variant="slds-button_neutral" class="slds-m-left_x-small"
+                        onclick={openSchedulePopup}></lightning-button>
+                    <lightning-button type="submit" class="slds-m-left_x-small" label="Update Project"
+                        variant="brand"></lightning-button>
+
+                    <table
+                        class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout"
+                        role="grid" style="width: 100%;margin-top: 15px;" id="tblPMTool">
+                        <tr>
+                            <td>
+                                <lightning-input-field field-name="Hide_Released_to_Mfgr__c"></lightning-input-field>
+                            </td>
+                            <td>
+                                <lightning-input-field field-name="Hide_Tag__c"></lightning-input-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <lightning-input-field field-name="Hide_Act_Ship__c"></lightning-input-field>
+                            </td>
+                            <td>
+                                <lightning-input-field field-name="Hide_IOM_Done__c"></lightning-input-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <lightning-input-field field-name="Hide_Billing_Status__c"></lightning-input-field>
+                            </td>
+                            <td>
+                                <lightning-input-field field-name="Hide_Date_of_Billing__c"></lightning-input-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <lightning-input-field field-name="Hide_Payment_Received__c"></lightning-input-field>
+                            </td>
+                            <td>
+                                <lightning-input-field field-name="Hide_Note__c"></lightning-input-field>
+                            </td>
+                        </tr>
+                    </table>
+
+                </lightning-record-edit-form>
+            </lightning-accordion-section>
+
+            <lightning-accordion-section label="Financials" name="E" >
+                <table>
+                    <tr>
+                        <td style="width: 50%;vertical-align: top;">
+
+                            <table aria-multiselectable="true"
+                                class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                                role="grid" style="width: 98%;" cellspacing=9px>
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th style="width: 50%; font-weight: bold; ">REVENUE</th>
+                                        <th colspan=2 class="centerHeading">AMOUNTS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>DIRECT </td>
+                                        <td colspan="2">
+                                            <!-- ${activeFinancialQuote.salesDirect} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.salesDirect}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>BUY/RESELL</td>
+                                        <td colspan="2">
+                                            <!-- ${activeFinancialQuote.salesBuyReSell} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.salesBuyReSell}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                    </tr>
+                                    <tr class="bgcolorOfTotal">
+                                        <td>TOTAL PROJECT SALES</td>
+                                        <td colspan="2">
+                                            <!-- ${activeFinancialQuote.totalProjectSales} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.totalProjectSales}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th colspan="3">COST</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>DIRECT</td>
+                                        <td colspan="2">N/A</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BUY/RESELL</td>
+                                        <td colspan="2">
+                                            <!-- ${activeFinancialQuote.costBuyResell} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.costBuyResell}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                    </tr>
+                                    <tr class="bgcolorOfTotal">
+                                        <td>TOTAL PROJECT COST</td>
+                                        <td colspan="2">
+                                            <!-- ${activeFinancialQuote.costBuyResell} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.costBuyResell}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th>MARGIN</th>
+                                        <th><b>$</b></th>
+                                        <th><b>%</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>COMISSION/REBATE</td>
+                                        <td>
+                                            <!-- ${activeFinancialQuote.marginCommissionRebate} -->
+                                            <lightning-formatted-number
+                                                value={activeFinancialQuote.marginCommissionRebate}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+
+                                        </td>
+                                        <td>
+                                            <template if:true={activeFinancialQuote.marginCommissionRebatePercentage}>
+                                                {activeFinancialQuote.marginCommissionRebatePercentage}%
+                                            </template>
+                                            <template if:false={activeFinancialQuote.marginCommissionRebatePercentage}>
+                                                N/A
+                                            </template>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>BUY/RESELL</td>
+                                        <td>
+                                            <!-- ${activeFinancialQuote.marginBuyResell} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.marginBuyResell}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+
+                                        </td>
+                                        <td>{activeFinancialQuote.marginBuyResellPercentage}%</td>
+                                    </tr>
+                                    <tr class="bgcolorOfTotal">
+                                        <td>TOTAL PROJECT MARGIN</td>
+                                        <td>
+                                            <!-- ${activeFinancialQuote.totalProjectMargin} -->
+                                            <lightning-formatted-number value={activeFinancialQuote.totalProjectMargin}
+                                                format-style="currency" currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                        <td>{activeFinancialQuote.totalProjectMarginPercentage}%</td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </td>
+                        <td style="vertical-align: top;">
+                            <table aria-multiselectable="true"
+                                class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                                role="grid" style="width: 95%;" id="tblSO">
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th style="width: 20%;">SO/PO</th>
+                                        <th style="width: 20%;">Revenue</th>
+                                        <th style="width: 20%;">Cost</th>
+                                        <th style="width: 20%;">Margin $</th>
+                                        <th style="width: 20%;">Margin %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={lstSalesAndPurchaseOrders} for:item="so">
+                                        <tr key={so.id}>
+                                            <td>
+                                                <lightning-formatted-url value={so.soUrl} label={so.Name}
+                                                    target="_blank"></lightning-formatted-url>
+                                            </td>
+                                            <td>
+                                                <!-- ${so.AcctSeedERP__Total__c} -->
+                                                <lightning-formatted-number value={so.AcctSeedERP__Total__c}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <template for:each={so.Purchase_Orders__r} for:item="po">
+                                            <tr key={po.id}>
+                                                <td style="padding-left: 30px;">
+                                                    <lightning-formatted-url value={po.poUrl} label={po.Name}
+                                                        target="_blank"></lightning-formatted-url>
+                                                </td>
+                                                <td></td>
+                                                <td style="color: red;">
+                                                    <!-- (${po.AcctSeedERP__Total__c}) -->
+                                                    (<lightning-formatted-number value={po.AcctSeedERP__Total__c}
+                                                        format-style="currency" currency-code="USD">
+                                                    </lightning-formatted-number>)
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </template>
+
+                                        <!-- Inventory Cost from product  -->
+                                        <template for:each={so.invCost} for:item="ic">
+                                            <tr key={ic.id}>
+                                                <td style="padding-left: 30px;">
+                                                    <lightning-formatted-url value={ic.icUrl} label={ic.Name}
+                                                        target="_blank"></lightning-formatted-url>
+                                                </td>
+                                                <td></td>
+                                                <td style="color: red;">
+                                                    (<lightning-formatted-number value={ic.AcctSeed__Unit_Cost__c}
+                                                        format-style="currency" currency-code="USD">
+                                                    </lightning-formatted-number>)
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </template>
+
+                                        <tr key={so.id} style="background-color: #EBEBEB; font-weight: bold;">
+                                            <td style="font-weight: bold;">Totals</td>
+                                            <td>
+                                                <!-- ${so.AcctSeedERP__Total__c} -->
+                                                <lightning-formatted-number value={so.AcctSeedERP__Total__c}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>
+                                            </td>
+                                            <td style="color: red; font-weight: bold;">
+                                                <!-- (${so.poTotal}) -->
+                                                (<lightning-formatted-number value={so.poAndICTotal}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>)
+                                            </td>
+                                            <td>
+                                                <!-- ${so.margin} -->
+                                                <lightning-formatted-number value={so.margin} format-style="currency"
+                                                    currency-code="USD">
+                                                </lightning-formatted-number>
+                                            </td>
+                                            <td>{so.marginPercentage}%</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+
+                            <!-- lABOR POSTING WITH JOURNAL ENTRY -->
+                            <table aria-multiselectable="true"
+                                class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                                role="grid" style="width: 95%; margin-top: 20px;" id="tblJournalEntry">
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th style="width: 25%;">LABOR POSTINGS</th>
+                                        <th style="width: 25%;">HOURS</th>
+                                        <th style="width: 25%;">DEBITS/CREDITS</th>
+                                        <th style="width: 25%;">REFERENCE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={journalEntryList} for:item="journalEnt">
+                                        <tr key={journalEnt.ID}>
+                                            <td></td>
+                                            <td>{journalEnt.hourQuantity}</td>
+                                            <!-- need if its debit then red else credit then green -->
+                                            <td style="color: red; font-weight: bold;" if:true={journalEnt.debit}>
+                                                (<lightning-formatted-number value={journalEnt.debit}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>)
+                                            </td>
+
+                                            <td style="color: green; font-weight: bold;" if:false={journalEnt.debit}>
+                                                (<lightning-formatted-number value={journalEnt.credit}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>)
+                                            </td>
+                                            <td class="slds-form-element slds-size--1-of-12 td-fixed-width">
+                                                <div class="slds-cell-wrap">{journalEnt.reference}</div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                                <tr style="background-color: #EBEBEB; font-weight: bold;">
+                                    <td style="font-weight: bold;">TOTAL LABOR</td>
+                                    <td></td>
+                                    <td style="color: red; font-weight: bold;">
+                                        (<lightning-formatted-number value={totalLabourJE} format-style="currency"
+                                            currency-code="USD">
+                                        </lightning-formatted-number>)
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+
+                            <!-- OTHER POSTING WITH JOURNAL ENTRY -->
+                            <table aria-multiselectable="true"
+                                class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                                role="grid" style="width: 95%; margin-top: 20px;" id="OtherJournalEntry">
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th style="width: 25%;">OTHER POSTINGS</th>
+                                        <th style="width: 25%;">HOURS</th>
+                                        <th style="width: 25%;">DEBITS/CREDITS</th>
+                                        <th style="width: 25%;">REFERENCE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={journalEntryOtherList} for:item="journalEntOther">
+                                        <tr key={journalEntOther.ID}>
+                                            <td></td>
+                                            <td>{journalEntOther.hourQuantity}</td>
+                                            <!-- need if its debit then red else credit then green -->
+                                            <td style="color: red; font-weight: bold;" if:true={journalEntOther.debit}>
+                                                (<lightning-formatted-number value={journalEntOther.debit}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>)
+                                            </td>
+
+                                            <td style="color: green; font-weight: bold;"
+                                                if:false={journalEntOther.debit}>
+                                                (<lightning-formatted-number value={journalEntOther.credit}
+                                                    format-style="currency" currency-code="USD">
+                                                </lightning-formatted-number>)
+                                            </td>
+                                            <td class="slds-form-element slds-size--1-of-12 td-fixed-width">
+                                                <div class="slds-cell-wrap">{journalEntOther.reference}</div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                                <tr style="background-color: #EBEBEB; font-weight: bold;">
+                                    <td style="font-weight: bold;">TOTAL OTHER</td>
+                                    <td></td>
+                                    <td style="color: red; font-weight: bold;">
+                                        (<lightning-formatted-number value={totalOtherJE} format-style="currency"
+                                            currency-code="USD">
+                                        </lightning-formatted-number>)
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+
+                            <table aria-multiselectable="true"
+                                class="slds-table slds-no-cell-focus slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols"
+                                role="grid" style="width: 95%; margin-top: 20px;">
+                                <thead>
+                                    <tr class="slds-line-height_reset" style="height: 25px;">
+                                        <th></th>
+                                        <th>Total Revenue</th>
+                                        <th>Total Cost</th>
+                                        <th>Total Margin $</th>
+                                        <th>Total Margin %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="color: green; font-weight: bold; width: 20%;">Grand Totals</td>
+                                        <td style="font-weight: bold; width: 20%;">
+                                            <lightning-formatted-number value={grandTotalSO} format-style="currency"
+                                                currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                        <td style="font-weight: bold; color: red; width: 20%;">
+                                            (<lightning-formatted-number value={grandTotalCost} format-style="currency"
+                                                currency-code="USD">
+                                            </lightning-formatted-number>)
+                                        </td>
+                                        <td style="color: green; font-weight: bold; width: 20%;">
+                                            <lightning-formatted-number value={grandTotalMargin} format-style="currency"
+                                                currency-code="USD">
+                                            </lightning-formatted-number>
+                                        </td>
+                                        <td style="color: green; font-weight: bold; width: 20%;">
+                                            {grandTotalMarginPercentage}%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <template if:true={isOtherCostPostingPopupOpen}>
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                    title="Close" onclick={closeOtherCostingModal}>
+                                    <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                        <use
+                                            xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close">
+                                        </use>
+                                    </svg>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h2 class="slds-modal__title slds-hyphenate">Other Cost Posting</h2>
+                            </header>
+                            <lightning-record-edit-form object-api-name="Cost_Posting__c" record-id={costPostingId}
+                                onsubmit={handleSubmit} onsuccess={handleSuccessOtherPosting} class="otherPosting">
+                                <div class="slds-modal__content slds-p-around_medium">
+                                    <table class="slds-table">
+                                        <tr>
+                                            <td style="width: 20%;">Quantity</td>
+                                            <td>
+                                                <lightning-input-field field-name="Quantity__c" variant="label-hidden">
+                                                </lightning-input-field>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Unit Cost</td>
+                                            <td>
+                                                <lightning-input-field field-name="Unit_Cost__c" variant="label-hidden">
+                                                </lightning-input-field>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Description</td>
+                                            <td>
+                                                <lightning-input-field field-name="Description__c"
+                                                    variant="label-hidden">
+                                                </lightning-input-field>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <footer class="slds-modal__footer">
+                                    <lightning-button label="Cancel" variant="neutral"
+                                        onclick={closeOtherCostingModal}></lightning-button>
+                                    <lightning-button label="" variant="brand" type="submit"
+                                        class="slds-m-left_x-small"></lightning-button>
+                                </footer>
+                            </lightning-record-edit-form>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+            </lightning-accordion-section>
+
+            <template if:true={isSendEmailPopup}>
+                <!--
+                        <c-email-send></c-email-send>
+                    -->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container modal-container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closeSendEmailPopup}>
+                                <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                    <use
+                                        xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close">
+                                    </use>
+                                </svg>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Send Email</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium modal-content" id="modal-content-id-2">
+                            <c-email-Send record-id={recordId}></c-email-Send>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Close" variant="slds-button_neutral" onclick={closeSendEmailPopup}
+                                class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button class="slds-m-left_x-small" variant="brand" type="submit"
+                                name="Send Email" label="Send Email" onclick={sendEmail}></lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+
+            <template if:true={isSchedulePopupOpen}>
+                <div if:true={isLoading} class="exampleHolder">
+                    <div class="demo-only" style="height:6rem">
+                        <div class="slds-spinner_container">
+                            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container modal-container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closeSchedulePopup}>
+                                <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                    <use
+                                        xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#close">
+                                    </use>
+                                </svg>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Schedule Email (9:00 AM)
+                            </h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium modal-content" id="modal-content-id-1">
+
+
+                            <template for:each={lstScheduleTo} for:item="sch" for:index="ind">
+                                <div class="slds-grid slds-wrap" key={sch.Id} style="margin-top: 1%;">
+                                    <div class="slds-col slds-size_1-of-12" key={sch.Id}>
+                                        <span>Schedule To</span>
+                                    </div>
+
+                                    <div class="slds-col slds-size_2-of-12" key={sch.Id}>
+                                        <span>
+                                            <lightning-record-edit-form record-id={sch.Id}
+                                                object-api-name="Project_Schdule_To__c">
+                                                <lightning-input-field field-name="Schedule_Type__c"
+                                                    variant="label-hidden" value={sch.Schedule_Type__c}
+                                                    onchange={handleChangeScheduleTypeChage}
+                                                    data-index={ind}></lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </span>
+                                    </div>
+
+                                    <div class="slds-col slds-size_3-of-12" key={sch.Id}
+                                        style="margin-left:2%; margin-right:2%;">
+                                        <template if:true={sch.isUser}>
+                                            <lightning-record-edit-form record-id={sch.Id}
+                                                object-api-name="Project_Schdule_To__c">
+                                                <lightning-input-field field-name="User__c" variant="label-hidden"
+                                                    value={sch.User__c} onchange={handleChangeScheduleTypeChage}
+                                                    data-index={ind}>
+                                                </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </template>
+                                        <template if:false={sch.isUser}>
+                                            <lightning-record-edit-form record-id={sch.Id}
+                                                object-api-name="Project_Schdule_To__c">
+                                                <lightning-input-field field-name="Contact__c" variant="label-hidden"
+                                                    value={sch.Contact__c} onchange={handleChangeScheduleTypeChage}
+                                                    data-index={ind}>
+                                                </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </template>
+                                    </div>
+
+                                    <div class="slds-col slds-size_23-of-12" key={sch.Id}>
+                                        <template if:true={sch.isLast}>
+                                            <lightning-button variant="brand" label="Add Recipient" data-index={ind}
+                                                icon-name="utility:adduser" value={ind}
+                                                onclick={onAddUser}></lightning-button>
+                                        </template>
+                                    </div>
+
+                                    <div class="slds-col slds-size_2-of-12 slds-align_absolute-left" key={sch.Id}>
+                                        <lightning-button variant="destructive" label="Delete"
+                                            icon-name="utility:delete" class="slds-m-left_x-small" data-index={ind}
+                                            value={ind} onclick={onDeleteUser}></lightning-button>
+                                    </div>
+                                </div>
+
+                            </template>
+
+                            <div class="slds-grid slds-wrap" style="    MARGIN-TOP: 3%;">
+                                <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12"
+                                    style="font-weight: 700;">
+                                    <span>Send Every</span>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-large-size_8-of-12" style="width: 40%;">
+                                    <span>
+                                        <lightning-record-edit-form record-id={recordId} object-api-name="Project__c">
+                                            <lightning-input-field field-name="Schedule_On__c" variant="label-hidden"
+                                                data-index={ind} onchange={handleChangeScheduleTypeChage}>
+                                            </lightning-input-field>
+                                        </lightning-record-edit-form>
+                                    </span>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12"
+                                    style="margin-top: 1%;font-weight: 700;">
+                                    <span>Schedule End Date</span>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-large-size_8-of-12"
+                                    style="margin-top: 1%;width: 40%;">
+                                    <span>
+                                        <lightning-record-edit-form record-id={recordId} object-api-name="Project__c">
+                                            <lightning-input-field field-name="Schedule_End_Date__c"
+                                                variant="label-hidden" data-index={ind}
+                                                onchange={handleChangeScheduleTypeChage}></lightning-input-field>
+                                        </lightning-record-edit-form>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" variant="slds-button_neutral" onclick={closeSchedulePopup}
+                                class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button class="slds-m-left_x-small" variant="brand" type="submit" name="Save"
+                                label="Save" onclick={saveEmailSchedules}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+        </lightning-accordion>
+    </lightning-card>
+</template>

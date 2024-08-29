@@ -1,0 +1,98 @@
+<!-- sldsValidatorIgnore -->
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-10-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <template lwc:if={productDetails}>
+        <section role="dialog" 
+                tabindex="-1" 
+                aria-labelledby="modal-heading-01" 
+                aria-modal="true"
+                aria-describedby="modal-content-id-1" 
+                class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+                            title="Close"
+                            onclick={handleClose}>
+                        <lightning-icon icon-name="utility:close" 
+                                        alternative-text="close" 
+                                        variant="inverse"
+                                        size="small">
+                        </lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" 
+                        class="slds-text-heading_medium slds-hyphenate">
+                        {label.addProduct}
+                    </h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-m-bottom_small bottom_margin" data-id="searchBar">
+                        <lightning-input type="search"
+                                        value={searchValue}
+                                        class="slds-m-bottom_xx-small"
+                                        variant="label-hidden"
+                                        placeholder="Search Product"
+                                        onchange={handleSearch}>
+                        </lightning-input>
+                        <template for:each={allSelectedRows} for:item="row">
+                            <lightning-pill label={row.name} 
+                                            key={row.productId} 
+                                            class="slds-m-around_xx-small"
+                                            data-product-id={row.productId} 
+                                            onremove={handleRemovePill} 
+                                            title={row.name}>
+                            </lightning-pill>
+                        </template>
+                    </div>
+                    <lightning-spinner alternative-text="Loading" 
+                                    size="large" 
+                                    variant="brand"
+                                    if:true={isLoading}>
+                    </lightning-spinner>
+                    <div class="slds-p-around_medium">
+                        <lightning-datatable key-field="productId"
+                                            data={productDetails}
+                                            columns={columns}
+                                            onrowselection={handleRowSelection}
+                                            selected-rows={preSelectedRows}>
+                        </lightning-datatable>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-3 "></div>
+                        <div class="slds-col slds-size_1-of-3 slds-align_absolute-center">
+                            <button class="slds-button slds-button_neutral" 
+                                    onclick={handlePrevious}
+                                    disabled={disablePrevious}>
+                                {label.previousLabel}
+                            </button>
+                            <button class="slds-button slds-button_neutral" 
+                                    onclick={handleNext}
+                                    disabled={disableNext}>
+                                {label.nextLabel}
+                            </button>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <button class="slds-button slds-button_neutral" 
+                                    onclick={handleClose}>
+                                {label.cancelLabel}
+                            </button>
+                            <button class="slds-button slds-button_brand" 
+                                    onclick={handleContinue}>
+                                {label.continueLabel}
+                            </button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

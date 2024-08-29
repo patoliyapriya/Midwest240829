@@ -1,0 +1,28 @@
+<template>
+    <div if:true={isLoading} >
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+    <div style="width: 95%; font-weight: bold; margin: 15px;">
+        <div style="text-align: right; width: 100%; border-top: 1px solid #e5e5e5; background-color: #f3f3f3; padding: 6px;">All Projects</div>
+        <div style="display: flex; padding: 6px;">
+            <div style="width: 70%;">Total Sales Backlog (Booked not Invoiced)</div>
+            <div style="text-align: right; width: 30%;">
+                <lightning-formatted-number value={salesBackLog} format-style="currency" currency-code="USD"></lightning-formatted-number>
+            </div>
+        </div>
+        <div style="display: flex; border-top: 1px solid #e5e5e5; padding: 6px;">
+            <div style="width: 70%;">Total Margin Backlog (Booked not Invoiced)</div>
+            <div style="text-align: right; width: 30%;">
+                <lightning-formatted-number value={marginBacklog} format-style="currency" currency-code="USD"></lightning-formatted-number>
+            </div>
+        </div>
+        <div style="height: 30px;"></div>
+    </div>
+    <!--
+    <lightning-datatable columns={columns}
+                            data={salesBackLog}
+                            key-field="id"
+                            hide-checkbox-column>
+    </lightning-datatable>
+    -->
+</template>

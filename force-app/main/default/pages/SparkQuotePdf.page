@@ -1,0 +1,132 @@
+<apex:page renderAs="pdf" applyHtmlTag="false" showHeader="false" applyBodyTag="false" standardController="quote" extensions="SparkQuotePdfController">
+
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                margin-bottom: 4.5cm;
+
+                @bottom-center {
+                    content: element(footer);
+                }
+            }
+
+            div.footer {
+                display: block;
+                position: running(footer);
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+        </style>
+    </head>
+
+    <body style="font-family:Arial,sans-serif;">
+        <table style="width: 100%;" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    <apex:image value="{!$Resource.SparkLogo}" width="250" height="40"/>
+                </td>
+                <td style="font-size: 22px; color: #ff5a1d; text-align: right; font-weight: bold;">
+                    Quote On Investment
+                </td>
+            </tr>
+        </table>
+
+        <table style="margin-top:35px; width: 100%;">
+            <tr>
+                <td style="width: 65%">
+                    <table style="width: 100%;" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="padding-bottom: 5px;">
+                                <b style="color: #394653;">Project Name:</b>&nbsp;
+                                <apex:outputText value="{!Quote.Name}" style="color: #656e78;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-bottom: 5px;">
+                                <b style="color: #394653;">Company Name:</b>&nbsp;
+                                <apex:outputText value="{!Quote.Attention_to_Account__r.Name}" style="color: #656e78;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-bottom: 5px;">
+                                <b style="color: #394653;">Key Contact:</b>&nbsp;
+                                <apex:outputText value="{!Quote.Attention_to_Contact__r.Name}" style="color: #656e78;"/>
+                        </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b style="color: #394653;">Quote Date:</b>&nbsp;
+                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}" style="color: #656e78;">
+                                    <apex:param value="{!Quote.Bid_Date__c}" />
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                    </table>    
+                </td>
+                <td style="vertical-align: top; width: 35%;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: right; padding-bottom: 5px; color: #394653;">
+                                <b>Spark Creative and Marketing</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding-bottom: 5px; color: #656e78;">17814 Edison Avenue</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; color: #656e78;">Chesterfield, MO 63005</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b style="color: #394653;">Your Spark Contact:</b>&nbsp;
+                    <apex:outputText value="{!Quote.Owner.Name}" style="color: #656e78;"/>
+                </td>
+                <td>
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: right; padding-bottom: 5px; color: #656e78;">w. thespark.agency</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding-bottom: 5px; color: #656e78;">p. 636.288.4067</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; color: #656e78;">e. bg@thespark.agency</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <div>
+            <apex:repeat value="{!lstGroup}" var="group">
+                <div style="color: #ff5a1d; font-size: 18px; border-bottom: 2px solid #d1d1d1; padding-bottom: 20px; font-weight: bold; margin-top: 20px;">{!group.grp.Name}</div>
+                <apex:repeat value="{!group.lstSubGroups}" var="subGroup">
+                <div style="margin-top: 20px; font-weight: bold; margin-bottom: 25px; color: #6c6e70;">{!subGroup.subGroup.Name}</div>
+                    <apex:repeat value="{!subGroup.lstQuoteLineItems}" var="lineItem">
+                        <div style="margin-top: 7px; color: #6f7881;">
+                            <apex:outputText value="{!lineItem.Descriptions__c}" escape="false"/></div>
+                    </apex:repeat>
+                </apex:repeat>
+            </apex:repeat>
+        </div>
+    </body>
+
+    <div class="footer">
+        <div style="font-family:Arial,sans-serif; border-top: 2px solid #ff5a1d; text-align: right;">
+            <div style="margin-top: 15px;"><b style="color: #ff5a1d; font-size: 18px;">Total Investment:</b> 
+                <apex:outputText value="{0, number, $###,###,###,###,##0.00}">
+                    <apex:param value="{!Quote.Total_Base_Bid_Total__c}"/>
+                </apex:outputText>
+            </div>
+        </div>
+    </div>
+</apex:page>

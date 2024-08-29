@@ -1,0 +1,624 @@
+<apex:page controller="SalesRepReportController" sidebar="false">
+    <apex:slds />
+    <style>
+        table td{
+            border: 1px solid rgb(243, 242, 242) !important;
+            padding: 3px !important;
+        }
+        table {
+            border: 1px solid black !important;
+            border-collapse: inherit !important;
+        }
+        .parentDisable{
+            position:fixed;
+            top:0;
+            left:0;
+            background:#000;
+            opacity:0.5; 
+            height:100%;
+            width:100%; 
+        }
+        .descPopup{
+            width:75%;
+            position:fixed;
+            border: 0px;
+            top: 5%;
+            left: 10%;
+            background-color: white;
+            z-index: 100;
+        }
+        .tableFormula{
+            width: 97% !important;
+            border: 1px solid black !important;
+            margin: 10px !important;
+        }
+        table.tableFormula, table.tableFormula th, table.tableFormula td{
+            border: 1px solid black !important;
+        }
+    </style>
+    <script>
+        function openFormulaPopup() {
+            var divFormula = document.getElementById('idFormulaDiv');
+            divFormula.style.display = 'block';
+            return false;
+        }
+        function closeFormulaPopup() {
+            var divFormula = document.getElementById('idFormulaDiv');
+            divFormula.style.display = 'none';
+            return false;
+        }
+    </script>
+    <apex:form id="formId">
+        <div style="display:none;" id="idFormulaDiv">
+            <div class="parentDisable"></div>
+            <div class="descPopup" style="height:400px;overflow: scroll;">
+                <table class="tableFormula">
+                    <tr>
+                        <td width="15%">Filter Name</td>
+                        <td width="85%">Filter Criteria</td>
+                    </tr>
+                    <tr>
+                        <td>Top 10 Targeted</td>
+                        <td>
+                            1. Filter By SalesRep's Opportunities <br/>
+                            2. StageName = 'TARGET/NEGOTIATING' OR Targeted = true <br/>
+                            3. Total Project Margin != NULL
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Top 10 Post Bid</td>
+                        <td>
+                            1. Filter By SalesRep's Opportunities <br/>
+                            2. StageName = 'POST BID' <br/>
+                            3. Total Project Margin != NULL
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Top 10 Bidding</td>
+                        <td>
+                            1. Filter By SalesRep's Opportunities <br/>
+                            2. StageName = 'BIDDING' <br/>
+                            3. Total Project Margin != NULL
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Top 10 Lead/Budget</td>
+                        <td>
+                            1. Filter By SalesRep's Opportunities <br/>
+                            2. StageName = 'LEAD' OR StageName = 'DD/Budget' <br/>
+                            3. Total Project Margin != NULL
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Open Projects</td>
+                        <td>
+                            1. Get the Ids of an Opportunity of project where Project Stage != 'Archieved' <br/>
+                            2. Filter out Opportunity with #1(mentioned above) Opp Ids
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Actual Booking</td>
+                        <td>
+                            1. Filter By SalesRep's Opportunities <br/>
+                            2. Opportunity CloseDate greater than and equals to Current Month - Number of month Actual Booking <br/>
+                            3. Opportunity CloseDate less than and equals to TODAY <br/>
+                            4. Opportunity StageName = 'Closed Won' <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Forecast Booking</td>
+                        <td>
+                            1. Filter By SalesRep's Opportunities <br/>
+                            2. Opportunity CloseDate less than and equals to Current Month + Number of month Forecast Booking <br/>
+                            3. Opportunity CloseDate greater than and equals to TODAY <br/>
+                            4. Opportunity StageName IN ('BIDDING', 'POST BID', 'TARGET/NEGOTIATING', 'DD/BUDGET', 'ENGINEERING') <br/>
+                            5. Opportunities does not have project
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <center><button class="slds-button slds-button_brand" onclick="return closeFormulaPopup();">Close</button></center>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <apex:outputPanel >
+            <div style="padding:5px;">
+                <button class="slds-button slds-button_brand" onclick="return openFormulaPopup();">Dashboard Formulas</button>
+            </div> 
+            <table width="100%">
+                <tr>
+                    <td width="70%" style="vertical-align:top;">
+                        <table width="100%" cellspacing="0" cellpadding="5" id="tblSummary" border="1">
+                            <tr style="background-color:#CCEBEF;font-weight:bold;font-size:14px;">
+                                <td rowspan="2" align="middle">
+                                    
+                                    <!-- {!$User.FirstName} {!$User.LastName} -->
+                                    <apex:selectList size="1" value="{!selectSalesRep}">
+                                        <apex:selectOptions value="{!lstSelectSalesRep}" />
+                                        <apex:actionSupport action="{!Init}" event="onchange" reRender="formId"/>
+                                    </apex:selectList>
+                                </td>
+                                <td colspan="2" align="middle">{!YEAR(TODAY())}</td>
+                                <td colspan="4" align="middle">ACTUAL BOOKING</td>
+                                <td colspan="4" align="middle">FORECASTED BOOKING</td>
+                                <td rowspan="2" align="middle">
+                                    <apex:outputLink value="/apex/ShowAllOpportunity?stageName=Past Due&selectSalesRep={!selectSalesRep}" target="_blank" style="text-decoration:none;">PAST DUE FORECAST</apex:outputLink>
+                                </td>
+                            </tr>
+                            <tr style="background-color:#CCEBEF;font-weight:bold;">
+                                <td>Goal</td>
+                                <td>YTD</td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Actual Booking&duration=12" target="_blank" >12M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Actual Booking&duration=6" target="_blank" >6M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Actual Booking&duration=3" target="_blank" >3M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Actual Booking&duration=1" target="_blank" >1M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Forecast Booking&duration=1" target="_blank" >1M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Forecast Booking&duration=3" target="_blank" >3M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Forecast Booking&duration=6" target="_blank" >6M</apex:outputLink>
+                                </td>
+                                <td>
+                                    <apex:outputLink value="/apex/ActualForecastBooking?selectSalesRep={!selectSalesRep}&reportType=Forecast Booking&duration=12" target="_blank" >12M</apex:outputLink>
+                                </td>
+                            </tr>
+                            <apex:repeat value="{!lstSummaryTableDetails}" var="st">
+                                <tr>
+                                    <td style="background-color:#CCEBEF;font-weight:bold;font-size:14px;" width="12%">{!st.Name}</td>
+                                    <td width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.Goal}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.colorYTD}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.YTD}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.color12M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.actualBooking12M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.color6M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.actualBooking6M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.color3M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.actualBooking3M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.color1M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.actualBooking1M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.colorForecasted1M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.forecastedBooking1M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.colorForecasted3M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.forecastedBooking3M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.colorForecasted6M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.forecastedBooking6M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="background-color:{!st.colorForecasted12M}" width="8%">
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.forecastedBooking12M}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td>
+                                        <apex:outputText value="{0,number,currency}" >
+                                            <apex:param value="{!st.pastDueForecast}" />
+                                        </apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </td>
+                    <td width="15%">
+                        <analytics:reportChart reportId="00O61000001ZBZE" showRefreshButton="false" size="tiny" filter="[{column:'Sales_Representative__c.Office_Location__c',operator:'equals',value:'{!selectSalesRep}'}]" 
+                                rendered="{!IF(selectSalesRep == 'Saint Louis' || selectSalesRep == 'Oklahoma' || selectSalesRep == 'Kansas City' || selectSalesRep == 'Denver',true,false)}" id="officeRevenue"/>
+                        <analytics:reportChart reportId="00O61000001ZBZE" showRefreshButton="false" size="tiny" rendered="{!IF(selectSalesRep == 'Master Report',true,false)}" id="masterRevenue"/>
+                        <analytics:reportChart reportId="00O61000001ZBZE" showRefreshButton="false" size="tiny" filter="[{column:'Sales_Representative__c.Sales_Rep_Id__c',operator:'contains',value:'{!LEFT(selectSalesRep,15)}'}]" 
+                                rendered="{!IF(selectSalesRep != 'Saint Louis' && selectSalesRep != 'Oklahoma' && selectSalesRep != 'Kansas City' && selectSalesRep != 'Denver' && selectSalesRep != 'Master Report',true,false)}" id="SalesRepRevenue"/>
+                    </td>
+                    <td width="15%">
+                        <analytics:reportChart reportId="00O61000001ZBZD" showRefreshButton="false" size="tiny" filter="[{column:'Sales_Representative__c.Office_Location__c',operator:'equals',value:'{!selectSalesRep}'}]" 
+                                rendered="{!IF(selectSalesRep == 'Saint Louis' || selectSalesRep == 'Oklahoma' || selectSalesRep == 'Kansas City' || selectSalesRep == 'Denver',true,false)}" id="officeMargin"/>
+                        <analytics:reportChart reportId="00O61000001ZBZD" showRefreshButton="false" size="tiny" rendered="{!IF(selectSalesRep == 'Master Report',true,false)}" id="masterMargin"/>
+                        <analytics:reportChart reportId="00O61000001ZBZD" showRefreshButton="false" size="tiny" filter="[{column:'Sales_Representative__c.Sales_Rep_Id__c',operator:'contains',value:'{!LEFT(selectSalesRep,15)}'}]" 
+                                rendered="{!IF(selectSalesRep != 'Saint Louis' && selectSalesRep != 'Oklahoma' && selectSalesRep != 'Kansas City' && selectSalesRep != 'Denver' && selectSalesRep != 'Master Report',true,false)}" id="SalesRepMargin"/>
+                    </td>
+                </tr>
+            </table>
+        </apex:outputPanel>
+        
+        <br/>
+        <apex:outputPanel >
+            <table width="100%" cellspacing="0" cellpadding="5" border="1" id="tblTargetNegotiation">
+                <tr>
+                    <td style="background-color:#1197BB;" colspan="14">
+                        <apex:outputLink value="/apex/ShowAllOpportunity?stageName=TARGET/NEGOTIATING&selectSalesRep={!selectSalesRep}" target="_blank" style="color: white;font-size:14px;font-weight:bold;text-decoration:none;">TOP 10 TARGETED</apex:outputLink>
+                    </td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Opportunity Number</td>
+                    <td rowspan="2" style="font-weight:bold;" width="15%">Opportunity Name</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Owner Name</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">SE Contribution $</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">Total Project $</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Close Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Ship Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="3%">Prob %</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Bidders</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Description</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Last Activity</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Last Chatter Action</td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                </tr>
+                <apex:repeat value="{!lstOpportunityTargetedWrapper}" var="opp">
+                    <tr>
+                        <td>
+                            <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                        </td>
+                        <td>{!opp.Opportunity.Name}</td>
+                        <td>{!opp.Opportunity.Owner.Name}</td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.margin}" /> 
+                            </apex:outputText>
+                            
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.revenue}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" /></td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.Ship_Date__c}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>{!opp.Opportunity.Probability}</td>
+                        <td>{!opp.Opportunity.Bidders__c}</td>
+                        <td>{!opp.Opportunity.Description}</td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.LastModifiedDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+        <br/>
+        <apex:outputPanel >
+            <table width="100%" cellspacing="0" cellpadding="5" border="1">
+                <tr>
+                    <td style="background-color:#1197BB;" colspan="14">
+                        <apex:outputLink value="/apex/ShowAllOpportunity?stageName=POST BID&selectSalesRep={!selectSalesRep}" target="_blank" style="color: white;font-size:14px;font-weight:bold;text-decoration:none;">TOP 10 POST BID</apex:outputLink>
+                    </td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Opportunity Number</td>
+                    <td rowspan="2" style="font-weight:bold;" width="15%">Opportunity Name</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Owner Name</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">SE Contribution $</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">Total Project $</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Close Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Ship Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="3%">Prob %</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Bidders</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Description</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Last Activity</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Last Chatter Action</td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                </tr>
+                <apex:repeat value="{!lstOpportunityPostBidWrapper}" var="opp">
+                    <tr>
+                        <td>
+                            <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                        </td>
+                        <td>{!opp.Opportunity.Name}</td>
+                        <td>{!opp.Opportunity.Owner.Name}</td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.margin}" /> 
+                            </apex:outputText>
+                            
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.revenue}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" /></td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.Ship_Date__c}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>{!opp.Opportunity.Probability}</td>
+                        <td>{!opp.Opportunity.Bidders__c}</td>
+                        <td>{!opp.Opportunity.Description}</td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.LastModifiedDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+        <br/>
+        <apex:outputPanel >
+            <table width="100%" cellspacing="0" cellpadding="5" border="1">
+                <tr>
+                    <td style="background-color:#1197BB;" colspan="14">
+                        <apex:outputLink value="/apex/ShowAllOpportunity?stageName=BIDDING&selectSalesRep={!selectSalesRep}" target="_blank" style="color: white;font-size:14px;font-weight:bold;text-decoration:none;">TOP 10 BIDDING</apex:outputLink>
+                    </td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Opportunity Number</td>
+                    <td rowspan="2" style="font-weight:bold;" width="15%">Opportunity Name</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Owner Name</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">SE Contribution $</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">Total Project $</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Close Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Ship Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="3%">Prob %</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Bidders</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Description</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Last Activity</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Last Chatter Action</td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                </tr>
+                <apex:repeat value="{!lstOpportunityBiddingWrapper}" var="opp">
+                    <tr>
+                        <td>
+                            <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                        </td>
+                        <td>{!opp.Opportunity.Name}</td>
+                        <td>{!opp.Opportunity.Owner.Name}</td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.margin}" /> 
+                            </apex:outputText>
+                            
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.revenue}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" /></td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.Ship_Date__c}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>{!opp.Opportunity.Probability}</td>
+                        <td>{!opp.Opportunity.Bidders__c}</td>
+                        <td>{!opp.Opportunity.Description}</td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.LastModifiedDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+        <br/>
+        <apex:outputPanel >
+            <table width="100%" cellspacing="0" cellpadding="5" border="1">
+                <tr>
+                    <td style="background-color:#1197BB;" colspan="14">
+                        <apex:outputLink value="/apex/ShowAllOpportunity?stageName=LEAD,DD/BUDGET&selectSalesRep={!selectSalesRep}" target="_blank" style="color: white;font-size:14px;font-weight:bold;text-decoration:none;">TOP 10 LEAD/BUDGET</apex:outputLink>
+                    </td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Opportunity Number</td>
+                    <td rowspan="2" style="font-weight:bold;" width="15%">Opportunity Name</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Owner Name</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">SE Contribution $</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">Total Project $</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Close Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Ship Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="3%">Prob %</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Bidders</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Description</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Last Activity</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Last Chatter Action</td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                </tr>
+                <apex:repeat value="{!lstOpportunityLeadBudgetWrapper}" var="opp">
+                    <tr>
+                        <td>
+                            <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                        </td>
+                        <td>{!opp.Opportunity.Name}</td>
+                        <td>{!opp.Opportunity.Owner.Name}</td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.margin}" /> 
+                            </apex:outputText>
+                            
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.revenue}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" /></td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.Ship_Date__c}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>{!opp.Opportunity.Probability}</td>
+                        <td>{!opp.Opportunity.Bidders__c}</td>
+                        <td>{!opp.Opportunity.Description}</td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.LastModifiedDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+        <br/>
+        <apex:outputPanel >
+            <table width="100%" cellspacing="0" cellpadding="5" border="1">
+                <tr>
+                    <td style="background-color:#1197BB;" colspan="14">
+                        <apex:outputLink value="/apex/ShowAllOpportunity?stageName=Open Projects&selectSalesRep={!selectSalesRep}" target="_blank" style="color: white;font-size:14px;font-weight:bold;text-decoration:none;">OPEN PROJECTS</apex:outputLink>
+                    </td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Opportunity Number</td>
+                    <td rowspan="2" style="font-weight:bold;" width="15%">Opportunity Name</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Owner Name</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">SE Contribution $</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">Total Project $</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Close Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Ship Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="3%">Prob %</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Bidders</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Description</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Last Activity</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Last Chatter Action</td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                </tr>
+                <apex:repeat value="{!lstOpportunityOpenProjectWrapper}" var="opp">
+                    <tr>
+                        <td>
+                            <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                        </td>
+                        <td>{!opp.Opportunity.Name}</td>
+                        <td>{!opp.Opportunity.Owner.Name}</td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.margin}" /> 
+                            </apex:outputText>
+                            
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.revenue}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" /></td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.Ship_Date__c}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>{!opp.Opportunity.Probability}</td>
+                        <td>{!opp.Opportunity.Bidders__c}</td>
+                        <td>{!opp.Opportunity.Description}</td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.LastModifiedDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

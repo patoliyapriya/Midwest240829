@@ -1,0 +1,21 @@
+<template>
+
+            <lightning-combobox name="progress" label="" value={selectedValue} variant="label-hidden "
+                options={options} onchange={handleChangeUser}>
+            </lightning-combobox>
+  
+    <div  style="padding-top: 4%;">
+        <div style="background-color: rgb(242, 243, 243);">
+            <h2 style="font-weight: bold; padding: 8px 0px 8px 60px;">{title}</h2>
+        </div>
+        <lightning-datatable columns={columns}
+                            data={topSalesRepByActivity}
+                            key-field="id"
+                            hide-checkbox-column
+                            show-row-number-column
+                            hide-table-header="true"
+                           >
+                    </lightning-datatable>        
+    </div>
+
+</template>

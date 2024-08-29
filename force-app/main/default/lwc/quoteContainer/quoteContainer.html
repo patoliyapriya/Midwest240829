@@ -1,0 +1,47 @@
+<!--
+  @description       : 
+  @author            : Nilesh Badrakiya
+  @group             : 
+  @last modified on  : 04-30-2024
+  @last modified by  : Nilesh Badrakiya
+-->
+<template>
+    <div class="container">
+    <div class="slds-p-bottom_xx-large">
+        <lightning-spinner alternative-text="Loading" 
+                        size="large" 
+                        variant="brand" 
+                        if:true={isLoading}>
+        </lightning-spinner>
+        <template if:true={cartWrapper}>
+            <template if:false={showDesignQuoteDetail}>
+                <c-quote-header quoteid={quoteId} 
+                                cart-wrapper={cartWrapper} 
+                                ondesignquoteclick={handleDesignQuote}
+                                is-marrs={isMarrs}>
+                </c-quote-header>
+                    <template for:each={cartWrapper.groupDetails} for:item="groupItem">
+                        <div class="quoteContent" key={groupItem.groupId}>
+                            <c-quote-group group-wrapper={groupItem} 
+                                        quoteid={quoteId} 
+                                        quote-details={cartWrapper.quoteDetails}
+                                        onloadquotecontainer={handleReloadCartWrapper}
+                                        onquotegrouptoggle={handleQuoteGroupToggle}
+                                        onmarrsquotegroup={handleMarrsQuoteGroup}
+                                        is-marrs={isMarrs}>
+                            </c-quote-group>
+                        </div>
+                    </template>
+                    <div class="slds-m-vertical_x-small"></div> 
+                    <div class="slds-docked-form-footer borderRadius">
+                        <c-quote-footer quote-details={cartWrapper.quoteDetails}
+                                        is-marrs={isMarrs}></c-quote-footer>
+                    </div>
+            </template>
+            <template if:true={showDesignQuoteDetail}>
+                <c-design-quote-container quoteid={quoteId}></c-design-quote-container>
+            </template>
+        </template>
+    </div>
+    </div>
+</template>

@@ -1,0 +1,44 @@
+<apex:page standardController="Product2" extensions="NewProductController">
+    <apex:form >
+        <apex:pageMessages />
+        <apex:pageBlock title="Product Edit" mode="edit" id="pb">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!RedirectBacktoProductListPage}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Product Information">
+                <apex:inputField value="{!newProduct.Name}"/>
+                <apex:inputField value="{!newProduct.Manufacturer__c}" required="true"/>
+                
+                <apex:inputField value="{!newProduct.ProductCode}"/> 
+                <apex:inputField value="{!newProduct.Product_Type__c}" required="true"/> 
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Product Summary</apex:outputLabel>
+                    <apex:inputTextarea value="{!newProduct.Description}" cols="40"/> 
+                </apex:pageBlockSectionItem>
+                <apex:inputField value="{!newProduct.IsActive}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel ></apex:outputLabel>
+                    <apex:outputText ></apex:outputText>
+                </apex:pageBlockSectionItem>
+                <apex:inputField value="{!newProduct.Weight__c}" />
+                
+                               
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1">
+                <apex:inputField value="{!newProduct.Product_Description__c}"/> 
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Add Standard Price" >
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Standard Price" />
+                    <apex:outputpanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                            <apex:inputText value="{!stadardPrice}" id="StandarPrice"/>
+                        </div>
+                    </apex:outputpanel>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,17 @@
+<template>
+    <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right slds-m-around_medium">
+        <c-create-sales-order-sub-group-header sub-group-wrapper={subGroupHeader}
+                            quote-details={quoteDetails}
+                            group-wrapper={groupWrapper}
+                            onaccordion={handleAccordianChange}>
+        </c-create-sales-order-sub-group-header>
+        <c-create-sales-order-line-items line-item-wrapper={subGroupHeader.lineItemDetails}
+                                quote-details={quoteDetails}
+                                lwc:if={subGroupHeader.isOpen}
+                                onlineitemtoggle={handleLineItemToggle}
+                                onlineitemchange={handleLineItemChange}>
+        </c-create-sales-order-line-items>
+        <c-create-sales-order-sub-group-footer sub-group-wrapper={subGroupHeader}>
+        </c-create-sales-order-sub-group-footer>
+    </div>
+</template>

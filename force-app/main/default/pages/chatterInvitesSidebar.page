@@ -1,0 +1,88 @@
+<!-- Jonathan Hersh - jhersh@salesforce.com - 9/5/2010 -->
+<apex:page showheader="false" standardstylesheets="false" controller="chatterInvites" action="{!calcInvites}">
+    <apex:includescript value="{!URLFOR( $Resource.chatterInvites, 'jquery-1.4.2.min.js' )}" />
+    <apex:includescript value="{!URLFOR( $Resource.chatterInvites, 'jquery-ui-1.8.4.custom.min.js' )}" />
+    <apex:includescript value="{!URLFOR( $Resource.chatterInvites, 'sidebar.js' )}" />
+    <apex:stylesheet value="{!URLFOR( $Resource.chatterInvites, 'sidebar.css' )}" />
+    
+    <script type="text/javascript">
+    	function setFocusOnLoad() {}
+    	
+    	jQuery.noConflict();
+    </script>
+    
+    <apex:form id="theform">
+    
+   	<apex:actionfunction name="declineInviteAF" action="{!declineInvite}" rerender="theform">
+        <apex:param name="recID" assignto="{!recID}" value="" />
+    </apex:actionfunction>
+    <apex:actionfunction name="acceptInviteAF" action="{!acceptInvite}" rerender="dummy">
+        <apex:param name="recID" assignto="{!recID}" value="" />
+    </apex:actionfunction>
+    
+    <apex:outputpanel id="invitePanel" >
+
+    <apex:outputpanel rendered="{!pInvites.size = 0}" >
+        <p style="font-family: Arial; font-size: 12px">No invites. Why not <a target="_top" href="{!$Page.chatterInvites}">send some</a>?</p>
+    </apex:outputpanel>
+    <apex:repeat value="{!pInvites}" var="p" rendered="{!pInvites.size > 0}">
+        <div class="uInvite">
+            <div class="uPhoto" style="border:0; text-decoration:none">
+                <c:ciuserphoto uid="{!p.inviterID}" height="16" width="16" linked="true" target="_top" />
+            </div>
+            
+            <div class="uInviteBody">
+                <apex:outputlink value="/{!p.inviterID}" styleclass="name" target="_top">{!p.inviterName}</apex:outputlink> invited you to follow
+                <apex:repeat value="{!p.invites}" var="obInvites">
+                    {!obInvites.records.size} {!obInvites.obType & if( obInvites.records.size > 1, 's', '' )}:<br/>
+                    <apex:repeat value="{!obInvites.records}" var="r">
+                        <div id="invite{!r.recID}">
+                            <a href="javascript:void(0);" onclick="acceptInvite('{!JSINHTMLENCODE(r.recID)}', '{!JSINHTMLENCODE(r.recName)}', '{!if( obInvites.obType = 'Chatter Group', 'Joined', 'Following' )}'); return false;" class="ui-icon ui-icon-check">&nbsp;</a> 
+                            <a href="javascript:void(0);" onclick="declineInvite('{!JSINHTMLENCODE(r.recID)}'); return false;" class="ui-icon ui-icon-close">&nbsp;</a> 
+                            <apex:outputlink value="/{!r.recID}" styleclass="record" target="_top">{!r.recName}</apex:outputlink><br/>
+                        </div>
+                        <div style="clear:both"></div>
+                    </apex:repeat>      
+                </apex:repeat>
+            </div>
+        </div>
+    </apex:repeat>
+    
+    </apex:outputpanel>
+    
+    <apex:outputpanel id="dummy" />
+    
+    </apex:form>
+    
+    <style type="text/css">
+    	/* states and images */
+		.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; cursor: pointer; }
+		
+		/* states and images */
+		.ui-icon { width: 16px; height: 16px; background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_0078ae_256x240.png' )}); }
+		.ui-widget-content .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_0078ae_256x240.png' )}); }
+		.ui-widget-header .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_d8e7f3_256x240.png' )}); }
+		.ui-state-default .ui-icon { background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_e0fdff_256x240.png' )}); }
+		.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_056b93_256x240.png' )}); }
+		.ui-state-active .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_f5e175_256x240.png' )}); }
+		.ui-state-highlight .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_f7a50d_256x240.png' )}); }
+		.ui-state-error .ui-icon, .ui-state-error-text .ui-icon {background-image: url({!URLFOR( $Resource.chatterInvites, 'ui-icons_fcd113_256x240.png' )}); }
+		
+		/* positioning */
+		.ui-icon-close { background-position: -80px -128px; }
+		.ui-icon-check { background-position: -64px -144px; }
+		.ui-icon-closethick { background-position: -96px -128px; }
+		.ui-icon-alert { background-position: 0 -144px; }
+		.ui-icon-info { background-position: -16px -144px; }
+		.ui-icon-triangle-1-n { background-position: 0 -16px; }
+		.ui-icon-triangle-1-ne { background-position: -16px -16px; }
+		.ui-icon-triangle-1-e { background-position: -32px -16px; }
+		.ui-icon-triangle-1-se { background-position: -48px -16px; }
+		.ui-icon-triangle-1-s { background-position: -64px -16px; }
+		.ui-icon-triangle-1-sw { background-position: -80px -16px; }
+		.ui-icon-triangle-1-w { background-position: -96px -16px; }
+		.ui-icon-triangle-1-nw { background-position: -112px -16px; }
+		.ui-icon-triangle-2-n-s { background-position: -128px -16px; }
+		.ui-icon-triangle-2-e-w { background-position: -144px -16px; }
+    </style>
+</apex:page>

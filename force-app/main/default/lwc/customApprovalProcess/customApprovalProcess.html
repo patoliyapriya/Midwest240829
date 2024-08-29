@@ -1,0 +1,91 @@
+<template>
+    <div if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+    <div if:false={isLoading} class="divContainer">
+        <div class="divBody">
+            <div align="right">
+                <lightning-button variant="brand"
+                                    label="Add Approver"
+                                    icon-name="utility:approval"
+                                    icon-position="left"
+                                    onclick={addApprover}>
+                </lightning-button>
+            </div>
+            <template for:each={lstApprover} for:item="approver" for:index="approverIndex">
+                <div key={approver.Id} class="divApprover">
+                    <div align="right" class="slds-m-around_x-small">
+                            <lightning-button variant="destructive" 
+                                              label="Delete" 
+                                              icon-name="utility:delete" 
+                                              data-index={approverIndex} 
+                                              onclick={removeApprover}>
+                            </lightning-button>
+                    </div>
+                    <div>
+                        <lightning-record-edit-form object-api-name="Approver__c">
+                            <div class="divComponent">
+                                <div class="divLabel">Approver</div>
+                                <div class="slds-m-left_x-small divLookup">
+                                    <lightning-input-field field-name="ApproverId__c" 
+                                                            variant="label-hidden" 
+                                                            value={approver.approverId} 
+                                                            onchange={handleChangeApprover}
+                                                            data-index={approverIndex}>
+                                    </lightning-input-field>
+                                </div>
+                            </div>
+                            <template for:each={approver.lstSubmitter} for:item="submitter" for:index="submitterIndex">
+                                <div class="divComponent" key={submitter.Id}>
+                                    <div class="divLabel">Submitter</div>
+                                    <div class="slds-m-left_x-small divLookup">
+                                        <lightning-input-field field-name="User__c" 
+                                                                variant="label-hidden" 
+                                                                value={submitter.submitterId}
+                                                                onchange={handleChangeSubmitter}
+                                                                data-approverindex={approverIndex}
+                                                                data-submitterindex={submitterIndex}>
+                                        </lightning-input-field>
+                                    </div>
+                                    <template if:true={submitter.isAdd}>
+                                        <div>
+                                            <lightning-button-icon variant="destructive" 
+                                                                    icon-name="utility:adduser"
+                                                                    class="slds-m-left_x-small"
+                                                                    onclick={addSubmitter}
+                                                                    data-approverindex={approverIndex}
+                                                                    data-submitterindex={submitterIndex}>
+                                            </lightning-button-icon>
+                                        </div>
+                                    </template>
+                                    <template if:true={submitter.isDelete}>
+                                        <div>
+                                            <lightning-button-icon variant="destructive" 
+                                                                    icon-name="utility:delete" 
+                                                                    class="slds-m-left_x-small"
+                                                                    onclick={removeSubmitter}
+                                                                    data-approverindex={approverIndex}
+                                                                    data-submitterindex={submitterIndex}>
+                                            </lightning-button-icon>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </lightning-record-edit-form>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <div>
+            <footer class="modal-footer slds-modal__footer">
+                    <lightning-button class="slds-m-left_x-small" 
+                                    variant="brand" 
+                                    type="submit"
+                                    label="Save"
+                                    onclick={saveApprover}>
+                    </lightning-button>
+                <!-- </div>    -->
+            </footer>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,26 @@
+.tableWidth {
+    width:5rem;
+}
+
+td {
+    padding-left: 5px !important;
+    padding-right: 1px !important;
+}
+
+.wrapText {
+    text-wrap: balance;
+}
+
+th {
+    padding-left: 5px !important;
+}
+
+.thWidth {
+    width: 55px;
+}
+
+
+.decriptionRow{
+    min-height: 1.8rem;
+    display: block;
+}

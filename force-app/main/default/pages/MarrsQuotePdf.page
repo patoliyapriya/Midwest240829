@@ -1,0 +1,609 @@
+<apex:page extensions="GenerateQuoteDocumentController" standardController="Quote" applyHtmlTag="false" showHeader="false" applyBodyTag="false" renderAs="pdf">
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                margin-bottom: 2.5cm;
+
+                @bottom-center {
+                    content: element(footer);
+                }
+            }
+
+            div.footer {
+                display: block;
+                position: running(footer);
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+        </style>
+    </head>
+    <div class="footer">
+        <div style="font-family:Arial,sans-serif;font-size:10px;text-align:right;">
+            <apex:outputText value="marrsdistribution.com" /> | Page
+            <span class="pagenumber" /> of
+            <span class="pagecount" />
+        </div>
+    </div>
+    <body style="font-family:Arial,sans-serif;">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 35%">
+                    <!-- Header Left table -->
+                    <table>
+                        <tr>
+                            <td>
+                                <apex:image value="{!$Resource.MaRRsLogoPDF}" width="250" height="100"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-family:Arial,sans-serif;font-size:14px;padding-top: 15px;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td>MaRRs Distribution, LLC</td>
+                                    </tr>
+                                    <tr>
+                                        <td>17814 Edison Ave.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Chesterfield, MO 63005</td>
+                                    </tr>
+                                    <tr>
+                                        <td>636.536.6800</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 65%; vertical-align: top;">
+                    <!-- Header Right table -->
+                    <table style="font-family:Arial,sans-serif;font-size:14px;" cellpadding="2" cellspacing="3">
+                        <tr>
+                            <td style="font-weight: bold;font-size: 28px; font-style: italic;">FREIGHT QUOTE</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 18px;">{!quote.Name}</td>
+                        </tr>
+                        <tr>
+                            <td><b>OPP # / QUOTE #:</b> {!quote.Opportunity_Number__c} / {!quote.QuoteNumber}</td>
+                        </tr>
+                        <tr>
+                            <td><b>QUOTE DATE: </b> 
+                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                    <apex:param value="{!Today()}" />
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr style="display: {!IF(Quote.Attention_to_Account__c == null, 'none', 'table-row')};">
+                            <td>
+                                <b>ATTN TO COMPANY: </b>{!Quote.Attention_to_Account__r.Name}
+                            </td>
+                        </tr>
+                        <tr style="display: {!IF(Quote.Bidding_To__c == null, 'none', 'table-row')};">
+                            <td>
+                                <b>ATTN TO PERSON: </b>{!Quote.Bidding_To__r.Name}
+                            </td>
+                        </tr>
+                        <tr style="display: {!IF(OR(Quote.Bidding_To__c == null, Quote.Bidding_To__r.Email == null, Quote.Bidding_To__r.Email == ''), 'none', 'table-row')};">
+                            <td>
+                                <b>EMAIL: </b>{!Quote.Bidding_To__r.Email}
+                            </td>
+                        </tr>
+                        <tr style="display: {!IF(OR(Quote.Bidding_To__c == null, Quote.Bidding_To__r.phone == null), 'none', 'table-row')};">
+                            <td>
+                                <b>PHONE: </b>{!Quote.Bidding_To__r.phone}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <!-- SERVICE DETAILS -->
+                <td colspan="2">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 20%; font-family:Arial,sans-serif;font-size:14px;color: red;font-weight: bold;">SERVICE DETAILS</td>
+                            <td style="width: 80%">
+                                <div style="border-top: red 1px solid;color: white;margin-top: 20px;">a</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="font-size: 13px; font-family:Arial,sans-serif;width: 100%;">
+                        <tr>
+                            <td style="font-weight: bold; vertical-align: top;">ORIGIN:</td>
+                            <td style="vertical-align: top;">
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.OriginalName__c)}">
+                                    {!Quote.Opportunity.OriginalName__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Origin_Street__c)}">
+                                    {!Quote.Opportunity.Origin_Street__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Origin_City__c)}">
+                                    {!Quote.Opportunity.Origin_City__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Origin_State__c)}">
+                                    {!Quote.Opportunity.Origin_State__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Origin_PostalCode__c)}">
+                                    {!Quote.Opportunity.Origin_PostalCode__c}. <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Origin_Country__c)}">
+                                    {!Quote.Opportunity.Origin_Country__c}. <br/>
+                                </apex:outputText>
+                            </td>
+                            <td style="font-weight: bold; vertical-align: top;">CONSOLIDATION:</td>
+                            <td style="vertical-align: top;">
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Consolidation__c)}">
+                                    {!Quote.Opportunity.Consolidation__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Consolidation_Street__c)}">
+                                    {!Quote.Opportunity.Consolidation_Street__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Consolidation_City__c)}">
+                                    {!Quote.Opportunity.Consolidation_City__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Consolidation_State__c)}">
+                                    {!Quote.Opportunity.Consolidation_State__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Consolidation_PostalCode__c)}">
+                                    {!Quote.Opportunity.Consolidation_PostalCode__c}. <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Consolidation_Country__c)}">
+                                    {!Quote.Opportunity.Consolidation_Country__c}. <br/>
+                                </apex:outputText>
+                            </td>
+                            <td style="font-weight: bold; vertical-align: top;">DESTINATION:</td>
+                            <td style="vertical-align: top;">
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Destination__c)}">
+                                    {!Quote.Opportunity.Destination__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Destination_Street__c)}">
+                                    {!Quote.Opportunity.Destination_Street__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Destination_City__c)}">
+                                    {!Quote.Opportunity.Destination_City__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Destination_State__c)}">
+                                    {!Quote.Opportunity.Destination_State__c}, <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Destination_PostalCode__c)}">
+                                    {!Quote.Opportunity.Destination_PostalCode__c}. <br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(Quote.Opportunity.Destination_Country__c)}">
+                                    {!Quote.Opportunity.Destination_Country__c}. <br/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top: 15px; font-weight: bold;">SERIVCE:</td>
+                            <td style="padding-top: 15px;">{!Quote.Opportunity.Service__c}</td>
+                            <td style="padding-top: 15px; font-weight: bold;">ORDER:</td>
+                            <td style="padding-top: 15px;">{!Quote.Opportunity.Order__c}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <apex:outputText >
+                        <div style="margin-top:15px"></div>
+                        <apex:variable value="{!0}" var="cnt" />
+                        <apex:repeat value="{!lstProductGroupWrapperClass}" var="grp">
+                            <apex:variable value="{!cnt+1}" var="cnt" />
+                            <apex:outputPanel rendered="{!AND(grp.productGroup.Alternate__c == false)}">
+                                
+                                <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid black;{!IF(grp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                    <tr style="background-color:black;">
+                                        <td style="color: white;font-family:Arial,sans-serif;font-size: 16px;font-weight:bold;" colspan="2">{!grp.productGroup.Name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                                <apex:outputPanel rendered="{!AND(subGrp.productGroup.Alternate__c == false)}">
+                                                    <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8;{!IF(subGrp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                                        <tr style="background-color:#F2F2F2;">
+                                                            <td colspan="7">{!subGrp.productGroup.Name}</td>
+                                                        </tr>
+                                                        <tr style="background-color:#767171;">
+                                                            <!-- <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">QTY</td> -->
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">DETAILS</td>
+                                                            <td colspan="{!subGrp.colspan}" style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">DESCRIPTION</td>
+                                                            <!-- <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(quote.Hide_Price_Per__c == true, 'table-cell', 'none')}">PRICE PER</td> -->
+                                                            <td style="border-left: 1px solid #9e9b9b;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">PRICE</td>
+                                                        </tr>
+                                                        <apex:variable var="color" value="#F2F2F2" />
+                                                        <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                                            <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                                            <apex:outputText rendered="{!AND(prod.productDetails.Alternate__c == false)}">
+                                                                <tr style="background-color: {!color};{!IF(prod.productDetails.Page_Break__c,'page-break-after: always;','')}">
+                                                                    <!--
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{!prod.productDetails.Quantity__c}" rendered="{! !prod.productDetails.Hide_Quantity__c}" />
+                                                                    </td> -->
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">{!prod.productDetails.Tag__c}</td>
+                                                                    <!--
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Product_Code__c == true || subGrp.productGroup.Hide_Code__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{!prod.productDetails.Product_Code__c}" rendered="{! !prod.productDetails.Hide_Code__c}" />
+                                                                    </td>
+                                                                    -->
+                                                                    <td colspan="{!subGrp.colspan}" style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                                        <apex:outputText value="{!prod.productDetails.Descriptions__c}" escape="false" />
+                                                                    </td>
+                                                                    <!--
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(quote.Hide_Price_Per__c == true, 'table-cell', 'none')}">
+                                                                        <apex:outputField value="{!prod.productDetails.Price_Per__c}" />
+                                                                    </td>
+                                                                    -->
+                                                                    <td style="border-left: 1px solid #9e9b9b;font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                                            <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                                        </apex:outputText>
+                                                                    </td>
+                                                                </tr>
+                                                            </apex:outputText>
+                                                        </apex:repeat>
+                                                        <tr style="display : {!IF(subGrp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')};">
+                                                            <td colspan="7" style="border-top: 1px solid #9e9b9b;">
+                                                                <table width="100%" cellpadding="2" cellspacing="0">
+                                                                    <tr>
+                                                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!subGrp.productGroup.Name} Total</td>
+                                                                        <td style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;width:10%;">
+                                                                            <!-- <apex:outputField value="{!subGrp.productGroup.Total_Line_Items__c}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}"/> -->
+                                                                            <apex:outputText value="{0, Number,currency}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}">
+                                                                                <apex:param value="{!subGrp.productGroup.Total_Line_Items__c}" />
+                                                                            </apex:outputText>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <div style="margin-top:3px;"></div>
+                                                </apex:outputPanel>
+                                            </apex:repeat>
+                                        </td>
+                                    </tr>
+                                    <!--
+                                    <tr style="background-color: #A8D08D;display : {!IF(grp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')}">
+                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!grp.productGroup.Name} &nbsp;Total</td>
+                                        <td width="15%" style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;">
+                                            <!-- <apex:outputField value="{!grp.productGroup.Total_Sub_Groups__c}" rendered="{! !grp.productGroup.Hide_Pricing__c}"/> ->
+                                            <apex:outputText value="{0, Number,currency}" rendered="{! !grp.productGroup.Hide_Pricing__c}">
+                                                <apex:param value="{!grp.productGroup.Total_Sub_Groups__c}" />
+                                            </apex:outputText>
+                                        </td>
+                                    </tr>
+                                    -->
+                                </table>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!IF( AND(cnt != lstProductGroupWrapperClass.size,grp.productGroup.Alternate__c == false), TRUE, FALSE )}">
+                                <div style="page-break-after: always;"> </div>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </apex:outputText>
+                    <!--
+                    <apex:outputPanel id="pnlSummary" rendered="{!Quote.Hide_Total_Base_Bid_Total__c == false}">
+                        <table cellpadding="5" cellspacing="0" width="60%" style="margin-top:15px;border: 1px solid #c8c8c8; margin-left: 280px;">
+                            <tr style="background-color:#767171;">
+                                <td style="font-family:Arial,sans-serif;font-size:14px;color:white;font-weight:bold;text-align:right;">TOTAL AMOUNT</td>
+                                <td style="font-family:Arial,sans-serif;font-size:14px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">
+                                    <center></center>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-family:Arial,sans-serif;font-size: 14px;text-align:right;">Grand Total</td>
+                                <td style="font-family:Arial,sans-serif;font-size: 14px;text-align:right;border-left: 1px solid #9e9b9b;">
+                                    <apex:outputText value="{0, Number,currency}">
+                                        <apex:param value="{!quote.Total_Base_Bid_Total__c}" />
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                    -->
+                    <apex:outputPanel rendered="{!hasAlternates}">
+                        <div style="background-color:#F2F2F2;border: solid 1px;margin-top: 2%;">
+                            <center>
+                                <div style="color: Black;font-family:Arial,sans-serif;font-size: 25px;font-weight:bold;margin-top: 0.5%;">Alternates</div>
+                                <div style="color: Black;font-family:Arial,sans-serif;font-size: 13px;/* border: solid; */margin-bottom: 0.5%;">All products below are alternate options and NOT included in the base bid.</div>
+                            </center>
+                        </div>
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!hasIndividualAlternates}">
+                        <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8; margin-top:20px;">
+
+                            <tr style="background-color:#767171;">
+                                <td style="width:90%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b">DESCRIPTION</td>
+                                <td style="width:10%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b">PRICE</td>
+                            </tr>
+                            <apex:variable var="alternateColor" value="#F2F2F2" />
+                            <apex:repeat value="{!lstProductGroupWrapperClass}" var="grp">
+                                <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                    <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                        <apex:outputText rendered="{!IF( AND(prod.productDetails.Alternate__c == true,grp.productGroup.Alternate__c == false,subGrp.productGroup.Alternate__c==false,prod.productDetails.Hide_Line__c == false), TRUE, FALSE )}">
+
+                                            <apex:variable var="alternateColor" value="{!IF(alternateColor == '#F2F2F2', '', '#F2F2F2')}" />
+
+                                            <tr style="background-color:{!alternateColor};">
+
+                                                <td style="font-family:Arial,sans-serif;font-size: 10px;">
+                                                    <apex:outputText value="{!grp.productGroup.Name} Group. {!prod.productDetails.Descriptions__c}" escape="false" style="font-family:Arial,sans-serif;font-size: 10px;">
+                                                    </apex:outputText>
+                                                </td>
+                                                <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                    <!-- <apex:outputField value="{!prod.productDetails.Price_Per__c}" />-->
+                                                    <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                        <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                    </apex:outputText>
+                                                </td>
+
+
+                                            </tr>
+                                        </apex:outputText>
+
+                                    </apex:repeat>
+                                </apex:repeat>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+
+
+                    <apex:outputPanel rendered="{!hasAlternates}">
+                        <div style="margin-top:15px"></div>
+
+                        <apex:repeat value="{!lstProductGroupWrapperClassForAlternate}" var="grp">
+                            <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                <apex:variable value="{!0}" var="subtotal" />
+                                <apex:outputPanel rendered="{!If(AND(subGrp.productGroup.Alternate__c == true,grp.productGroup.Alternate__c == FALSE,subGrp.productGroup.Hide_Line__c == false),TRUE,False)}">
+
+
+                                    <table width="100%" cellpadding="5" cellspacing="0" style="{!IF(grp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                        <tr>
+                                            <td colspan="2">
+
+                                                <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8;{!IF(subGrp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                                    <tr style="background-color:#F2F2F2;">
+                                                        <td colspan="7">{!subGrp.productGroup.Name}</td>
+                                                    </tr>
+                                                    <tr style="background-color:#767171;">
+                                                        <!-- <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">QTY</td> -->
+                                                        <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">DETAILS</td>
+                                                        <td colspan="{!subGrp.colspan}" style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">DESCRIPTION</td>
+                                                        <td style="width:10%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">PRICE</td>
+                                                    </tr>
+                                                    <apex:variable var="color" value="#F2F2F2" />
+                                                    <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                                        <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                                        <apex:outputText rendered="{!prod.productDetails.Hide_Line__c == false}">
+                                                            <tr style="background-color: {!color};{!IF(prod.productDetails.Page_Break__c,'page-break-after: always;','')}">
+                                                                <!--
+                                                                <td style="font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">
+                                                                    <apex:outputText value="{!prod.productDetails.Quantity__c}" rendered="{! !prod.productDetails.Hide_Quantity__c}" />
+                                                                </td>
+                                                                -->
+                                                                <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">{!prod.productDetails.Tag__c}</td>
+
+                                                                <td colspan="{!subGrp.colspan}" style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                                    <apex:outputText value="{!prod.productDetails.Descriptions__c}" escape="false" />
+                                                                </td>
+                                                                <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">
+                                                                    <!-- <apex:outputField value="{!prod.productDetails.Price_Per__c}" />-->
+                                                                    <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                                        <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                                    </apex:outputText>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        </apex:outputText>
+                                                        <apex:variable value="{!subtotal+prod.productDetails.Sales_Price__c}" var="subtotal" />
+                                                    </apex:repeat>
+
+                                                    <tr style="display : {!IF(subGrp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')};">
+                                                        <td colspan="7" style="border-top: 1px solid #9e9b9b;">
+                                                            <table width="100%" cellpadding="2" cellspacing="0">
+                                                                <tr>
+                                                                    <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!subGrp.productGroup.Name} Total</td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;width:10%;">
+                                                                        <!-- <apex:outputField value="{!subGrp.productGroup.Total_Line_Items__c}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}"/> -->
+                                                                        <apex:outputText value="{0, Number,currency}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}">
+                                                                            <apex:param value="{!subtotal}" />
+                                                                        </apex:outputText>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </apex:outputPanel>
+                            </apex:repeat>
+                        </apex:repeat>
+                    </apex:outputPanel>
+
+
+                    <apex:outputPanel rendered="{!hasAlternates}">
+                        <div style="margin-top:15px"></div>
+
+                        <apex:repeat value="{!lstProductGroupWrapperClassForAlternate}" var="grp">
+                            <apex:variable value="{!0}" var="grptotal" />
+                            <apex:outputPanel rendered="{!grp.productGroup.Alternate__c == true}">
+                                <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid black;{!IF(grp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                    <tr style="background-color:black;">
+                                        <td style="color: white;font-family:Arial,sans-serif;font-size: 16px;font-weight:bold;" colspan="2">{!grp.productGroup.Name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <apex:repeat value="{!grp.lstProductSubGroup}" var="subGrp">
+                                                <apex:variable value="{!0}" var="subtotal" />
+                                                <apex:outputPanel rendered="{!subGrp.productGroup.Hide_Line__c == false}">
+                                                    <table width="100%" cellpadding="5" cellspacing="0" style="border: 1px solid #c8c8c8;{!IF(subGrp.productGroup.Page_Break__c,'page-break-before: always;','')}">
+                                                        <tr style="background-color:#F2F2F2;">
+                                                            <td colspan="7">{!subGrp.productGroup.Name}</td>
+                                                        </tr>
+                                                        <tr style="background-color:#767171;">
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">QTY</td>
+                                                            <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">TAG</td>
+                                                            <td colspan="{!subGrp.colspan}" style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;">DESCRIPTION</td>
+                                                            <td style="width:10%;font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">PRICE</td>
+                                                        </tr>
+                                                        <apex:variable var="color" value="#F2F2F2" />
+                                                        <apex:repeat value="{!subGrp.lstProductSelected}" var="prod">
+                                                            <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                                            <apex:outputText rendered="{!prod.productDetails.Hide_Line__c == false}">
+                                                                <tr style="background-color: {!color};{!IF(prod.productDetails.Page_Break__c,'page-break-after: always;','')}">
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;display:{!IF(subGrp.productGroup.Hide_Quantity__c == true, 'none', 'table-cell')}">
+                                                                        <apex:outputText value="{!prod.productDetails.Quantity__c}" rendered="{! !prod.productDetails.Hide_Quantity__c}" />
+                                                                    </td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(Quote.Hide_All_Tags__c == true, 'none', 'table-cell')}">{!prod.productDetails.Tag__c}</td>
+
+                                                                    <td colspan="{!subGrp.colspan}" style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                                                        <apex:outputText value="{!prod.productDetails.Descriptions__c}" escape="false" />
+                                                                    </td>
+                                                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;display:{!IF(subGrp.productGroup.Hide_Price_Column__c == true, 'none', 'table-cell')}">
+                                                                        <!-- <apex:outputField value="{!prod.productDetails.Price_Per__c}" />-->
+                                                                        <apex:outputText value="{0, Number,currency}" rendered="{!prod.productDetails.Hide_Pricing__c == false}">
+                                                                            <apex:param value="{!prod.productDetails.Sales_Price__c}" />
+                                                                        </apex:outputText>
+                                                                    </td>
+                                                                    
+                                                                </tr>
+                                                            </apex:outputText>
+                                                            <apex:variable value="{!subtotal+prod.productDetails.Sales_Price__c}" var="subtotal" />
+                                                        </apex:repeat>
+                                                        <!--
+                                                        <tr style="display : {!IF(subGrp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')};">
+                                                            <td colspan="7" style="border-top: 1px solid #9e9b9b;">
+                                                                <table width="100%" cellpadding="2" cellspacing="0">
+                                                                    <tr>
+                                                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!subGrp.productGroup.Name} Total</td>
+                                                                        <td style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;width:10%;">
+                                                                            <!-- <apex:outputField value="{!subGrp.productGroup.Total_Line_Items__c}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}"/> ->
+                                                                            <apex:outputText value="{0, Number,currency}" rendered="{! !subGrp.productGroup.Hide_Pricing__c}">
+                                                                                <apex:param value="{!subtotal}" />
+                                                                                <apex:variable value="{!grptotal+subtotal}" var="grptotal" />
+                                                                            </apex:outputText>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        -->
+                                                    </table>
+                                                    <div style="margin-top:3px;"></div>
+                                                </apex:outputPanel>
+                                                <apex:variable value="{!grptotal+subtotal}" var="grptotal" />
+                                            </apex:repeat>
+                                        </td>
+                                    </tr>
+                                    <!--
+                                    <tr style="background-color: #A8D08D;display : {!IF(grp.productGroup.Hide_Pricing__c == true, 'none', 'table-row')}">
+                                        <td style="font-family:Arial,sans-serif; font-size: 14px;font-weight: bold;text-align:right;width:90%;">{!grp.productGroup.Name} &nbsp;Total</td>
+                                        <td width="15%" style="font-family:Arial,sans-serif;font-size: 14px;font-weight: bold;">
+                                            <!-- <apex:outputField value="{!grp.productGroup.Total_Sub_Groups__c}" rendered="{! !grp.productGroup.Hide_Pricing__c}"/> ->
+                                            <apex:outputText value="{0, Number,currency}" rendered="{! !grp.productGroup.Hide_Pricing__c}">
+                                                <apex:param value="{!grptotal}" />
+                                            </apex:outputText>
+                                        </td>
+                                    </tr>
+                                    -->
+                                </table>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </apex:outputPanel>
+
+
+                    <apex:outputPanel rendered="{!lstAdditionDuduction.size > 0}">
+                        <table width="100%" cellpadding="5" cellspacing="0" style="margin-top:25px;border: 1px solid #c8c8c8;">
+                            <tr style="background-color:#F2F2F2;">
+                                <td colspan="4" style="font-family:Arial,sans-serif;font-size: 14px;font-weight:bold;vertical-align:middle;">Adds/Deducts/Alternates</td>
+                            </tr>
+                            <tr style="background-color:#767171;">
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:3%;align:middle;">#</td>
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:15%;border-left: 1px solid #9e9b9b;">TYPE</td>
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:67%;border-left: 1px solid #9e9b9b;">DETAILS</td>
+                                <td style="font-family: Arial,sans-serif;font-size:12px;color:white;font-weight:bold;width:15%;border-left: 1px solid #9e9b9b;">AMOUNT</td>
+                            </tr>
+                            <apex:variable value="{!0}" var="addDedCount" />
+                            <apex:variable var="color" value="#F2F2F2" />
+                            <apex:repeat value="{!lstAdditionDuduction}" var="ad">
+                                <apex:variable var="color" value="{!IF(color == '#F2F2F2', '', '#F2F2F2')}" />
+                                <tr style="background-color: {!color};">
+                                    <td align="middle" style="font-family:Arial,sans-serif;font-size: 10px;">
+                                        <apex:variable value="{!addDedCount + 1}" var="addDedCount" /> {!addDedCount}.
+                                    </td>
+                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                        <apex:outputText value="{!ad.Type__c}" style="width:95%;" />
+                                    </td>
+                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                        <apex:outputText value="{!ad.Details__c}" style="width:95%;" />
+                                    </td>
+                                    <td style="font-family:Arial,sans-serif;font-size: 10px;border-left: 1px solid #9e9b9b;">
+                                        <!-- <apex:outputField value="{!ad.Amount__c}" style="width:90%;" /> -->
+                                        <apex:outputText value="{0, Number,currency}" style="width:90%;">
+                                            <apex:param value="{!ad.Amount__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                </td>
+            </tr>
+            <tr>
+                <!-- PAYMENT TERMS -->
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td width="15%" style="font-family:Arial,sans-serif;font-size:9px;color:#C45911;font-weight:bold;vertical-align:top;">PAYMENT TERMS</td>
+                            <td style="font-family:Arial,sans-serif;font-size:9px;" width="85%">NET 30 days from date of shipment (subject to credit approval). Prices are firm for acceptance within 30 days. Except where banned by law, credit
+                                card orders will be subject to a 3% processing fee.</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <!-- NOTES -->
+                <td colspan="2" style="font-size: 11px; font-family:Arial,sans-serif;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 20px; border-top: 1px gray solid;padding-top: 15px;">Notes</div> 
+                    1. For your protection, affordable "All Risk" cargo insurance is available and recommended. <br />
+                    2. Unless otherwise specified, the above quote does not include costs associated with customs clearance (for e.g., examination fees, drayage,
+                    duties, taxes, etc.), parking/toll charges, State/Local delivery fees or permits, lift gate delivery service, hazardous material handing fees, Redeliver
+                    Inside delivery, Residential Delivery, Storage, or consolidation services. <br />
+                    3. As applicable, charges will be converted into the relevant currency using current exchange rates. A currency conversion surcharge may apply to
+                    the quoted rate. <br />
+                    4. To ensure that these quoted rates are applied, please list the quote number on your Shipper's Letter of Instructions, Purchase Order, and
+                    Payment. <br />
+                    5. If the size, weight, measurement, pick-up or delivery to or location of the quoted shipment changes, promptly notify MaRRS Distribution, LLC as it
+                    may affect the quoted charges. <br />
+                    6. All shipments are subject to re-weight and re-measurement by MaRRS Distribution and/or its subcontractors. <br />
+                </td>
+            </tr>
+            <tr>
+                <!-- TERMS -->
+                <td colspan="2" style="font-size: 11px; font-family:Arial,sans-serif;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 20px;margin-top: 20px;">Terms</div>
+                    1. Destination charges are based on quoted freight profile. If profile changes, rates may be adjusted by MaRRS Distribution.. <br/>
+                    2. Rates are submitted and services will be provided under MaRRS Distribution LLC's standard Terms and Conditions of Service and/or the terms set forth in the
+                    applicable contract of carriage.<br/>
+                    3. Unless mutually agreed otherwise, rates quoted are not applicable to dangerous goods or perishable cargo.<br/>
+                    4. Pricing and services quoted may be contingent upon "known shipper" status where applicable.<br/>
+                    5. Quotations are subject to change due to factors beyond MaRRS Distribution LLC's control such as, fuel surcharge, General Rate Increases, Peak Season
+                    Adjustment Factors, scope modifications and war risk and security surcharges and may be adjusted accordingly.<br/>
+                    6. This quote shall supersede any prior quotes or oral agreements/discussions pertaining to the quoted rates. Unless mutually agreed to in writing, quotations
+                    are not binding.<br/>
+                    7. Rates are valid for 30 days from the date of this quote unless revised or revoked.<br/>
+                    8. Delinquent Payment charge of 1.5% per month applies for all invoices over 30 days old.<br/>
+                </td>
+            </tr>
+        </table>
+    </body>
+</apex:page>

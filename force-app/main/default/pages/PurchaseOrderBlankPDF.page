@@ -1,0 +1,7 @@
+<apex:page standardController="AcctSeedERP__Purchase_Order__c" 
+            applyBodyTag="false" 
+            title="{!AcctSeedERP__Purchase_Order__c.PO_Custom_Number__c & ' | Accounting Seed'}" 
+            renderAs="pdf">
+thisis blank pdf page
+
+</apex:page>

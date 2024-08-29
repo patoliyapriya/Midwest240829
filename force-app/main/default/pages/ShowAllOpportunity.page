@@ -1,0 +1,152 @@
+<apex:page controller="ShowAllOpportunity" sidebar="false" >
+    <style>
+        .parentDisable{
+            position:fixed;
+            top:0;
+            left:0;
+            background:#000;
+            opacity:0.5; 
+            height:100%;
+            width:100%; 
+            z-index:100;
+        }
+        
+        .button { 
+            background: url('{!$Resource.LoadingButton}') no-repeat left top; 
+            width:335px; 
+            height:65px;
+            position:fixed;
+            border: 0px;
+            top: 45%;
+            left: 45%;
+            z-index:120;
+        }
+        
+        .circle {
+            
+            width:22px;
+            height:22px;
+            float:left;
+            margin-bottom:18px;
+            margin-top:18px;
+            margin-left: 55px;
+            z-index:120;
+        }
+                
+        .txt {
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+            font-size:13px;
+            color:#000000;
+            line-height:20px;
+            margin-left:15px;
+            margin-bottom:18px;
+            margin-top:18px;
+            width: 200px;
+            font-weight: bold;
+            float: left;
+            z-index:120;
+        }   
+    </style>
+    
+    <script>
+        
+        function startSplash() {                        
+            var divObj = document.getElementById('divLoading');            
+            divObj.style.display='block';                                                   
+        }
+          
+        function endSplash() {              
+            document.getElementById('divLoading').style.display='none';                      
+        }
+        
+    </script>
+    
+    <apex:form id="formId">
+        <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); "/>
+        <div id="divLoading" style="display:none;">
+            <div class="parentDisable"></div>
+            <div class="button" id="splashDiv">
+                <div class="circle"><apex:image value="{!$Resource.LoadingImage}"></apex:image></div>
+                <div class="txt">Please Wait. Loading...</div>
+            </div>
+        </div>  
+        <table width="100%">
+            <tr>
+                <td align="right">
+                    <apex:commandButton value="First" action="{!first}" status="splashStatus" reRender="formId"/>
+                    <apex:commandButton value="Previos" action="{!previous}" status="splashStatus" disabled="{! !hasPrevious}" reRender="formId"/> 
+                    <apex:commandButton value="Next" action="{!next}" status="splashStatus" disabled="{! !hasNext}" reRender="formId"/>
+                    <apex:commandButton value="Last" action="{!last}" status="splashStatus" reRender="formId"/>
+                </td>
+            </tr>
+        </table>
+        <apex:outputPanel id="pnlAllOpportunity">
+            <table width="100%" cellspacing="0" cellpadding="5" border="1">
+                <tr><td style="background-color:#1197BB;color:white;font-size:14px;" colspan="14"><b>All {!stageName}</b></td></tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Opportunity Number</td>
+                    <td rowspan="2" style="font-weight:bold;" width="15%">Opportunity Name</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Owner Name</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">SE Contribution $</td>
+                    <td colspan="2" style="font-weight:bold;" width="10%" align="middle">Total Project $</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Close Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="4%">Est. Ship Date</td>
+                    <td rowspan="2" style="font-weight:bold;" width="3%">Prob %</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Bidders</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Description</td>
+                    <td rowspan="2" style="font-weight:bold;" width="5%">Last Activity</td>
+                    <td rowspan="2" style="font-weight:bold;" width="13%">Last Chatter Action</td>
+                </tr>
+                <tr style="background-color:#CCEBEF;">
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                    <td width="5%" style="font-weight:bold;">Margin</td>
+                    <td width="5%" style="font-weight:bold;">Revenue</td>
+                </tr>
+                <apex:repeat value="{!opportunity}" var="opp">
+                    <tr>
+                        <td>
+                            <apex:outputLink value="/{!opp.Opportunity.Id}" target="_blank">{!opp.Opportunity.Opportunity_Number__c}</apex:outputLink>
+                        </td>
+                        <td>{!opp.Opportunity.Name}</td>
+                        <td>{!opp.Opportunity.Owner.Name}</td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.margin}" /> 
+                            </apex:outputText>
+                            
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,number,currency}"> 
+                                <apex:param value="{!opp.revenue}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Project_Margin__c}" /></td>
+                        <td><apex:outputField value="{!opp.Opportunity.Total_Base_Bid_Total_Quote__c}" /></td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.CloseDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.Ship_Date__c}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>{!opp.Opportunity.Probability}</td>
+                        <td>{!opp.Opportunity.Bidders__c}</td>
+                        <td>{!opp.Opportunity.Description}</td>
+                        <td>
+                            <apex:outputText value="{0,date,MM/dd/yy}"> 
+                                <apex:param value="{!opp.Opportunity.LastActivityDate}" /> 
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{!opp.lastChatterAction}" escape="false" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

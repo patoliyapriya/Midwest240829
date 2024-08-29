@@ -1,0 +1,237 @@
+<apex:page standardController="AcctSeed__Billing__c" 
+            title="{!AcctSeed__Billing__c.Name & ' | Accounting Seed'}"
+            extensions="AcctSeed.BillingPDFControllerExt,AcctSeedInvociePDFCtrl" 
+            applyBodyTag="false" renderAs="PDF">
+    <head>
+        <style type="text/css" media="print">
+        @page {            
+            margin-bottom: 4.9cm;
+            @bottom-center {
+                    content: element(footer);
+            }
+        } 
+               
+        div.footer {
+           display: block;
+           position: running(footer);
+        }
+            
+        body {    
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        p {color: #818181;line-height: 17px;}
+        </style>
+        <!--
+        <style type="text/css" media="print">
+            @page {    
+                  
+                  margin-bottom: 3.9cm;      
+                  @bottom-center {
+                        content: element(footer);
+                    }
+              }    
+                  
+              th {    
+                
+                  text-align: center;    
+                  font-weight: bold;    
+                    
+              }    
+                  
+                  
+              td {   
+                
+                  text-align: center;    
+                  font-size: 14px;    
+                    
+              } 
+              div.footer {
+                    display: block;
+                    position: running(footer);
+                } 
+                body {
+                font-family: "Arial""Sans-Serif";
+                font-size: 12px;
+                margin: 0px;
+            }
+            .tableHeader {
+                font-weight: bold;
+                height: 20px;
+                padding: 6px;
+                vertical-align: top;
+                color: #002b66;
+                border-top: 3px solid #000;
+            }
+            .columnHeader {
+                text-align: right;
+            }
+            .tableRow {
+                border-bottom: 1px solid #002b66;
+                padding: 6px;
+                vertical-align:text-top;
+            }
+            .topLine {
+                border-top: 1px solid #002b66;
+            }
+            .tableRowAmount {
+                background-color: #002b66;
+                color: white;
+            }
+            .tableRowAdress {
+                color: #002b66;
+            }
+            .alignRight {
+                text-align: right
+            }
+            .overflowHidden {
+                width:100%;
+                overflow:hidden;
+            } 
+        </style>
+    -->
+    </head>
+    
+
+
+
+    <body style="font-family:Arial,sans-serif; font-size:11.5px;">
+
+        <div class="header">
+            <div>
+                <apex:image value="{!$Resource.SparkHeader}" width="750px"/>
+            </div>  
+        </div> 
+ 
+            <div style="width: 225px;float:left;">
+            <p><b style="color:#496e9c;">SOLD TO:</b><br/>
+             <apex:outputText rendered="{!!ISBLANK(AcctSeed__Billing__c.AcctSeed__Customer__r.Name)}">
+                 {!AcctSeed__Billing__c.AcctSeed__Customer__r.Name}<br/>
+             </apex:outputText>
+             
+              <apex:outputText rendered="{!!ISBLANK(AcctSeed__Billing__c.AcctSeed__Billing_Street__c)}">
+               {!AcctSeed__Billing__c.AcctSeed__Billing_Street__c}<br/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeed__Billing__c.AcctSeed__Billing_City__c)}">
+                                    {!AcctSeed__Billing__c.AcctSeed__Billing_City__c}
+                                </apex:outputText>
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeed__Billing__c.AcctSeed__Billing_State__c)}">
+                                    {!AcctSeed__Billing__c.AcctSeed__Billing_State__c}
+                                </apex:outputText>
+                               
+                                <apex:outputText rendered="{!!ISBLANK(AcctSeed__Billing__c.AcctSeed__Billing_PostalCode__c)}">
+                                    {!AcctSeed__Billing__c.AcctSeed__Billing_PostalCode__c}
+                                </apex:outputText>
+            </p>
+          </div>
+          
+           <div style="width: 225px;float:left;">
+            <p>
+            <b style="color:#496e9c;">REMIT PAYMENT TO:</b><br/>
+            Spark<br/>
+                                17814 Edison Ave<br/>
+                                Chesterfield, MO 63005
+            </p>
+            </div>
+               <div style="width: 225px;float:left;">
+            <p><b style="color:#496e9c;">
+                INVOICE: {!IF(AcctSeed__Billing__c.Invoice_Number__c == '', AcctSeed__Billing__c.Name, AcctSeed__Billing__c.Invoice_Number__c)} </b><br/>
+              <b style="color:#496e9c;">INVOICE DATE: </b>
+                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                    <apex:param value="{!AcctSeed__Billing__c.CreatedDate}" />
+                                </apex:outputText>
+                                <br/>
+                                <b style="color:#496e9c;">ORDER NUMBER: </b>
+                                {!AcctSeed__Billing__c.AcctSeedERP__Sales_Order__r.Name}
+                               <br/>
+                                <b style="color:#496e9c;">ORDER DATE: </b>
+                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                    <apex:param value="{!AcctSeed__Billing__c.AcctSeedERP__Sales_Order__r.CreatedDate}" />
+                                </apex:outputText>
+                                 <br/>
+                                <b style="color:#496e9c;">CUTOMER PO: </b>
+                                {!AcctSeed__Billing__c.AcctSeed__PO_Number__c}
+                          <br/>
+                                <b style="color:#496e9c;">TERMS: </b>
+                                {!AcctSeed__Billing__c.AcctSeed__Billing_Terms_Name__c}
+                           <br/>
+                                <b style="color:#496e9c;">PAYMENT DUE: </b>
+                                <apex:outputText value="{0,date,MM'/'dd'/'yyyy}">
+                                    <apex:param value="{!AcctSeed__Billing__c.AcctSeed__Due_Date2__c}" />
+                                </apex:outputText>
+                           
+           
+            </p>
+            </div>
+                               
+                          
+                          
+                       
+              <div style="width:100%; float:left;">        
+           
+                    <apex:variable var="color" value="#FFFFFF" />
+                    <table cellspacing="0" style="font-family:Arial,sans-serif; color: white; width: 100%;" >
+                        <tr style="background:#f15e22;color:white;font-size: 15px; height: 35px;">
+                            <td width="40%" style="padding: 5px;"><b>DESCRIPTION</b></td>
+                        </tr>
+                        <apex:repeat value="{!BillingLineList}" var="item">
+                            <tr style="color: black;font-size:12px;background:{!color};
+                                    border-top: 1px solid #dddbda;
+                                    border-bottom: 1px solid #dddbda; height: 35px;padding: 3px;">
+                            
+                            <td style="text-align:left;padding: 5px;">
+                                <apex:outputText escape="false"
+                                rendered="{!billingSO.AcctSeedERP__Sales_Order__r.Quote__c != null}"
+                                value="{!item.AcctSeedERP__Sales_Order_Line__r.Quote_Line_Item__r.Descriptions__c}">
+                               
+                            </apex:outputText>
+
+                            <apex:outputText escape="false"
+                                rendered="{!billingSO.AcctSeedERP__Sales_Order__r.Quote__c == null}"
+                                value="{!item.AcctSeed__Product__r.Name}">
+                               
+                            </apex:outputText>
+                            </td>         
+                            
+                        </tr>
+                        <apex:variable var="color" value="{!IF(color == '#FFFFFF', '#F0F0F0', '#FFFFFF')}" /> 
+                        </apex:repeat>
+                    </table> 
+          </div>
+      <div style="width: 725px;" class="footer">
+           
+               
+                  <p>Payment Terms: Please remit payment within 30 days.</p>
+
+                   <hr style="border: 2px solid #f15e22;margin-bottom:5px;"></hr>
+              
+              <div style="float:left; margin-top:10px;">
+ 
+                        <apex:image value="{!$Resource.sparklogobottom}" width="161" height="45"></apex:image>
+               </div>     
+                <div style="float:right;margin-top:10px;">
+                        <p style="font-weight: bold;display: inline;font-family:Arial,sans-serif;color:#496e9c;">Net Invoice: </p>
+                        <apex:outputText value="{0, number, ###,###,###,###,##0.00}">
+                            <apex:param value="{!AcctSeed__Billing__c.AcctSeed__Total__c - taxLine.AcctSeed__Total__c}"/>
+                        </apex:outputText>                 
+                      <br/>
+                            <p style="font-weight: bold;display: inline;font-family:Arial,sans-serif;color:#496e9c;">Sales Tax: </p>
+                            <apex:outputText value="{0, number, ###,###,###,###,##0.00}">
+                                <apex:param value="{!taxLine.AcctSeed__Total__c}"/>
+                            </apex:outputText>
+                           <br/>
+                    
+                            <p style="font-weight: bold;display: inline;font-family:Arial,sans-serif;color:#496e9c;">Invoice Total: </p>
+                            <apex:outputText value="{0, number, ###,###,###,###,##0.00}">
+                                <apex:param value="{!AcctSeed__Billing__c.AcctSeed__Total__c}"/>
+                            </apex:outputText>
+          
+                      </div>
+             
+               
+          
+    </div>
+</body>
+
+</apex:page>

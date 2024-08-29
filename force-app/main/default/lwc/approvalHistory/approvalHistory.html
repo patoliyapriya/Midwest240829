@@ -1,0 +1,24 @@
+<template>
+    <lightning-card>
+        <div if:false={isloading}>
+            <template if:true={submittedExpenseApproval}>
+                <lightning-card title="Approval History">
+                    <lightning-datatable 
+                                key-field="id" 
+                                columns={columns} 
+                                data={submittedExpenseApproval} 
+                                class="noRowHover"
+                                hide-checkbox-column>
+                    </lightning-datatable>
+                </lightning-card>
+            </template>
+        
+            <template if:false={submittedExpenseApproval}>
+                <lightning-card style="font-weight: bold ;"><div style="padding-left: 1%;">No data to display</div></lightning-card>
+            </template>
+        </div>
+        <div if:true={isloading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+    </lightning-card>
+</template>

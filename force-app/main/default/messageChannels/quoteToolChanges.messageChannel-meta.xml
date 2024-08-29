@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This Lightning Message Channel sends information from LWC fields to Save Purpose</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>Specify a source name where it is sending</description>
+        <fieldName>sender</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>On Change Field Name</description>
+        <fieldName>fieldName</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>On Change Value From the Field</description>
+        <fieldName>fieldValue</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>Record Id To Send</description>
+        <fieldName>recordId</fieldName>
+    </lightningMessageFields>
+    <masterLabel>OnChangeDataPassingChannel</masterLabel>
+</LightningMessageChannel>

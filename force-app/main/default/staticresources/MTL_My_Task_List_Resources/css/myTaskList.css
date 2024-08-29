@@ -1,0 +1,88 @@
+/*
+	myTaskList.css Stylesheet for use with My Task List package
+	Author: Mike Hineline
+
+	Copyright (c) 2013, salesforce.com, Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, with or without modification, 
+	are permitted provided that the following conditions are met:
+	
+	    * Redistributions of source code must retain the above copyright notice, 
+	    this list of conditions and the following disclaimer.
+	    * Redistributions in binary form must reproduce the above copyright notice, 
+	    this list of conditions and the following disclaimer in the documentation 
+	    and/or other materials provided with the distribution.
+	    * Neither the name of the salesforce.com, Inc. nor the names of its contributors 
+	    may be used to endorse or promote products derived from this software 
+	    without specific prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+	IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+	LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+	OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+	OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+	body {
+		font-size: 10pt !important; /* Override default Bootstrap font-size of 14px */
+		line-height: 1.228 !important; /* Override default Bootstrap line-height of 1.428 */
+		font-family: "ProximaNovaSoft-Regular",Arial,Helvetica,sans-serif; /* Override default Bootstrap font-family; note that ProximaNova is used by Salesforce1 */
+	}
+	p {
+		margin:0px 0px 3px !important; /* Override default Bootstrap p margin of 0px 0px 10px */
+	}
+	.taskPanel {
+		margin-bottom: 10px !important;
+	}
+	.btn {
+		/* Override Bootstrap button styles to emulate Salesforce1 styling */
+		margin: 0;
+		padding: 4px 14px;
+		height: 35px;
+		color:#44596c;
+		font-family: "ProximaNovaSoft-Semibold",Arial,Helvetica,sans-serif;
+		background: -moz-linear-gradient(#ffffff,#f1f1f1);
+		background: -webkit-linear-gradient(#ffffff,#f1f1f1);
+		background: -ms-linear-gradient(#ffffff,#f1f1f1);
+		background: linear-gradient(#ffffff,#f1f1f1);
+		box-shadow: none;
+	}
+	.btn:active {
+		/* Override Bootstrap button styles to emulate Salesforce1 styling */
+	    background: #e9e9e9;
+	}
+	@media (max-width : 280px) {
+		.hideContentSmallScreen {
+			display: none;
+		}	
+	}
+	.panel-title {
+		font-size: 10pt !important;
+		line-height: 1.228 !important;
+	}
+	.panel-body {
+		padding: 5px 8px !important;
+	}
+	.panel-heading {
+		padding: 5px 8px !important;
+		color: #333333 !important;
+	}
+	.taskAction {
+		clear: both;
+		float: right;
+	}
+	.strikeThrough {
+		text-decoration: line-through;
+	}
+	.priorityIcon {
+		width:10px;
+		height:13px;
+		overflow:hidden;
+	}

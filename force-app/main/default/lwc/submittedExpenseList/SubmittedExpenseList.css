@@ -1,0 +1,5 @@
+.blueRow{
+    background-color: blue !important;
+    color: red;
+    pointer-events: none;
+}

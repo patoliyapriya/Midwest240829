@@ -1,0 +1,13 @@
+.headerbg {
+    /* background: #1a0000; */
+    background: #011242;
+}
+
+.headerfont {
+    font-weight: bold;
+}
+
+input {
+    border: none;
+    outline: none;
+}

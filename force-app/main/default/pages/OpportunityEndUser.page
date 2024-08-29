@@ -1,0 +1,12 @@
+<apex:page standardController="Account" extensions="OpportunityEndUser" applyHtmlTag="false" showheader="false"> 
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockTable value="{!lstOpportunity}" var="opp">
+                <apex:column value="{!opp.Name}"/>
+                <apex:column value="{!opp.StageName}"/>
+                <apex:column value="{!opp.Total_Base_Bid_Total_Quote__c}"/>
+                <apex:column value="{!opp.CloseDate}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
