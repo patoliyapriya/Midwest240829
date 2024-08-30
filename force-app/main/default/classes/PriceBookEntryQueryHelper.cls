@@ -23,6 +23,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                                     addConditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true).
                                                     addConditionIncludes(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MIDWEST_GROUP_OFFICE,office).
                                                     orderBy(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_NAME,PriceBookEntryConstants.CONSTANT_ASC).
@@ -49,6 +51,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                                     addCondition(
                                                         Query.doAnd(
                                                             Query.conditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true),
@@ -84,6 +88,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                                     addConditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true).
                                                     addConditionIncludes(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MIDWEST_GROUP_OFFICE,office).
                                                     addConditionGt(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_NAME,lastProductName).
@@ -112,6 +118,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                                     addCondition(
                                                         Query.doAnd(
                                                             Query.conditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true),
@@ -148,6 +156,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                                     addConditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true).
                                                     addConditionIncludes(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MIDWEST_GROUP_OFFICE,office).
                                                     addConditionLt(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_NAME,firstProductName).
@@ -176,6 +186,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                                     selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                                    selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                                     addCondition(
                                                         Query.doAnd(
                                                             Query.conditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true),
@@ -270,6 +282,8 @@ public with sharing class PriceBookEntryQueryHelper {
                                         selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_DESCRIPTION).  
                                         selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MANUFACTURER).
                                         selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_ID).  
+                                        selectField(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_TYPE).
+                                        selectField(PriceBookEntryConstants.RELATIONSHIP_HIDE_PRODUCT).
                                         addConditionEq(PriceBookEntryConstants.RELATIONSHIP_PRICEBOOK_IS_STANDARD,true).
                                         addConditionEq(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_NAME,'Freight').
                                         addConditionIncludes(PriceBookEntryConstants.RELATIONSHIP_PRODUCT_MIDWEST_GROUP_OFFICE,office).

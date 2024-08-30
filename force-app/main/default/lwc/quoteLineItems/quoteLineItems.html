@@ -125,7 +125,19 @@
                         <td data-label="Code" class="wrapText">
                             {lineItem.code}
                         </td>
-                        <td class="slds-cell-edit slds-cell_action-mode wrapText thWidth" role="gridcell">
+                        <td class="slds-cell-edit slds-cell_action-mode wrapText thWidth" role="gridcell" onmouseenter={handleShowButton} onmouseleave={handleHideButton}>
+                            <template if:false={editDescription}>
+                                <lightning-button-icon class="slds-float_right" 
+                                                    icon-name="utility:edit"
+                                                    alternative-text="Update First Name" 
+                                                    title="Update First Name" 
+                                                    variant="bare"
+                                                    size="medium" 
+                                                    data-id={lineItem.lineItemId} 
+                                                    onclick={showRichTextModal} 
+                                                    if:true={showButton}>
+                                </lightning-button-icon>
+                            </template>
                             <lightning-formatted-rich-text value={lineItem.description}
                                                         class="decriptionRow" 
                                                         data-id={lineItem.lineItemId} 

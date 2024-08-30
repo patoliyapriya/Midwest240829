@@ -15,6 +15,8 @@ public with sharing class ProductWrapper {
     @AuraEnabled public String productCode;
     @AuraEnabled public Decimal listPrice;
     @AuraEnabled public String productSummary;
+    @AuraEnabled public String productType;
+    @AuraEnabled public Boolean hideProduct;
 
     /**
     * @description : Constructor
@@ -39,5 +41,7 @@ public with sharing class ProductWrapper {
         this.productSummary = priceBookEntry.Product2.Description;
         this.manufacturer = priceBookEntry.Product2.Manufacturer__c;
         this.listPrice = priceBookEntry.UnitPrice;
+        this.hideProduct = priceBookEntry.Product2.HideProduct__c;
+        this.productType=priceBookEntry.Product2.Product_Type__c;
     }
 }

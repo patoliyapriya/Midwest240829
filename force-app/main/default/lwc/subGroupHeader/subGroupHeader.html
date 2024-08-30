@@ -9,11 +9,18 @@
 <template>
     <template if:true={addProducts}>
         <c-manage-product onhideaddproduct={handleHideAddProduct} 
-                    quote-details={quoteDetails} 
+                        quote-details={quoteDetails} 
+                        onshownewproduct={handleshownewproduct}
                         subgroup-id={subGroupDetails.subGroupId}
                         is-marrs={isMarrs}>
         </c-manage-product>
     </template>
+
+    <template if:true={newProducts}>
+        <c-new-product-modal onhidenewproduct={handleHideNewProduct}>
+        </c-new-product-modal>
+    </template>
+    
     <template if:true={showDeleteModal}>
         <c-delete-modal record-id={subGroupDetails.subGroupId} 
                         is-from="Sub Group" 

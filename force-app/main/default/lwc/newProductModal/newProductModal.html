@@ -1,0 +1,230 @@
+<template>
+    <lightning-spinner alternative-text="Loading" size="medium" variant="brand" if:true={isLoading}>
+    </lightning-spinner>
+    <section role="dialog" 
+             tabindex="-1" 
+             aria-labelledby="modal-heading-01" 
+             aria-modal="true"
+             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+
+        <div class="slds-modal__container">
+
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+                        title="Close"
+                        onclick={handleClose}>
+                         <lightning-icon icon-name="utility:close"
+                                         alternative-text="close" 
+                                         variant="inverse" 
+                                         size="small"
+                                         class="slds-c-icon-color">
+                         </lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+
+                <h2 id="modal-heading-01" 
+                   class="slds-text-heading_medium slds-hyphenate">
+                  Add New Product
+                </h2>
+            </header>
+             
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">  
+
+                <lightning-layout class=" slds-var-p-around_small">
+                    <lightning-layout-item flexibility="auto">
+                      <label class="slds-float_right slds-m-right_medium "><abbr class="slds-required"
+                          title=" = Required Information"><b>*</b> </abbr> = Required Information</label>
+                    </lightning-layout-item>
+                </lightning-layout>
+                 
+                <lightning-layout class=" slds-var-p-around_medium slds-m-top_small background ">
+                    <lightning-layout-item flexibility="auto">
+                      <label class="slds-float_left  slds-text-heading_small">Information</label>
+                </lightning-layout-item>
+                </lightning-layout>
+
+                <div class="slds-grid slds-p-top_small">
+                        <div class="slds-col slds-col slds-order_2 slds-large-order_1">
+                            <div class="slds-col slds-p-left_small slds-size_small slds-align_absolute-left ">
+                                    <lightning-input    type="text" 
+                                                        data-name = "productName"
+                                                        field-name="productName" 
+                                                        value={productName} 
+                                                        label="Product Name"
+                                                        required="true" 
+                                                        onchange={handleProductName}>
+                                    </lightning-input>  
+                            </div>            
+                        </div>
+                        <div class="slds-col slds-order_1 slds-large-order_2">
+                            <div class=" slds-size_small ">
+                                <lightning-combobox data-name="Manufacturer" 
+                                                    value={manufacturer} 
+                                                    label="Manufacturer" 
+                                                    placeholder="--None--"
+                                                    options={manufacturerPickListValues}
+                                                    onchange={handleManufacturer} 
+                                                    required="true">
+                                </lightning-combobox>
+                            </div>
+                        </div>
+                </div> 
+                
+                <div class="slds-grid slds-p-top_medium">
+                    <div class="slds-col slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-p-left_small slds-size_small slds-align_absolute-left ">
+                                <lightning-input    type="text" 
+                                                    data-name = "productCode"
+                                                    field-name="productCode" 
+                                                    value={productCode} 
+                                                    label="product Code"
+                                                    onchange={handleProductCode}>
+                                </lightning-input>  
+                        </div>            
+                    </div>
+                    <div class="slds-col slds-order_1 slds-large-order_2">
+                        <div class=" slds-size_small ">  
+                            <template if:true={showProductType}>                       
+                            <lightning-combobox 
+                                                data-name = "productType"
+                                              
+                                                label="Product Type" 
+                                                placeholder="--None--"
+                                                options={productTypePickListValues}
+                                                onchange={handleproductType} 
+                                                required="true">
+                            </lightning-combobox>
+                            </template>
+                            <template if:false={showProductType}>                       
+                                <lightning-combobox name="productType" 
+                                                    label="Product Type" 
+                                                    placeholder="--None--"
+                                                    disabled>
+                                </lightning-combobox>
+                                </template>
+                            </div>
+                    </div>
+                 </div>   
+            
+            <div class="slds-grid slds-p-top_medium">
+                <div class="slds-col slds-col slds-order_2 slds-large-order_1">
+                    <div class="slds-col slds-p-left_small slds-size_small slds-align_absolute-left ">
+                            <lightning-textarea required="true" 
+                                                data-name="productSummary"
+                                                field-name="ProductSummary" 
+                                                value={productSummary} 
+                                                label="Product Summary"
+                                                onchange={handleProductSummary}>
+                            </lightning-textarea>  
+                    </div>            
+                </div>
+                <div class="slds-col slds-order_1 slds-large-order_2">
+                    <div>
+                           <div class="slds-size_small slds-p-top_large ">
+                                <lightning-input    type="checkbox" 
+                                                    checked
+                                                    field-name="Active" 
+                                                    label="Active"
+                                                    onchange={handleActiveCheckbox}>
+                                </lightning-input>  
+                            </div>
+                   </div>                                  
+                </div>
+        </div>   
+
+        <div class="slds-grid slds-p-top_medium">
+                <div class="slds-col slds-col slds-order_2 slds-large-order_1">
+                    <div class="slds-col slds-p-left_small slds-size_x-large slds-align_absolute-left ">
+                        <lightning-dual-listbox name="languages"
+                                        label= "Midwest Group Office"
+                                        source-label="Available"
+                                        selected-label="Selected"
+                                        options={groupOffice}
+                                        size="4"
+                                        onchange={handleMidWestGroupOfficeChange}>
+                        </lightning-dual-listbox>
+                    </div>            
+                </div>
+                <div class="slds-col slds-order_1 slds-large-order_2">
+                        <div class=" slds-size_small slds-p-top_x-large">                       
+                            <lightning-input  
+                                             type="number" 
+                                            data-name="weight"
+                                            field-name="Weight" 
+                                            label="Weight"
+                                            onchange={handleWeightChange}>
+                            </lightning-input>  
+                        </div> 
+                </div>
+        </div> 
+        
+        <div class="slds-grid  slds-p-top_medium">
+            <div class="slds-col slds-p-horizontal_medium">
+                    <div class="slds-col slds-p-left_small  slds-align_absolute-left ">
+                        <lightning-input-rich-text 
+                                                    label="Product Description"
+                                                    data-name="productDescription"
+                                                    label-visible
+                                                    required = "true"
+                                                    formats={allowedFormats} 
+                                                    class="visibleLines"
+                                                    onchange={handleProductDescription}             
+                                                    share-with-entity-id={recordId}>
+                        </lightning-input-rich-text> 
+                    </div>            
+            </div>
+        </div>
+        
+        
+            <lightning-layout class=" slds-var-p-around_medium slds-m-top_medium background ">
+                <lightning-layout-item flexibility="auto">
+                <label class="slds-float_left  slds-text-heading_small">Add Standard Price</label>
+            </lightning-layout-item>
+            </lightning-layout>
+
+            <div class="slds-grid">
+                    <div class="slds-grid ">
+                                <div class="slds-col slds-p-left_small slds-p-top_medium slds-size_small slds-align_absolute-left ">
+                                        <lightning-input    type="text" 
+                                                            data-name="standardPrice"
+                                                            field-name="Standard Price" 
+                                                            value={standardPrice} 
+                                                            label="Standard Price"
+                                                            required="true" 
+                                                            onchange={handlestandardPrice}>
+                                        </lightning-input>  
+                                </div>
+                    </div>
+            </div>
+     </div>
+
+            <footer class="slds-modal__footer">
+                <div class="slds-col slds-size_1-of-3 slds-align_absolute-center">
+                    <lightning-button   variant="Neutral" 
+                                        label="Cancle"  
+                                        title="Primary action"
+                                        onclick={handleClose} 
+                                        >
+                    </lightning-button>
+
+                    <!-- <lightning-button   variant="brand" 
+                                        label="Save & New"  
+                                        data-name="saveAndNew"
+                                        title="Primary action"
+                                        onclick={handleSaveNewProduct} 
+                                        class="slds-p-left_small slds-p-right_small">
+                   </lightning-button> -->
+
+                    <lightning-button   variant="brand" 
+                                        data-name="save"
+                                        label="Save"  
+                                        title="Primary action"
+                                        class="slds-p-left_small"
+                                        onclick={handleSaveNewProduct}>
+                    </lightning-button>
+                </div>
+            </footer>
+
+        </div>
+    </section>
+</template>

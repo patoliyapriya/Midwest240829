@@ -151,6 +151,7 @@ public with sharing class ManageProductController {
         lineItemObj.List_Price__c = 0;
         lineItemObj.ProductId__c = product.Id;
         lineItemObj.Row_Index__c = rowIndex + 1; 
+        lineItemObj.Hide_Code__c = product.HideProduct__c;
         return lineItemObj;
     }
 

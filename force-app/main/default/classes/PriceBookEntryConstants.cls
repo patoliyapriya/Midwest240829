@@ -22,6 +22,8 @@ public with sharing class PriceBookEntryConstants {
     public static final String RELATIONSHIP_PRODUCT_MIDWEST_GROUP_OFFICE = 'Product2.Midwest_Group_Office__c';
     public static final String RELATIONSHIP_PRICEBOOK_IS_STANDARD = 'Pricebook2.IsStandard';
     public static final String RELATIONSHIP_PRODUCT_ID = 'Product2.Id';
+    public static final String RELATIONSHIP_PRODUCT_TYPE = 'Product2.Product_Type__c';
+    public static final String RELATIONSHIP_HIDE_PRODUCT = 'Product2.HideProduct__c';
 
     //constant
     public static final String CONSTANT_ASC = 'ASC';

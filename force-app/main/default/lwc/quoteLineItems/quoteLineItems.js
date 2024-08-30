@@ -61,6 +61,7 @@ export default class QuoteLineItems extends LightningElement {
     @track groupIdOfdraggedItem;
     @track subGroupIdOfdropItem;
     @track groupIdOfdropItem;
+    @track showButton = false;
 
     messageContext = createMessageContext();
 
@@ -577,5 +578,13 @@ export default class QuoteLineItems extends LightningElement {
           
             event.target.value = input;
             }
+    }
+
+    handleShowButton() {
+        this.showButton = true;
+    }
+    
+    handleHideButton() {
+        this.showButton = false;
     }
 }

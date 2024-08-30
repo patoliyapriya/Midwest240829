@@ -1,5 +1,6 @@
 import {api, track} from "lwc";
 import { LightningElement} from 'lwc';
+import LightningConfirm  from 'lightning/confirm';
 import { NavigationMixin } from "lightning/navigation";
 import cancelLabel from "@salesforce/label/c.CancelButtonLabel";
 import newGroupLabel from "@salesforce/label/c.NewGroup";
@@ -93,14 +94,32 @@ export default class QuoteHeader extends NavigationMixin(LightningElement) {
         }
     }
 
-    handleCancel() {
-        this[NavigationMixin.Navigate]({
+    // handleCancel() {
+    //     this[NavigationMixin.Navigate]({
+    //         type: NAV_CONSTANT.STANDARDRECORDPAGE,
+    //         attributes: {
+    //             recordId: this.quoteid,
+    //             actionName: NAV_CONSTANT.VIEW
+    //         }
+    //     });
+    // }
+
+    async handleCancel() {
+
+        const result = await LightningConfirm.open({
+            theme: 'warning',
+            label: 'Warning!',
+            message : ' You will lose any unsaved data. Are you sure?',
+        });
+        if(result){
+            this[NavigationMixin.Navigate]({
             type: NAV_CONSTANT.STANDARDRECORDPAGE,
             attributes: {
                 recordId: this.quoteid,
                 actionName: NAV_CONSTANT.VIEW
             }
-        });
+          });
+        }
     }
 
     handleNewGroup() {

@@ -66,7 +66,13 @@
                 </div>
                 <footer class="slds-modal__footer">
                     <div class="slds-grid slds-wrap">
-                        <div class="slds-col slds-size_1-of-3 "></div>
+                        <lightning-button variant="brand"
+                                        label="New Product" title="Primary action"
+                                        onclick={handleNewProductButton}
+                                        class="slds-align_absolute-left">
+                        </lightning-button>
+                        <!-- <div class="slds-col slds-size_1-of-3 "></div> -->
+                        <div class="slds-col  slds-align_absolute-left"></div> 
                         <div class="slds-col slds-size_1-of-3 slds-align_absolute-center">
                             <button class="slds-button slds-button_neutral" 
                                     onclick={handlePrevious}

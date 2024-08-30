@@ -21,6 +21,7 @@ const CLASS_CONSTANT = {
     DATAIDSEARCH : `[data-id="searchBar"]`,
     BOTTOMMARGIN : 'bottom_margin',
     HIDEADDPRODUCT : 'hideaddproduct',
+    SHOWNEWPRODUCT :'shownewproduct'
 };
 
 const EVENT_CONSTANT = {
@@ -60,9 +61,10 @@ export default class ManageProduct extends LightningElement {
     columns = [
         { label: 'Product Name', fieldName: 'name'},
         { label: 'Product Code', fieldName: 'code'},
-        { label: 'List Price', fieldName: 'listPrice'},
+        // { label: 'List Price', fieldName: 'listPrice'},
         { label: 'Product Summary', fieldName: 'productSummary'},
-        { label: 'Manufacturer', fieldName: 'manufacturer'}
+        { label: 'Manufacturer', fieldName: 'manufacturer'},
+        { label: 'Product Type', fieldName: 'productType'},
     ];
 
     label = {addProduct,
@@ -295,6 +297,10 @@ export default class ManageProduct extends LightningElement {
 
     handleContinue() {
         this.saveProductsToLineItem();
+    }
+
+    handleNewProductButton(){
+        this.dispatchEvent(new CustomEvent(CLASS_CONSTANT.SHOWNEWPRODUCT));    
     }
 
     async saveProductsToLineItem() {

@@ -60,6 +60,8 @@ export default class SubGroupHeader extends LightningElement {
     @track rowIndexOfdropItem;
     @track subGroupIdOfdraggedItem;
     @track rowIndexOfdraggedLineItem;
+    @track newProducts = false;
+    @track isOpen = true;
 
     oldMultiplier = '';
     oldMargin = '';
@@ -166,6 +168,15 @@ export default class SubGroupHeader extends LightningElement {
             this.setAllSelectionStyle(this.subGroupDetails.alternate);
         }
     } 
+
+    handleshownewproduct(){
+        this.addProducts = false;
+        this.newProducts = true;
+    }
+    handleHideNewProduct(){
+        this.addProducts = true;
+        this.newProducts = false;
+    }
 
     handleFirstNameEdit() {
         this.editFirstName = true;

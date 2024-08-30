@@ -22,6 +22,7 @@ public with sharing class ProductQueryHelper {
                                                     selectField(ProductConstants.FIELD_NAME_DESCRIPTION).
                                                     selectField(ProductConstants.FIELD_NAME_MANUFACTURER).
                                                     selectField(ProductConstants.FIELD_NAME_FAMILY).
+                                                    selectField(ProductConstants.FIELD_NAME_HIDE_PRODUCT).
                                                     selectField(ProductConstants.FIELD_NAME_WEIGHT).
                                                     selectField(ProductConstants.FIELD_NAME_PRODUCT_TYPE).
                                                     addConditionIn(ManagedObject.FIELD_NAME_ID,ProductIds).

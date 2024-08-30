@@ -17,6 +17,7 @@ public with sharing class ProductConstants {
     public static final String FIELD_NAME_FAMILY = 'Family';
     public static final String FIELD_NAME_WEIGHT = 'Weight__c';
     public static final String FIELD_NAME_PRODUCT_TYPE = 'Product_Type__c';
+    public static final String FIELD_NAME_HIDE_PRODUCT = 'HideProduct__c';
 
     //constant
     public static final String CONSTANT_ASC = 'ASC';
