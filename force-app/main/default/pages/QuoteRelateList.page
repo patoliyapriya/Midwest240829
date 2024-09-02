@@ -50,6 +50,12 @@
             font-weight: bold;
             float: left;
         }   
+
+        .scrollableTable {
+            max-height: 134px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        } 
         
     </style>
     <script>
@@ -100,28 +106,31 @@
             <apex:pageBlockButtons location="top">
                 <apex:commandButton value="New Quote" action="{!newQuote}" />
             </apex:pageBlockButtons>
-            <apex:pageBlockTable value="{!lstQuote}" var="quote">
-                <apex:column headerValue="Action">
-                    <apex:outputLink value="/{!quote.Id}/e?retURL=/{!quote.Id}&cancelURL=/{!Opportunity.Id}" target="_parent">Edit</apex:outputLink>&nbsp; | &nbsp;
-                    <apex:commandLink value="Del" action="{!deleteQuote}" reRender="pbId" status="splashStatus" oncomplete="refreshPage('{!Opportunity.Id}');">
-                        <apex:param value="{!quote.Id}" name="quoteId" assignTo="{!deleteQuoteId}"/>
-                    </apex:commandLink>
-                </apex:column>
-                <apex:column headerValue="Quote Number">
-                    <apex:outputLink value="/{!quote.Id}" target="_parent">{!quote.QuoteNumber}</apex:outputLink>
-                </apex:column>
-                <apex:column headerValue="Name">
-                    <apex:outputLink value="/{!quote.Id}" target="_parent">{!quote.Name}</apex:outputLink>
-                </apex:column>
-                <apex:column headerValue="Is Primary?" style="text-align:center;" headerClass="alignCenter">
-                    <apex:inputCheckbox disabled="true" rendered="{!quote.Id == Opportunity.Sync_Quote__c}" value="{!quote.Id == Opportunity.Sync_Quote__c}"></apex:inputCheckbox>
-                    <apex:inputCheckbox onclick="makeQuotePrimary('{!quote.Id}', this);" rendered="{!quote.Id != Opportunity.Sync_Quote__c}" ></apex:inputCheckbox>
-                </apex:column>
-                <apex:column value="{!quote.Is_Locked__c}" style="text-align:center;" headerClass="alignCenter"/>
-                <apex:column value="{!quote.Total_Base_Bid_Total__c}" headerValue="Total Base Bid" style="text-align:right;" headerClass="alignRight"/>
-                <apex:column value="{!quote.Total_Project_Margin__c}" style="text-align:right;" headerClass="alignRight"/>
-                <apex:column value="{!quote.Total_Project_Margin_Percentage__c}" style="text-align:right;" headerClass="alignRight"/>
-            </apex:pageBlockTable>
+
+            <div class="scrollableTable">
+                <apex:pageBlockTable value="{!lstQuote}" var="quote">
+                    <apex:column headerValue="Action">
+                        <apex:outputLink value="/{!quote.Id}/e?retURL=/{!quote.Id}&cancelURL=/{!Opportunity.Id}" target="_parent">Edit</apex:outputLink>&nbsp; | &nbsp;
+                        <apex:commandLink value="Del" action="{!deleteQuote}" reRender="pbId" status="splashStatus" oncomplete="refreshPage('{!Opportunity.Id}');">
+                            <apex:param value="{!quote.Id}" name="quoteId" assignTo="{!deleteQuoteId}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:column headerValue="Quote Number">
+                        <apex:outputLink value="/{!quote.Id}" target="_parent">{!quote.QuoteNumber}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="Name">
+                        <apex:outputLink value="/{!quote.Id}" target="_parent">{!quote.Name}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="Is Primary?" style="text-align:center;" headerClass="alignCenter">
+                        <apex:inputCheckbox disabled="true" rendered="{!quote.Id == Opportunity.Sync_Quote__c}" value="{!quote.Id == Opportunity.Sync_Quote__c}"></apex:inputCheckbox>
+                        <apex:inputCheckbox onclick="makeQuotePrimary('{!quote.Id}', this);" rendered="{!quote.Id != Opportunity.Sync_Quote__c}" ></apex:inputCheckbox>
+                    </apex:column>
+                    <apex:column value="{!quote.Is_Locked__c}" style="text-align:center;" headerClass="alignCenter"/>
+                    <apex:column value="{!quote.Total_Base_Bid_Total__c}" headerValue="Total Base Bid" style="text-align:right;" headerClass="alignRight"/>
+                    <apex:column value="{!quote.Total_Project_Margin__c}" style="text-align:right;" headerClass="alignRight"/>
+                    <apex:column value="{!quote.Total_Project_Margin_Percentage__c}" style="text-align:right;" headerClass="alignRight"/>
+                </apex:pageBlockTable>
+            </div>
         </apex:pageBlock>
     </apex:form>
 </apex:page>
